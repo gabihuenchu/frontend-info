@@ -3306,11 +3306,17 @@ function AppContainer({ children }) {
                                         "loader": ("TURBOPACK compile-time value", "default"),
                                         "dangerouslyAllowSVG": ("TURBOPACK compile-time value", false),
                                         "unoptimized": ("TURBOPACK compile-time value", false),
-                                        "domains": ("TURBOPACK compile-time value", [
-                                            ("TURBOPACK compile-time value", "storage.googleapis.com"),
-                                            ("TURBOPACK compile-time value", "firebasestorage.googleapis.com")
+                                        "domains": ("TURBOPACK compile-time value", []),
+                                        "remotePatterns": ("TURBOPACK compile-time value", [
+                                            ("TURBOPACK compile-time value", {
+                                                "protocol": ("TURBOPACK compile-time value", "https"),
+                                                "hostname": ("TURBOPACK compile-time value", "storage.googleapis.com")
+                                            }),
+                                            ("TURBOPACK compile-time value", {
+                                                "protocol": ("TURBOPACK compile-time value", "https"),
+                                                "hostname": ("TURBOPACK compile-time value", "firebasestorage.googleapis.com")
+                                            })
                                         ]),
-                                        "remotePatterns": ("TURBOPACK compile-time value", []),
                                         "localPatterns": ("TURBOPACK compile-time value", [
                                             ("TURBOPACK compile-time value", {
                                                 "pathname": ("TURBOPACK compile-time value", "**"),

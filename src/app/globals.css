@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Importar tipografías del branding */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Definir variables CSS para colores del branding */
+:root {
+  --verde-oscuro: #2B3210;
+  --blanco-cremoso: #FBF8EF;
+  --rojo-catastrofe: #DE6E27;
+  --azul-grisaceo: #E5E2D9;
+  --verde-oliva: #505631;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--blanco-cremoso);
+  color: var(--verde-oscuro);
+}
+
+/* Component classes */
+.logo-container {
+  @apply flex items-center font-bold;
+}
+
+.catastrofes-text {
+  @apply tracking-tight;
+}
+
+.cl-badge {
+  @apply font-semibold;
+}
+
+/* Utility classes for branding */
+.bg-verde-oscuro {
+  background-color: var(--verde-oscuro);
+}
+
+.bg-blanco-cremoso {
+  background-color: var(--blanco-cremoso);
+}
+
+.bg-rojo-catastrofe {
+  background-color: var(--rojo-catastrofe);
+}
+
+.bg-azul-grisaceo {
+  background-color: var(--azul-grisaceo);
+}
+
+.bg-verde-oliva {
+  background-color: var(--verde-oliva);
+}
+
+.text-verde-oscuro {
+  color: var(--verde-oscuro);
+}
+
+.text-blanco-cremoso {
+  color: var(--blanco-cremoso);
+}
+
+.text-rojo-catastrofe {
+  color: var(--rojo-catastrofe);
+}
+
+.text-azul-grisaceo {
+  color: var(--azul-grisaceo);
+}
+
+.text-verde-oliva {
+  color: var(--verde-oliva);
+}
+
+.border-verde-oscuro {
+  border-color: var(--verde-oscuro);
+}
+
+.border-blanco-cremoso {
+  border-color: var(--blanco-cremoso);
+}
+
+.border-rojo-catastrofe {
+  border-color: var(--rojo-catastrofe);
+}
+
+.border-azul-grisaceo {
+  border-color: var(--azul-grisaceo);
+}
+
+.border-verde-oliva {
+  border-color: var(--verde-oliva);
+}

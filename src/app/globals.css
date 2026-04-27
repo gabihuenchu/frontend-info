@@ -1,13 +1,20 @@
 /* Importar tipografías del branding */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Definir variables CSS para colores del branding */
+/* Definir variables CSS para colores del branding - Tema Oscuro Catástrofes */
 :root {
-  --verde-oscuro: #2B3210;
-  --blanco-cremoso: #FBF8EF;
-  --rojo-catastrofe: #DE6E27;
-  --azul-grisaceo: #E5E2D9;
-  --verde-oliva: #505631;
+  --verde-oscuro: #1a1f1a;
+  --verde-oliva: #2d3420;
+  --verde-acento: #3d4a2b;
+  --rojo-alerta: #dc2626;
+  --rojo-brillante: #ef4444;
+  --blanco-puro: #ffffff;
+  --gris-claro: #f3f4f6;
+  --gris-medio: #6b7280;
+  --gris-oscuro: #374151;
+  --negro: #000000;
+  --verde-claro: #8B9A46;
+  --sombra-fuerte: rgba(0, 0, 0, 0.8);
 }
 
 /* Base styles */
@@ -25,69 +32,89 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--blanco-cremoso);
-  color: var(--verde-oscuro);
+  background-color: var(--negro);
+  color: var(--blanco-puro);
 }
 
-/* Utility classes for branding */
+/* Utility classes for branding - Tema Oscuro */
 .bg-verde-oscuro {
   background-color: var(--verde-oscuro);
-}
-
-.bg-blanco-cremoso {
-  background-color: var(--blanco-cremoso);
-}
-
-.bg-rojo-catastrofe {
-  background-color: var(--rojo-catastrofe);
-}
-
-.bg-azul-grisaceo {
-  background-color: var(--azul-grisaceo);
 }
 
 .bg-verde-oliva {
   background-color: var(--verde-oliva);
 }
 
+.bg-verde-acento {
+  background-color: var(--verde-acento);
+}
+
+.bg-rojo-alerta {
+  background-color: var(--rojo-alerta);
+}
+
+.bg-rojo-brillante {
+  background-color: var(--rojo-brillante);
+}
+
+.bg-blanco-puro {
+  background-color: var(--blanco-puro);
+}
+
+.bg-gris-claro {
+  background-color: var(--gris-claro);
+}
+
+.bg-verde-claro {
+  background-color: var(--verde-claro);
+}
+
+.bg-negro {
+  background-color: var(--negro);
+}
+
 .text-verde-oscuro {
   color: var(--verde-oscuro);
-}
-
-.text-blanco-cremoso {
-  color: var(--blanco-cremoso);
-}
-
-.text-rojo-catastrofe {
-  color: var(--rojo-catastrofe);
-}
-
-.text-azul-grisaceo {
-  color: var(--azul-grisaceo);
 }
 
 .text-verde-oliva {
   color: var(--verde-oliva);
 }
 
+.text-rojo-alerta {
+  color: var(--rojo-alerta);
+}
+
+.text-blanco-puro {
+  color: var(--blanco-puro);
+}
+
+.text-gris-medio {
+  color: var(--gris-medio);
+}
+
+.text-gris-oscuro {
+  color: var(--gris-oscuro);
+}
+
 .border-verde-oscuro {
   border-color: var(--verde-oscuro);
 }
 
-.border-blanco-cremoso {
-  border-color: var(--blanco-cremoso);
+.border-rojo-alerta {
+  border-color: var(--rojo-alerta);
 }
 
-.border-rojo-catastrofe {
-  border-color: var(--rojo-catastrofe);
+.border-blanco-puro {
+  border-color: var(--blanco-puro);
 }
 
-.border-azul-grisaceo {
-  border-color: var(--azul-grisaceo);
+.border-gris-medio {
+  border-color: var(--gris-medio);
 }
 
-.border-verde-oliva {
-  border-color: var(--verde-oliva);
+.border-verde-claro {
+  border-color: var(--verde-claro);
 }
 
 /* Common utility classes */
@@ -250,20 +277,20 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.hover\:text-blanco-cremoso:hover {
-  color: var(--blanco-cremoso);
+.hover\:text-blanco-puro:hover {
+  color: var(--blanco-puro);
 }
 
 .hover\:bg-verde-oliva:hover {
   background-color: var(--verde-oliva);
 }
 
-.hover\:bg-verde-oscuro:hover {
-  background-color: var(--verde-oscuro);
+.hover\:bg-verde-acento:hover {
+  background-color: var(--verde-acento);
 }
 
-.hover\:text-white:hover {
-  color: white;
+.hover\:bg-rojo-alerta:hover {
+  background-color: var(--rojo-alerta);
 }
 
 .transition-colors {
@@ -308,4 +335,100 @@ body {
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Estilos específicos para el tema de catástrofes */
+.catastrofes-bg {
+  background: linear-gradient(135deg, var(--negro) 0%, var(--verde-oscuro) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.catastrofes-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/catastrophes-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.login-panel {
+  background: rgba(26, 31, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.alert-box {
+  background: rgba(0, 0, 0, 0.9);
+  border-left: 4px solid var(--rojo-alerta);
+  backdrop-filter: blur(5px);
+}
+
+.input-field {
+  background: rgba(55, 65, 81, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--blanco-puro);
+}
+
+.input-field::placeholder {
+  color: var(--gris-medio);
+}
+
+.input-field:focus {
+  border-color: var(--rojo-brillante);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.btn-primary {
+  background: var(--verde-oliva);
+  color: var(--blanco-puro);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: var(--verde-acento);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-google {
+  background: var(--blanco-puro);
+  color: var(--gris-oscuro);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-google:hover {
+  background: var(--gris-claro);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.alert-icon {
+  color: var(--rojo-brillante);
+  font-size: 20px;
+}
+
+.slogan-text {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.slogan-text .highlight {
+  color: var(--rojo-brillante);
 }

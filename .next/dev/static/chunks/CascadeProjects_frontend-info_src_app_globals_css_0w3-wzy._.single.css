@@ -1,10 +1,17 @@
 /* [project]/CascadeProjects/frontend-info/src/app/globals.css [app-client] (css) */
 :root {
-  --verde-oscuro: #2b3210;
-  --blanco-cremoso: #fbf8ef;
-  --rojo-catastrofe: #de6e27;
-  --azul-grisaceo: #e5e2d9;
-  --verde-oliva: #505631;
+  --verde-oscuro: #1a1f1a;
+  --verde-oliva: #2d3420;
+  --verde-acento: #3d4a2b;
+  --rojo-alerta: #dc2626;
+  --rojo-brillante: #ef4444;
+  --blanco-puro: #fff;
+  --gris-claro: #f3f4f6;
+  --gris-medio: #6b7280;
+  --gris-oscuro: #374151;
+  --negro: #000;
+  --verde-claro: #8b9a46;
+  --sombra-fuerte: #000c;
 }
 
 * {
@@ -16,9 +23,9 @@
 html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--blanco-cremoso);
+  background-color: var(--negro);
   max-width: 100vw;
-  color: var(--verde-oscuro);
+  color: var(--blanco-puro);
   font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   overflow-x: hidden;
 }
@@ -27,60 +34,80 @@ html, body {
   background-color: var(--verde-oscuro);
 }
 
-.bg-blanco-cremoso {
-  background-color: var(--blanco-cremoso);
-}
-
-.bg-rojo-catastrofe {
-  background-color: var(--rojo-catastrofe);
-}
-
-.bg-azul-grisaceo {
-  background-color: var(--azul-grisaceo);
-}
-
 .bg-verde-oliva {
   background-color: var(--verde-oliva);
+}
+
+.bg-verde-acento {
+  background-color: var(--verde-acento);
+}
+
+.bg-rojo-alerta {
+  background-color: var(--rojo-alerta);
+}
+
+.bg-rojo-brillante {
+  background-color: var(--rojo-brillante);
+}
+
+.bg-blanco-puro {
+  background-color: var(--blanco-puro);
+}
+
+.bg-gris-claro {
+  background-color: var(--gris-claro);
+}
+
+.bg-verde-claro {
+  background-color: var(--verde-claro);
+}
+
+.bg-negro {
+  background-color: var(--negro);
 }
 
 .text-verde-oscuro {
   color: var(--verde-oscuro);
 }
 
-.text-blanco-cremoso {
-  color: var(--blanco-cremoso);
-}
-
-.text-rojo-catastrofe {
-  color: var(--rojo-catastrofe);
-}
-
-.text-azul-grisaceo {
-  color: var(--azul-grisaceo);
-}
-
 .text-verde-oliva {
   color: var(--verde-oliva);
+}
+
+.text-rojo-alerta {
+  color: var(--rojo-alerta);
+}
+
+.text-blanco-puro {
+  color: var(--blanco-puro);
+}
+
+.text-gris-medio {
+  color: var(--gris-medio);
+}
+
+.text-gris-oscuro {
+  color: var(--gris-oscuro);
 }
 
 .border-verde-oscuro {
   border-color: var(--verde-oscuro);
 }
 
-.border-blanco-cremoso {
-  border-color: var(--blanco-cremoso);
+.border-rojo-alerta {
+  border-color: var(--rojo-alerta);
 }
 
-.border-rojo-catastrofe {
-  border-color: var(--rojo-catastrofe);
+.border-blanco-puro {
+  border-color: var(--blanco-puro);
 }
 
-.border-azul-grisaceo {
-  border-color: var(--azul-grisaceo);
+.border-gris-medio {
+  border-color: var(--gris-medio);
 }
 
-.border-verde-oliva {
-  border-color: var(--verde-oliva);
+.border-verde-claro {
+  border-color: var(--verde-claro);
 }
 
 .min-h-screen {
@@ -242,20 +269,20 @@ html, body {
   box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -2px #0000000d;
 }
 
-.hover\:text-blanco-cremoso:hover {
-  color: var(--blanco-cremoso);
+.hover\:text-blanco-puro:hover {
+  color: var(--blanco-puro);
 }
 
 .hover\:bg-verde-oliva:hover {
   background-color: var(--verde-oliva);
 }
 
-.hover\:bg-verde-oscuro:hover {
-  background-color: var(--verde-oscuro);
+.hover\:bg-verde-acento:hover {
+  background-color: var(--verde-acento);
 }
 
-.hover\:text-white:hover {
-  color: #fff;
+.hover\:bg-rojo-alerta:hover {
+  background-color: var(--rojo-alerta);
 }
 
 .transition-colors {
@@ -300,6 +327,100 @@ html, body {
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.catastrofes-bg {
+  background: linear-gradient(135deg, var(--negro) 0%, var(--verde-oscuro) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.catastrofes-bg:before {
+  content: "";
+  opacity: .4;
+  z-index: -1;
+  background-image: url("/images/catastrophes-bg.jpg");
+  background-position: center;
+  background-size: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.login-panel {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: #1a1f1af2;
+  border: 1px solid #ffffff1a;
+}
+
+.alert-box {
+  border-left: 4px solid var(--rojo-alerta);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  background: #000000e6;
+}
+
+.input-field {
+  color: var(--blanco-puro);
+  background: #3741514d;
+  border: 1px solid #fff3;
+}
+
+.input-field::placeholder {
+  color: var(--gris-medio);
+}
+
+.input-field:focus {
+  border-color: var(--rojo-brillante);
+  box-shadow: 0 0 0 3px #ef44441a;
+}
+
+.btn-primary {
+  background: var(--verde-oliva);
+  color: var(--blanco-puro);
+  border: none;
+  transition: all .3s;
+}
+
+.btn-primary:hover {
+  background: var(--verde-acento);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px #0000004d;
+}
+
+.btn-google {
+  background: var(--blanco-puro);
+  color: var(--gris-oscuro);
+  border: 1px solid #0000001a;
+}
+
+.btn-google:hover {
+  background: var(--gris-claro);
+}
+
+.feature-icon {
+  background: #ffffff1a;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.alert-icon {
+  color: var(--rojo-brillante);
+  font-size: 20px;
+}
+
+.slogan-text {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.slogan-text .highlight {
+  color: var(--rojo-brillante);
 }
 
 /*# sourceMappingURL=CascadeProjects_frontend-info_src_app_globals_css_0w3-wzy._.single.css.map*/

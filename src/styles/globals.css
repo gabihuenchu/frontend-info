@@ -466,6 +466,7 @@ body {
   padding: 1.7rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  color-scheme: dark;
 }
 
 .login-logo {
@@ -523,6 +524,13 @@ body {
   margin-bottom: 1rem;
 }
 
+.login-document-row {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
 .login-field {
   position: relative;
 }
@@ -558,6 +566,58 @@ body {
   border-color: var(--verde-claro);
   box-shadow: 0 0 0 3px rgba(139, 154, 70, 0.2);
   background: rgba(0, 0, 0, 0.4);
+}
+
+.login-field input:-webkit-autofill,
+.login-field input:-webkit-autofill:hover,
+.login-field input:-webkit-autofill:focus,
+.login-field input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--blanco-puro);
+  -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.35) inset;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.35) inset;
+  caret-color: var(--blanco-puro);
+  transition: background-color 9999s ease-out 0s;
+}
+
+.login-select-field {
+  min-width: 0;
+}
+
+.login-select {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 154, 70, 0.55);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--blanco-puro);
+  padding: 0 2.1rem 0 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.8) 50%), linear-gradient(135deg, rgba(255, 255, 255, 0.8) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 18px, calc(100% - 12px) 18px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.login-select:hover {
+  border-color: rgba(139, 154, 70, 0.8);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.login-select:focus {
+  border-color: var(--verde-claro);
+  box-shadow: 0 0 0 3px rgba(139, 154, 70, 0.2);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.login-select option {
+  background: var(--verde-oscuro);
+  color: var(--blanco-puro);
 }
 
 .login-password-toggle {
@@ -688,6 +748,10 @@ body {
 @media (max-width: 640px) {
   .login-page {
     padding: 0.8rem;
+  }
+
+  .login-document-row {
+    grid-template-columns: 1fr;
   }
 
   .login-card {

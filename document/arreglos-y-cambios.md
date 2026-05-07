@@ -20,6 +20,36 @@
 
 ## Cambios Aplicados
 
+### [ARR-013] Cambios en flujo de registro y validación RUT (frontend)
+- **Fecha:** 2026-05-06
+- **Autor:** Camilo / Claude
+- **Tipo:** Feature | Bugfix | UX
+- **Error relacionado:** ERR-EMAIL-EXISTS (observado durante integración)
+- **Descripción del cambio:** Se actualizó el flujo de registro del frontend y se añadió validación/formatado del RUT en el formulario de registro. Cambios principales:
+  - El frontend ahora crea la cuenta en Firebase Auth desde el cliente (Firebase Web SDK), obtiene el `idToken` y llama al endpoint autenticado `POST /auth/firebase/sync` para sincronizar el perfil en `ms-identity`. Esto evita que el backend intente crear de nuevo el mismo correo en Firebase (problema `EMAIL_EXISTS`).
+  - Se agregó formateo automático del RUT en el input (`xx.xxx.xxx-x`) mediante la función `formatRut` y validación con `validateRut` (algoritmo módulo 11) antes de enviar el formulario.
+  - Se mejoró el manejo de errores en la UI para mostrar la propiedad `debugMessage` que devuelve el backend en formato RFC7807 (ProblemDetail).
+- **Archivos afectados:** `frontend-info/src/app/register/page.tsx`, `frontend-info/src/services/auth.service.ts`, `frontend-info/src/services/apiClient.ts`
+- **Tests actualizados:** N/A (recomendado: tests de input RUT y flujo de registro end-to-end)
+
+### [ARR-012] Centralización de configuración CORS en CorsConfig.java (MS Gateway)
+- **Fecha:** 2026-05-06
+- **Autor:** Claude
+- **Tipo:** Config | Refactor
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se creó `CorsConfig.java` en `MS-Api-Gateway/src/main/java/cl/catastrofescl/gateway/config/` para centralizar la configuración de CORS. Se agregaron propiedades configurables: `gateway.cors.enabled` (default: true) y `GATEWAY_CORS_ENABLED` en `.env`. Documentación clara sobre orígenes permitidos, métodos, headers y credenciales. Permite desactivar CORS rápidamente sin modificar código.
+- **Archivos afectados:** `MS-Api-Gateway/src/main/java/.../config/CorsConfig.java`, `MS-Api-Gateway/src/main/resources/application.yml`, `.env`
+- **Tests actualizados:** N/A
+
+### [ARR-011] Implementación de API Gateway (Fase 0.5)
+- **Fecha:** 2026-05-05
+- **Autor:** Claude
+- **Tipo:** Feature
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se implementó `ms-gateway` usando Spring Cloud Gateway (reactivo). Se eliminaron las dependencias legacy WebMVC e integró validación Firebase Admin SDK (bloqueante manejado con Mono.fromCallable), rate limiting con Bucket4j en memoria y configuración de Headers de Seguridad. Además se implementó un `GatewayExceptionHandler` para devolver siempre formato RFC 7807 (Problem Details).
+- **Archivos afectados:** `pom.xml`, `application.yml`, `GatewayApplication.java`, `FirebaseAuthenticationFilter.java`, `RateLimitingFilter.java`, `SecurityHeadersFilter.java`, `GatewayExceptionHandler.java`, `.env`
+- **Tests actualizados:** N/A
+
 ### [ARR-010] Cierre técnico de Fase 1 con endpoints faltantes y suite de pruebas inicial
 - **Fecha:** 2026-05-04
 - **Autor:** Claude
@@ -193,6 +223,15 @@
 - **Tests actualizados:** Pendiente — actualizar en Fase 1
 
 ---
+
+### [ARR-011] Implementación de API Gateway (Fase 0.5)
+- **Fecha:** 2026-05-05
+- **Autor:** Claude
+- **Tipo:** Feature
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se implementó `ms-gateway` usando Spring Cloud Gateway (reactivo). Se eliminaron las dependencias legacy WebMVC e integró validación Firebase Admin SDK (bloqueante manejado con Mono.fromCallable), rate limiting con Bucket4j en memoria y configuración de Headers de Seguridad. Además se implementó un `GatewayExceptionHandler` para devolver siempre formato RFC 7807 (Problem Details).
+- **Archivos afectados:** `pom.xml`, `application.yml`, `GatewayApplication.java`, `FirebaseAuthenticationFilter.java`, `RateLimitingFilter.java`, `SecurityHeadersFilter.java`, `GatewayExceptionHandler.java`, `.env`
+- **Tests actualizados:** N/A
 
 ### [ARR-012] Cambios en flujo de registro y validación RUT (frontend)
 - **Fecha:** 2026-05-06

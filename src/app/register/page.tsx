@@ -132,12 +132,12 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="login-form">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div className="login-field">
-                <Mail size={18} className="login-field-icon" />
+                <User size={18} className="login-field-icon" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Correo electrónico"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Nombres"
                   required
                 />
               </div>
@@ -164,9 +164,10 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.75rem' }}>
-              <div className="login-field">
+            <div className="login-document-row">
+              <div className="login-field login-select-field">
                 <select
+                  className="login-select"
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
                 >
@@ -178,10 +179,13 @@ export default function RegisterPage() {
               <div className="login-field">
                 <Lock size={18} className="login-field-icon" />
                 <input
+                  className="login-document-input"
                   type="text"
                   value={docNumber}
                   onChange={(e) => setDocNumber(formatRut(e.target.value))}
                   placeholder="Número de documento"
+                  autoComplete="off"
+                  style={{ background: '#00000059', color: '#ffffff' }}
                   required
                 />
               </div>

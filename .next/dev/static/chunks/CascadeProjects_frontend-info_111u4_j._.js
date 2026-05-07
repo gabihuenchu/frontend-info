@@ -7,6 +7,7 @@ __turbopack_context__.s([
     ()=>Home
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/CascadeProjects/frontend-info/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/CascadeProjects/frontend-info/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/CascadeProjects/frontend-info/node_modules/next/navigation.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__ = __turbopack_context__.i("[project]/CascadeProjects/frontend-info/node_modules/lucide-react/dist/esm/icons/activity.mjs [app-client] (ecmascript) <export default as Activity>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$waves$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Waves$3e$__ = __turbopack_context__.i("[project]/CascadeProjects/frontend-info/node_modules/lucide-react/dist/esm/icons/waves.mjs [app-client] (ecmascript) <export default as Waves>");
@@ -21,17 +22,40 @@ var _s = __turbopack_context__.k.signature();
 'use client';
 ;
 ;
+;
 function Home() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const [currentBanner, setCurrentBanner] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const banners = [
+        '/images/banner01.png',
+        '/images/banner02.png',
+        '/images/banner03.png'
+    ];
     const handleLogin = ()=>{
         router.push('/login');
     };
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Home.useEffect": ()=>{
+            const interval = setInterval({
+                "Home.useEffect.interval": ()=>{
+                    setCurrentBanner({
+                        "Home.useEffect.interval": (prev)=>(prev + 1) % banners.length
+                    }["Home.useEffect.interval"]);
+                }
+            }["Home.useEffect.interval"], 5000); // Cambiar cada 5 segundos
+            return ({
+                "Home.useEffect": ()=>clearInterval(interval)
+            })["Home.useEffect"];
+        }
+    }["Home.useEffect"], [
+        banners.length
+    ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "min-h-screen catastrofes-bg",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                className: "bg-verde-oscuro/90 backdrop-blur-sm border-b border-gris-medio/20",
+                className: "bg-verde-oliva /90 backdrop-blur-sm border-b border-gris-medio/20",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "container mx-auto px-4 py-4",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -45,7 +69,7 @@ function Home() {
                                         children: "CATÁSTROFES"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 21,
+                                        lineNumber: 37,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -53,13 +77,13 @@ function Home() {
                                         children: "CL"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 22,
+                                        lineNumber: 38,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 20,
+                                lineNumber: 36,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -71,7 +95,7 @@ function Home() {
                                         children: "Inicio"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 25,
+                                        lineNumber: 41,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -80,7 +104,7 @@ function Home() {
                                         children: "Alertas"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 28,
+                                        lineNumber: 44,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -89,7 +113,7 @@ function Home() {
                                         children: "Centros de Acopio"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 31,
+                                        lineNumber: 47,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -98,7 +122,7 @@ function Home() {
                                         children: "Donaciones"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 34,
+                                        lineNumber: 50,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -107,29 +131,29 @@ function Home() {
                                         children: "Iniciar Sesión"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 37,
+                                        lineNumber: 53,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 24,
+                                lineNumber: 40,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                        lineNumber: 19,
+                        lineNumber: 35,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 18,
+                    lineNumber: 34,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 17,
+                lineNumber: 32,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -137,12 +161,28 @@ function Home() {
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "container mx-auto text-center",
                     children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-8 flex justify-center",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                src: "/images/banner01.png",
+                                alt: "Banner CatástrofesCL",
+                                className: "w-full max-w-4xl h-auto rounded-lg shadow-2xl"
+                            }, void 0, false, {
+                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                lineNumber: 69,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                            lineNumber: 68,
+                            columnNumber: 11
+                        }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                             className: "text-5xl lg:text-6xl font-bold text-blanco-puro mb-6",
                             children: "Sistema de Gestión y Monitoreo de Catástrofes"
                         }, void 0, false, {
                             fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 51,
+                            lineNumber: 76,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -150,7 +190,7 @@ function Home() {
                             children: "Monitoreamos en tiempo real las emergencias para proteger vidas, informar y unir a Chile cuando más se necesita."
                         }, void 0, false, {
                             fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 54,
+                            lineNumber: 79,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -162,7 +202,7 @@ function Home() {
                                     children: "Acceder al Sistema"
                                 }, void 0, false, {
                                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 58,
+                                    lineNumber: 83,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -170,24 +210,58 @@ function Home() {
                                     children: "Ver Alertas Activas"
                                 }, void 0, false, {
                                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 64,
+                                    lineNumber: 89,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 57,
+                            lineNumber: 82,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 50,
+                    lineNumber: 66,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 49,
+                lineNumber: 65,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                className: "py-16 px-4 bg-negro/50",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "container mx-auto",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex justify-center",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                            src: "/images/about01.png",
+                            alt: "Sobre CatástrofesCL",
+                            style: {
+                                width: '1200px',
+                                height: 'auto'
+                            },
+                            className: "rounded-lg shadow-2xl"
+                        }, void 0, false, {
+                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                            lineNumber: 100,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                        lineNumber: 99,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                    lineNumber: 98,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                lineNumber: 97,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -204,7 +278,7 @@ function Home() {
                                         className: "alert-icon"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 76,
+                                        lineNumber: 115,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -212,13 +286,13 @@ function Home() {
                                         children: "ALERTAS ACTIVAS"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 77,
+                                        lineNumber: 116,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 75,
+                                lineNumber: 114,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -232,7 +306,7 @@ function Home() {
                                                 children: "Zonas costeras - Riesgo de tsunami"
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 81,
+                                                lineNumber: 120,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -240,13 +314,13 @@ function Home() {
                                                 children: "Región de Valparaíso"
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 82,
+                                                lineNumber: 121,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 80,
+                                        lineNumber: 119,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -257,7 +331,7 @@ function Home() {
                                                 children: "Alta temperatura - Riesgo de incendios"
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 85,
+                                                lineNumber: 124,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -265,374 +339,388 @@ function Home() {
                                                 children: "Región Metropolitana"
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 86,
+                                                lineNumber: 125,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 84,
+                                        lineNumber: 123,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 79,
+                                lineNumber: 118,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                        lineNumber: 74,
+                        lineNumber: 113,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 73,
+                    lineNumber: 112,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 72,
+                lineNumber: 111,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                className: "py-16 px-4 bg-gris-oscuro/20",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "container mx-auto",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "max-w-6xl mx-auto",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-3xl font-bold text-center text-blanco-puro mb-12",
+                                children: "Nuestros Servicios"
+                            }, void 0, false, {
+                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                lineNumber: 136,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "grid md:grid-cols-2 lg:grid-cols-4 gap-6",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-4",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__["Activity"], {
+                                                    className: "w-10 h-10 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 142,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 141,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-xl font-semibold text-blanco-puro mb-2",
+                                                children: "Monitoreo Sísmico"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 144,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio text-sm",
+                                                children: "Detección en tiempo real de movimientos telúricos"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 145,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 140,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-4",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$waves$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Waves$3e$__["Waves"], {
+                                                    className: "w-10 h-10 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 151,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 150,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-xl font-semibold text-blanco-puro mb-2",
+                                                children: "Alertas de Tsunami"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 153,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio text-sm",
+                                                children: "Sistema de alerta temprana y zonas de evacuación"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 154,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 149,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-4",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$flame$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Flame$3e$__["Flame"], {
+                                                    className: "w-10 h-10 text-rojo-brillante"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 160,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 159,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-xl font-semibold text-blanco-puro mb-2",
+                                                children: "Detección de Incendios"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 162,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio text-sm",
+                                                children: "Monitoreo de focos activos y riesgo forestal"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 163,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 158,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-4",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$question$2d$mark$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__HelpCircle$3e$__["HelpCircle"], {
+                                                    className: "w-10 h-10 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 169,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 168,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-xl font-semibold text-blanco-puro mb-2",
+                                                children: "Centro de Ayuda"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 171,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio text-sm",
+                                                children: "Conecta voluntarios y organiza la respuesta"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 172,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 167,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                lineNumber: 139,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                        lineNumber: 135,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                    lineNumber: 134,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                lineNumber: 133,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                 className: "py-16 px-4",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "container mx-auto",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-3xl font-bold text-center text-blanco-puro mb-12",
-                            children: "Servicios de Monitoreo"
-                        }, void 0, false, {
-                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 96,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid md:grid-cols-2 lg:grid-cols-4 gap-8",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$activity$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Activity$3e$__["Activity"], {
-                                                className: "w-8 h-8 text-blanco-puro"
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "max-w-6xl mx-auto",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "text-3xl font-bold text-center text-blanco-puro mb-12",
+                                children: "Plataforma Integral"
+                            }, void 0, false, {
+                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                lineNumber: 185,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "grid md:grid-cols-3 gap-8",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-6",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__["MapPin"], {
+                                                    className: "w-12 h-12 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 191,
+                                                    columnNumber: 19
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 102,
+                                                lineNumber: 190,
                                                 columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 101,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "SISMOS"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 104,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Monitoreo sísmico en tiempo real"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 105,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 100,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$waves$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Waves$3e$__["Waves"], {
-                                                className: "w-8 h-8 text-blanco-puro"
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-2xl font-semibold text-blanco-puro mb-4",
+                                                children: "Centros de Acopio"
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 111,
+                                                lineNumber: 193,
                                                 columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 110,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "TSUNAMIS"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 113,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Alertas tempranas y zonas de evacuación"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 114,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 109,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$flame$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Flame$3e$__["Flame"], {
-                                                className: "w-8 h-8 text-blanco-puro"
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio leading-relaxed",
+                                                children: "Encuentra los centros más cercanos para donar o recibir ayuda. Mapa interactivo en tiempo real."
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 120,
+                                                lineNumber: 194,
                                                 columnNumber: 17
                                             }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 119,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "INCENDIOS"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 122,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Detección de focos activos"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 123,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 118,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$question$2d$mark$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__HelpCircle$3e$__["HelpCircle"], {
-                                                className: "w-8 h-8 text-blanco-puro"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 189,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-6",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
+                                                    className: "w-12 h-12 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 200,
+                                                    columnNumber: 19
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 129,
+                                                lineNumber: 199,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-2xl font-semibold text-blanco-puro mb-4",
+                                                children: "Registro de Necesidades"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 202,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio leading-relaxed",
+                                                children: "Reporta necesidades urgentes en tu comunidad. Sistema validado y coordinado."
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 203,
                                                 columnNumber: 17
                                             }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 128,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "AYUDA"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 131,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Conecta, dona y haz la diferencia"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 132,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 127,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 99,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 198,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "feature-icon mx-auto mb-6",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"], {
+                                                    className: "w-12 h-12 text-verde-claro"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                    lineNumber: 209,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 208,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-2xl font-semibold text-blanco-puro mb-4",
+                                                children: "Seguimiento"
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 211,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-gris-medio leading-relaxed",
+                                                children: "Monitorea el impacto de tus donaciones en tiempo real. Trazabilidad completa."
+                                            }, void 0, false, {
+                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                                lineNumber: 212,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                        lineNumber: 207,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                                lineNumber: 188,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
+                        lineNumber: 184,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 95,
+                    lineNumber: 183,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 94,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "py-16 px-4",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "container mx-auto",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            className: "text-3xl font-bold text-center text-blanco-puro mb-12",
-                            children: "Características Principales"
-                        }, void 0, false, {
-                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 143,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid md:grid-cols-3 gap-8",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__["MapPin"], {
-                                                className: "w-8 h-8 text-blanco-puro"
-                                            }, void 0, false, {
-                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 149,
-                                                columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 148,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "Centros de Acopio"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 151,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Encuentra los centros más cercanos para donar o recibir ayuda."
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 152,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 147,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
-                                                className: "w-8 h-8 text-blanco-puro"
-                                            }, void 0, false, {
-                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 158,
-                                                columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 157,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "Registro de Necesidades"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 160,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Reporta necesidades urgentes en tu comunidad."
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 161,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 156,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "text-center p-6 login-panel rounded-lg",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "feature-icon mx-auto mb-4",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"], {
-                                                className: "w-8 h-8 text-blanco-puro"
-                                            }, void 0, false, {
-                                                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                                lineNumber: 167,
-                                                columnNumber: 17
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 166,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold text-blanco-puro mb-2",
-                                            children: "Seguimiento de Donaciones"
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 169,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-gris-medio",
-                                            children: "Monitorea el impacto de tus donaciones en tiempo real."
-                                        }, void 0, false, {
-                                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                            lineNumber: 170,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                    lineNumber: 165,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                            lineNumber: 146,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 142,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 141,
+                lineNumber: 182,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -648,24 +736,24 @@ function Home() {
                                 children: "PREVENIR"
                             }, void 0, false, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 182,
+                                lineNumber: 225,
                                 columnNumber: 25
                             }, this),
                             ". UNIR ES RESISTIR."
                         ]
                     }, void 0, true, {
                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                        lineNumber: 181,
+                        lineNumber: 224,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 180,
+                    lineNumber: 223,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 179,
+                lineNumber: 222,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
@@ -683,7 +771,7 @@ function Home() {
                                         children: "CATÁSTROFES"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 192,
+                                        lineNumber: 235,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -691,13 +779,13 @@ function Home() {
                                         children: "CL"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 193,
+                                        lineNumber: 236,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 191,
+                                lineNumber: 234,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -707,7 +795,7 @@ function Home() {
                                         children: "© 2024 CatástrofesCL. Todos los derechos reservados."
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 239,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -715,39 +803,39 @@ function Home() {
                                         children: "Plataforma de gestión humanitaria para Chile"
                                     }, void 0, false, {
                                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 240,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                                lineNumber: 195,
+                                lineNumber: 238,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                        lineNumber: 190,
+                        lineNumber: 233,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                    lineNumber: 189,
+                    lineNumber: 232,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-                lineNumber: 188,
+                lineNumber: 231,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/CascadeProjects/frontend-info/src/app/page.tsx",
-        lineNumber: 15,
+        lineNumber: 30,
         columnNumber: 5
     }, this);
 }
-_s(Home, "fN7XvhJ+p5oE6+Xlo0NJmXpxjC8=", false, function() {
+_s(Home, "wHAJWvI3WkGd6UZ/lZHKHivpmBw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$CascadeProjects$2f$frontend$2d$info$2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];

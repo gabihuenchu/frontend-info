@@ -1,20 +1,36 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Activity, Waves, Flame, HelpCircle, Bell, Shield, Users, MapPin } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
+  const [currentBanner, setCurrentBanner] = useState(0);
+  
+  const banners = [
+    '/images/banner01.png',
+    '/images/banner02.png',
+    '/images/banner03.png'
+  ];
 
   const handleLogin = () => {
     router.push('/login');
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % banners.length);
+    }, 5000); // Cambiar cada 5 segundos
+
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
   return (
     <div className="min-h-screen catastrofes-bg">
       {/* Header */}
-      <header className="bg-verde-oscuro/90 backdrop-blur-sm border-b border-gris-medio/20">
+      <header className="bg-verde-oliva
+      /90 backdrop-blur-sm border-b border-gris-medio/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
@@ -48,6 +64,15 @@ export default function Home() {
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
+          {/* Banner Image */}
+          <div className="mb-8 flex justify-center">
+            <img 
+              src="/images/banner01.png" 
+              alt="Banner CatástrofesCL" 
+              className="w-full max-w-4xl h-auto rounded-lg shadow-2xl"
+            />
+          </div>
+          
           <h1 className="text-5xl lg:text-6xl font-bold text-blanco-puro mb-6">
             Sistema de Gestión y Monitoreo de Catástrofes
           </h1>
@@ -64,6 +89,20 @@ export default function Home() {
             <button className="border-2 border-blanco-puro text-blanco-puro px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blanco-puro hover:text-verde-oscuro transition-colors">
               Ver Alertas Activas
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Image */}
+      <section className="py-16 px-4 bg-negro/50">
+        <div className="container mx-auto">
+          <div className="flex justify-center">
+            <img 
+              src="/images/about01.png" 
+              alt="Sobre CatástrofesCL" 
+              style={{ width: '1200px', height: 'auto' }}
+              className="rounded-lg shadow-2xl"
+            />
           </div>
         </div>
       </section>
@@ -90,48 +129,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="py-16 px-4">
+      {/* Services Section */}
+      <section className="py-16 px-4 bg-gris-oscuro/20">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center text-blanco-puro mb-12">
-            Servicios de Monitoreo
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <Activity className="w-8 h-8 text-blanco-puro" />
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center text-blanco-puro mb-12">
+              Nuestros Servicios
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-4">
+                  <Activity className="w-10 h-10 text-verde-claro" />
+                </div>
+                <h3 className="text-xl font-semibold text-blanco-puro mb-2">Monitoreo Sísmico</h3>
+                <p className="text-gris-medio text-sm">
+                  Detección en tiempo real de movimientos telúricos
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">SISMOS</h3>
-              <p className="text-gris-medio">
-                Monitoreo sísmico en tiempo real
-              </p>
-            </div>
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <Waves className="w-8 h-8 text-blanco-puro" />
+              <div className="bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-4">
+                  <Waves className="w-10 h-10 text-verde-claro" />
+                </div>
+                <h3 className="text-xl font-semibold text-blanco-puro mb-2">Alertas de Tsunami</h3>
+                <p className="text-gris-medio text-sm">
+                  Sistema de alerta temprana y zonas de evacuación
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">TSUNAMIS</h3>
-              <p className="text-gris-medio">
-                Alertas tempranas y zonas de evacuación
-              </p>
-            </div>
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <Flame className="w-8 h-8 text-blanco-puro" />
+              <div className="bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-4">
+                  <Flame className="w-10 h-10 text-rojo-brillante" />
+                </div>
+                <h3 className="text-xl font-semibold text-blanco-puro mb-2">Detección de Incendios</h3>
+                <p className="text-gris-medio text-sm">
+                  Monitoreo de focos activos y riesgo forestal
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">INCENDIOS</h3>
-              <p className="text-gris-medio">
-                Detección de focos activos
-              </p>
-            </div>
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <HelpCircle className="w-8 h-8 text-blanco-puro" />
+              <div className="bg-negro/40 p-6 rounded-lg border border-gris-medio/20 hover:border-verde-claro/50 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-4">
+                  <HelpCircle className="w-10 h-10 text-verde-claro" />
+                </div>
+                <h3 className="text-xl font-semibold text-blanco-puro mb-2">Centro de Ayuda</h3>
+                <p className="text-gris-medio text-sm">
+                  Conecta voluntarios y organiza la respuesta
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">AYUDA</h3>
-              <p className="text-gris-medio">
-                Conecta, dona y haz la diferencia
-              </p>
             </div>
           </div>
         </div>
@@ -140,36 +181,38 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center text-blanco-puro mb-12">
-            Características Principales
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-blanco-puro" />
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center text-blanco-puro mb-12">
+              Plataforma Integral
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-6">
+                  <MapPin className="w-12 h-12 text-verde-claro" />
+                </div>
+                <h3 className="text-2xl font-semibold text-blanco-puro mb-4">Centros de Acopio</h3>
+                <p className="text-gris-medio leading-relaxed">
+                  Encuentra los centros más cercanos para donar o recibir ayuda. Mapa interactivo en tiempo real.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">Centros de Acopio</h3>
-              <p className="text-gris-medio">
-                Encuentra los centros más cercanos para donar o recibir ayuda.
-              </p>
-            </div>
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <Users className="w-8 h-8 text-blanco-puro" />
+              <div className="text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-6">
+                  <Users className="w-12 h-12 text-verde-claro" />
+                </div>
+                <h3 className="text-2xl font-semibold text-blanco-puro mb-4">Registro de Necesidades</h3>
+                <p className="text-gris-medio leading-relaxed">
+                  Reporta necesidades urgentes en tu comunidad. Sistema validado y coordinado.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">Registro de Necesidades</h3>
-              <p className="text-gris-medio">
-                Reporta necesidades urgentes en tu comunidad.
-              </p>
-            </div>
-            <div className="text-center p-6 login-panel rounded-lg">
-              <div className="feature-icon mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blanco-puro" />
+              <div className="text-center p-8 bg-gris-oscuro/30 rounded-lg border border-gris-medio/20 hover:border-verde-claro/30 transition-all duration-300">
+                <div className="feature-icon mx-auto mb-6">
+                  <Shield className="w-12 h-12 text-verde-claro" />
+                </div>
+                <h3 className="text-2xl font-semibold text-blanco-puro mb-4">Seguimiento</h3>
+                <p className="text-gris-medio leading-relaxed">
+                  Monitorea el impacto de tus donaciones en tiempo real. Trazabilidad completa.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-blanco-puro mb-2">Seguimiento de Donaciones</h3>
-              <p className="text-gris-medio">
-                Monitorea el impacto de tus donaciones en tiempo real.
-              </p>
             </div>
           </div>
         </div>

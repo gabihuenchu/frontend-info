@@ -1,3 +1,0 @@
-module.exports=[64433,a=>{a.v({className:"inter_5972bc34-module__OU16Qa__className"})},33113,a=>{"use strict";var b=a.i(74957),c=a.i(64433);let d={className:c.default.className,style:{fontFamily:"'Inter', 'Inter Fallback'",fontStyle:"normal"}};null!=c.default.variable&&(d.variable=c.default.variable),a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"es",children:(0,b.jsx)("body",{className:d.className,children:a})})},"metadata",0,{title:"CatástrofesCL - Portal Ciudadano",description:"Plataforma de gestión de recursos humanitarios para catástrofes naturales en Chile"}],33113)},26894,a=>{a.n(a.i(33113))}];
-
-//# sourceMappingURL=%5Broot-of-the-server%5D__0i6i9pq._.js.map

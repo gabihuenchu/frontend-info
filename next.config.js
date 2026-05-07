@@ -20,6 +20,16 @@ const nextConfig = {
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   },
+  async rewrites() {
+    return [
+      {
+        // Intercepta todas las llamadas a /api/*
+        source: '/api/:path*',
+        // Las redirige al MS-Api-Gateway que es el orquestador
+        destination: 'http://localhost:8080/:path*',
+      }
+    ];
+  },
 }
 
 module.exports = nextConfig

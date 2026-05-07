@@ -194,6 +194,18 @@
 
 ---
 
+### [ARR-012] Cambios en flujo de registro y validación RUT (frontend)
+- **Fecha:** 2026-05-06
+- **Autor:** Camilo / Claude
+- **Tipo:** Feature | Bugfix | UX
+- **Error relacionado:** ERR-EMAIL-EXISTS (observado durante integración)
+- **Descripción del cambio:** Se actualizó el flujo de registro del frontend y se añadió validación/formatado del RUT en el formulario de registro. Cambios principales:
+  - El frontend ahora crea la cuenta en Firebase Auth desde el cliente (Firebase Web SDK), obtiene el `idToken` y llama al endpoint autenticado `POST /auth/firebase/sync` para sincronizar el perfil en `ms-identity`. Esto evita que el backend intente crear de nuevo el mismo correo en Firebase (problema `EMAIL_EXISTS`).
+  - Se agregó formateo automático del RUT en el input (`xx.xxx.xxx-x`) mediante la función `formatRut` y validación con `validateRut` (algoritmo módulo 11) antes de enviar el formulario.
+  - Se mejoró el manejo de errores en la UI para mostrar la propiedad `debugMessage` que devuelve el backend en formato RFC7807 (ProblemDetail).
+- **Archivos afectados:** `frontend-info/src/app/register/page.tsx`, `frontend-info/src/services/auth.service.ts`, `frontend-info/src/services/apiClient.ts`
+- **Tests actualizados:** N/A (recomendado: tests de input RUT y flujo de registro end-to-end)
+
 ## Decisiones Técnicas Documentadas
 
 ### [DEC-001] Firebase Auth como proveedor de identidad

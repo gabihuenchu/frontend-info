@@ -432,3 +432,278 @@ body {
 .slogan-text .highlight {
   color: var(--rojo-brillante);
 }
+
+/* Login page redesign */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  background-image: url('/images/Login-FondoCatastrofeCL.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.login-card-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-card {
+  background: rgba(45, 52, 32, 0.72);
+  border: 1px solid rgba(139, 154, 70, 0.5);
+  border-radius: 24px;
+  padding: 1.7rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  margin: 0 auto 0.7rem;
+  padding: 0.3rem 0.45rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.login-logo-image {
+  width: min(100%, 290px);
+  height: auto;
+}
+
+.login-accent-line {
+  width: 56px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--rojo-brillante);
+  margin: 0 0 1rem;
+}
+
+.login-copy {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.login-copy h1,
+.login-copy h2 {
+  font-size: 1.15rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--blanco-puro);
+  margin-bottom: 0.65rem;
+  letter-spacing: -0.5px;
+}
+
+.login-copy p {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+  letter-spacing: -0.2px;
+  max-width: 95%;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.login-field {
+  position: relative;
+}
+
+.login-field-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.login-field input {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 154, 70, 0.55);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--blanco-puro);
+  padding: 0 2.8rem 0 2.8rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: var(--verde-claro);
+  box-shadow: 0 0 0 3px rgba(139, 154, 70, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.login-password-toggle:hover {
+  color: var(--blanco-puro);
+}
+
+.login-submit {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #8B9A46 0%, #7a8a3c 100%);
+  color: var(--blanco-puro);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.login-submit:hover {
+  background: linear-gradient(135deg, #9aaa56 0%, #8B9A46 100%);
+  transform: translateY(-1px);
+}
+
+.login-divider {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+  text-align: center;
+  margin: 0.8rem 0 0.7rem;
+  font-weight: 500;
+}
+
+/* Registrar link under the form */
+.login-register {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.login-register-link {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem 0.5rem;
+}
+
+.login-register-link:hover {
+  color: var(--verde-claro);
+}
+
+
+.login-google {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 154, 70, 0.5);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--blanco-puro);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-google:hover {
+  background: rgba(139, 154, 70, 0.15);
+  border-color: var(--verde-claro);
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.login-features {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.login-feature-item {
+  text-align: center;
+}
+
+.login-feature-icon {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 0.45rem;
+  /* Removed circular background to display only the icon */
+  background: transparent;
+  color: var(--blanco-puro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-feature-item p {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.22;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.3px;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    padding: 0.8rem;
+  }
+
+  .login-card {
+    padding: 1.2rem;
+  }
+
+  .login-logo-image {
+    width: min(100%, 245px);
+  }
+
+  .login-copy h1,
+  .login-copy h2 {
+    font-size: 1.05rem;
+  }
+
+  .login-copy p {
+    font-size: 0.82rem;
+  }
+}

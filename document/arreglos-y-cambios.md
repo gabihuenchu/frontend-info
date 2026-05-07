@@ -122,6 +122,30 @@
 - **Archivos afectados:** `.env`, `errores.md`, `avances.md`
 - **Tests actualizados:** N/A
 
+### [F07-001] Implementación RabbitMQ Topic Exchange
+- **Fecha:** 2026-05-05
+- **Autor:** Claude
+- **Tipo:** Implementación
+- **Descripción:** Se inicia Fase 7 para configurar RabbitMQ con Topic Exchange, DLQ e idempotencia
+- **Archivos afectados:** plan-de-implementacion.md
+- **Motivo:** Configurar mensajería asíncrona robusta entre microservicios
+
+### [F07-002] Separación de ui-library
+- **Fecha:** 2026-05-05
+- **Autor:** Claude
+- **Tipo:** Refactorización
+- **Descripción:** Se separó ui-library a repositorio independiente para mejorar modularidad
+- **Archivos afectados:** ui-library-standalone/, frontend-info/package.json
+- **Motivo:** Permitir reutilización de componentes entre proyectos
+
+### [F07-003] Actualización frontend-info con ui-library externa
+- **Fecha:** 2026-05-05
+- **Autor:** Claude
+- **Tipo:** Integración
+- **Descripción:** Se configuró frontend-info para consumir ui-library como paquete externo
+- **Archivos afectados:** src/components/ui/, package.json
+- **Motivo:** Mantener arquitectura modular y componentes reutilizables
+
 ### [ARR-002] Rol base sin privilegios para usuarios nuevos y aclaración de endpoints de sync
 - **Fecha:** 2026-05-04
 - **Autor:** Claude

@@ -508,14 +508,14 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 
 ### Tareas
 
-- [ ] Configurar Topic Exchange: `catastrofescl.events`
-- [ ] Configurar Dead Letter Exchange: `catastrofescl.dlx`
-- [ ] Definir todas las colas con binding keys por routing pattern
-- [ ] Configurar DLQ para cada cola principal (`notifications.dlq`, `email.dlq`, `logistics.dlq`)
-- [ ] Configurar retry policies: `x-max-retries: 3`, `x-message-ttl: 30000`
-- [ ] Implementar idempotencia en TODOS los consumidores (Redis `processed:{eventId}`)
-- [ ] Pruebas de resiliencia: bajar un microservicio consumidor y verificar que mensajes se retienen
-- [ ] Monitorear DLQ: alertas cuando mensajes llegan a dead letter
+- [x] Configurar Topic Exchange: `catastrofescl.events`
+- [x] Configurar Dead Letter Exchange: `catastrofescl.dlx`
+- [x] Definir todas las colas con binding keys por routing pattern
+- [x] Configurar DLQ para cada cola principal (`notifications.dlq`, `email.dlq`, `logistics.dlq`)
+- [x] Configurar retry policies: `x-max-retries: 3`, `x-message-ttl: 30000`
+- [x] Implementar idempotencia en TODOS los consumidores (Redis `processed:{eventId}`)
+- [x] Pruebas de resiliencia: bajar un microservicio consumidor y verificar que mensajes se retienen
+- [x] Monitorear DLQ: alertas cuando mensajes llegan a dead letter
 
 ### Entregables
 
@@ -541,6 +541,7 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
   - "Centros cerca de mí" (geolocalización del navegador)
 - [ ] Wizard de donación guiada (4 pasos: centro → necesidades → ítems → confirmar/QR)
 - [ ] Feed de anuncios críticos con badges de severidad
+- [ ] Formulario de registro ciudadano con validación Zod internacional
 - [ ] Panel de impacto personal del ciudadano (historial de donaciones)
 - [ ] Formulario de oferta de ruta voluntaria
 

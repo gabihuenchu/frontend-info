@@ -1,12 +1,18 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import './inicio.css';
 import '@/styles/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
 export const metadata: Metadata = {
-  title: 'CatástrofesCL - Portal Ciudadano',
-  description: 'Plataforma de gestión de recursos humanitarios para catástrofes naturales en Chile',
+  title: 'CatástrofesCL — Sistema Nacional de Coordinación y Monitoreo',
+  description:
+    'Plataforma nacional de coordinación, monitoreo y gestión de recursos humanitarios para catástrofes naturales en Chile. Conectamos ciudadanos, autoridades y voluntarios.',
+  keywords: 'catástrofes, Chile, emergencias, monitoreo, donaciones, centros de acopio',
+  openGraph: {
+    title: 'CatástrofesCL — Sistema Nacional de Monitoreo',
+    description: 'Coordinación y gestión de recursos humanitarios para catástrofes en Chile.',
+    locale: 'es_CL',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
@@ -16,9 +22,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
-        {children}
-      </body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

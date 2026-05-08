@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './inicio.css';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'CatástrofesCL — Sistema Nacional de Coordinación y Monitoreo',

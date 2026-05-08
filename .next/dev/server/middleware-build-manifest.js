@@ -1,30 +1,6 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
-    "/_app": [
-      "static/chunks/0i-z_next_dist_compiled_10el0k7._.js",
-      "static/chunks/0i-z_next_dist_shared_lib_0h58gxg._.js",
-      "static/chunks/0i-z_next_dist_client_0i2mcde._.js",
-      "static/chunks/0i-z_next_dist_03u.jrb._.js",
-      "static/chunks/0i-z_next_app_0hl.~lm.js",
-      "static/chunks/[next]_entry_page-loader_ts_09b~cdk._.js",
-      "static/chunks/0i-z_react-dom_0_.wtjq._.js",
-      "static/chunks/0i-z_06i.fax._.js",
-      "static/chunks/[root-of-the-server]__0iw4jgb._.js",
-      "static/chunks/CascadeProjects_frontend-info_pages__app_07xvfw~._.js",
-      "static/chunks/turbopack-CascadeProjects_frontend-info_pages__app_08qw4bj._.js"
-    ],
-    "/_error": [
-      "static/chunks/0i-z_next_dist_compiled_10el0k7._.js",
-      "static/chunks/0i-z_next_dist_shared_lib_0.phgum._.js",
-      "static/chunks/0i-z_next_dist_client_0i2mcde._.js",
-      "static/chunks/0i-z_next_dist_0qp4ry5._.js",
-      "static/chunks/[next]_entry_page-loader_ts_04bn_b_._.js",
-      "static/chunks/0i-z_react-dom_0_.wtjq._.js",
-      "static/chunks/0i-z_06i.fax._.js",
-      "static/chunks/[root-of-the-server]__0nq_mto._.js",
-      "static/chunks/CascadeProjects_frontend-info_pages__error_07xvfw~._.js",
-      "static/chunks/turbopack-CascadeProjects_frontend-info_pages__error_00_o4~s._.js"
-    ]
+    "/_app": []
   },
   "devFiles": [],
   "polyfillFiles": [

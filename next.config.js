@@ -22,6 +22,16 @@ const nextConfig = {
   },
   // Soluciona problemas de cross-origin en desarrollo
   allowedDevOrigins: ['192.168.1.18', 'localhost:3000'],
+  async rewrites() {
+    return [
+      {
+        // Intercepta todas las llamadas a /api/*
+        source: '/api/:path*',
+        // Las redirige al MS-Api-Gateway que es el orquestador
+        destination: 'http://localhost:8080/:path*',
+      }
+    ];
+  },
 }
 
 module.exports = nextConfig

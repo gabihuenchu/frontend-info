@@ -15,7 +15,7 @@
 | Fase 5 | MS Coordinación de Emergencias | ⬜ No iniciado | 0% |
 | Fase 6 | MS Notificaciones + Lambda | ⬜ No iniciado | 0% |
 | Fase 7 | Integración RabbitMQ Completa | 🔄 En progreso | 80% |
-| Fase 8 | Frontend Completo | ⬜ No iniciado | 0% |
+| Fase 8 | Frontend Completo | 🔄 En progreso | 10% |
 | Fase 9 | QA, Hardening y Producción | ⬜ No iniciado | 0% |
 
 **Leyenda:** ⬜ No iniciado | 🔄 En progreso | ✅ Completado | 🔴 Bloqueado
@@ -47,6 +47,71 @@
 
 ## Registro de Avances
 
+### [2026-05-05] Conexión de Formulario de Registro e Integración de Redirección
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+### Completado
+- Se conectó el formulario de `RegisterPage` con el servicio `AuthService.register` (Axios).
+- Se implementó la lógica de redirección post-registro hacia `/login?registered=true`.
+- Se añadió un mensaje de éxito (advertencia visual) en `LoginPage` que se activa al detectar el parámetro `registered`.
+- Se actualizaron los campos del formulario de registro para incluir Nombres, Apellidos, Tipo de Documento y Número de Documento, cumpliendo con los requisitos de la API.
+- Se corrigió un error de desajuste de nombres de campos: se cambió `email` por `correo` en las interfaces de servicio para coincidir con los DTOs de Spring Boot, solucionando el error 500 en el registro.
+- Se implementó `Suspense` en `LoginPage` para el manejo de parámetros de búsqueda en Next.js.
+
+### En progreso
+- Implementación de la autenticación real con Firebase Auth SDK en el frontend para el Login.
+- Sincronización del estado de autenticación global.
+
+### Bloqueadores
+- Ninguno.
+
+### Próximos pasos
+- Configurar el Firebase Auth SDK en el frontend para permitir el inicio de sesión real.
+- Integrar la llamada a `AuthService.syncFirebase` tras el login exitoso en Firebase.
+
+### [2026-05-05] Creación de Servicios API para MS Identidad y Acceso
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+### Completado
+- Se creó el cliente base de `axios` en `src/services/apiClient.ts` con configuración para el Base URL (`http://localhost:8081`).
+- Se implementaron los servicios para consumir los 17 endpoints documentados en `ENDPOINTS.md`:
+  - `auth.service.ts`: Endpoints de registro, sincronización y envío/aceptación de invitaciones.
+  - `usuario.service.ts`: Endpoints de gestión de perfiles, roles, estados y solicitudes de rol.
+  - `rol.service.ts`: Endpoints para asignación y remoción de permisos a roles.
+  - `permiso.service.ts`: Endpoint para listar permisos.
+
+### En progreso
+- Integración de los servicios creados (como `AuthService.register`) en las páginas de frontend correspondientes (`RegisterPage`, etc.).
+- Auto-refresh del Firebase Token en el interceptor de Axios (Fase 8).
+
+### Bloqueadores
+- Ninguno.
+
+### Próximos pasos
+- Aplicar validación Zod en formularios e invocar los servicios `axios` para registrar/sincronizar los usuarios con la BD.
+
+### [2026-05-05] UI de Formulario de Registro Ciudadano
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+### Completado
+- Se implementó la interfaz visual de `RegisterPage` en `frontend-info` para coincidir exactamente con el diseño solicitado (`LoginRegister.png`).
+- Se reutilizaron las clases de `globals.css` (e.g. `.login-page`, `.login-card`) garantizando consistencia con `LoginPage`.
+- Se añadieron los iconos de Lucide React y los estados de los campos del formulario.
+
+### En progreso
+- Validación Zod internacional para los campos del formulario.
+- Integración real con el endpoint `/auth/register`.
+
+### Bloqueadores
+- Ninguno.
+
+### Próximos pasos
+- Implementar validación Zod y conexión con backend.
+
+### [2026-05-04] Cierre de Fase 1 — MS Identidad y Acceso
 #### [2026-05-05] Inicio Fase 7 — Integración RabbitMQ
 
 **Integrante(s):** Claude

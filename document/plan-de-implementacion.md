@@ -310,6 +310,11 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 - `@PreAuthorize` por roles funcionando en todos los endpoints
 - Swagger UI disponible en `localhost:8081/swagger-ui.html`
 
+**Notas de integración frontend (actualizadas 2026-05-06):**
+- El frontend de registro (`frontend-info`) fue actualizado para crear la cuenta en Firebase desde el cliente, obtener el `idToken` y llamar `POST /auth/firebase/sync` para sincronizar el perfil en `ms-identity`. Esto evita errores `EMAIL_EXISTS` cuando el cliente y el servidor intentan crear la misma cuenta en Firebase.
+- El campo de documento (RUT) en el formulario de registro ahora aplica formateo automático `xx.xxx.xxx-x` y validación con módulo 11 antes de enviar. UX: se evita enviar RUTs inválidos al backend y se mejora la experiencia de entrada.
+- El frontend muestra ahora el `debugMessage` proporcionado por el backend (RFC7807 ProblemDetail) para exponer errores claros al usuario en caso de fallos de sincronización.
+
 ---
 
 ## Fase 2 — MS Operaciones de Recursos
@@ -527,6 +532,8 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 ### Frontend de Información (Portal Ciudadano — Next.js SSR)
 
 - [ ] Layout base + sistema de rutas App Router
+- [x] Página de Iniciar Sesión (UI base completada)
+- [x] Página de Registro / Formulario ciudadano (UI completada, pendiente validación Zod)
 - [ ] Mapa interactivo público (Leaflet + OpenStreetMap):
   - Marcadores coloreados por estado de centro
   - Popups con necesidades críticas

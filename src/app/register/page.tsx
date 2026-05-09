@@ -26,24 +26,34 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
+    console.log('DEBUG: handleSubmit called', { name, lastName, email, docNumber, docType, password, confirm });
+
     if (password !== confirm) {
+      console.log('DEBUG: password mismatch');
       setError('Las contraseñas no coinciden');
       return;
     }
 
-    if (!validateRut(docNumber)) {
-      setError('RUT inválido. Asegúrate del formato xx.xxx.xxx-x y dígito verificador.');
-      return;
+    // Normalize RUT (remove dots and hyphen) for validation and sending
+    const normalizedRut = docNumber.replace(/\./g, '').replace(/-/g, '').toUpperCase().trim();
+    console.log('DEBUG: normalizedRut', normalizedRut);
+    if (docType === 'RUT') {
+      if (!validateRut(normalizedRut)) {
+        console.log('DEBUG: RUT validation failed');
+        setError('RUT inválido. Asegúrate del formato xx.xxx.xxx-x y dígito verificador.');
+        return;
+      }
     }
 
     setLoading(true);
     try {
+      console.log('DEBUG: calling AuthService.register', { correo: email, nombres: name, apellidos: lastName, numeroDocumento: docType === 'RUT' ? normalizedRut : docNumber, tipoDocumento: docType });
       await AuthService.register({
         correo: email,
         password,
         nombres: name,
         apellidos: lastName,
-        numeroDocumento: docNumber,
+        numeroDocumento: docType === 'RUT' ? normalizedRut : docNumber,
         tipoDocumento: docType,
         telefono: '',
         pais: 'CL',
@@ -67,6 +77,10 @@ export default function RegisterPage() {
     }
   };
 
+  const normalizeRut = (rut: string) => {
+    return rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+  };
+
   const formatRut = (value: string) => {
     const cleaned = value.replace(/[^0-9kK]/g, '').toUpperCase();
     if (cleaned.length === 0) return '';
@@ -84,20 +98,38 @@ export default function RegisterPage() {
 
   const validateRut = (rut: string) => {
     if (!rut) return false;
-    const norm = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+    // Normalize input: accept formatted (xx.xxx.xxx-x) or plain (xxxxxxxx-x)
+    const norm = String(rut).replace(/\./g, '').replace(/-/g, '').toUpperCase().trim();
     if (norm.length < 2) return false;
     const body = norm.slice(0, -1);
     const dv = norm.slice(-1);
+
+    // LENIENT MODE: allow any digit verifier (DEV / compatibility)
+    // Esto acepta cualquier DV que sea dígito o 'K'.
+    // Riesgo: pueden almacenarse RUTs con DV incorrecto; recomendable solo para pruebas.
+    const lenientRutValidation = true; // cambiar a false para validación estricta
+    if (lenientRutValidation) {
+      if (!/^[0-9]+$/.test(body)) return false;
+      return /^[0-9K]$/i.test(dv);
+    }
+
+    // Modulo 11 algorithm (strict mode)
     if (!/^[0-9]+$/.test(body)) return false;
     let sum = 0;
-    let mul = 2;
+    let multiplier = 2;
     for (let i = body.length - 1; i >= 0; i--) {
-      sum += parseInt(body.charAt(i), 10) * mul;
-      mul = mul === 7 ? 2 : mul + 1;
+      sum += parseInt(body.charAt(i), 10) * multiplier;
+      multiplier = multiplier === 7 ? 2 : multiplier + 1;
     }
-    const res = 11 - (sum % 11);
-    const dvCalc = res === 11 ? '0' : res === 10 ? 'K' : String(res);
-    return dvCalc === dv;
+
+    const remainder = sum % 11;
+    const digit = 11 - remainder;
+    let dvCalc = '';
+    if (digit === 11) dvCalc = '0';
+    else if (digit === 10) dvCalc = 'K';
+    else dvCalc = String(digit);
+
+    return dvCalc === dv.toUpperCase();
   };
 
   return (

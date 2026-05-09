@@ -93,6 +93,14 @@ export const AuthService = {
       // Obtener el token del usuario creado en Firebase
       const token = await credentials.user.getIdToken();
 
+      // DEBUG: mostrar token corto y payload para depuración local
+      try {
+        console.log('DEBUG: idToken (first 32 chars):', token?.substring(0, 32));
+        console.log('DEBUG: registroPayload', registroPayload);
+      } catch (e) {
+        // no romper en producción si console falla
+      }
+
       // Sincronizar el perfil en el backend usando el endpoint autenticado
       const syncResponse = await AuthService.syncFirebase({
         nombres: data.nombres,

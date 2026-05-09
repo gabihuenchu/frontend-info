@@ -1,5 +1,5 @@
 node_modules
-.next
+.next/
 .env.local
 .env.*.local
 out
@@ -8,3 +8,4 @@ build
 *.log
 .DS_Store
 .vercel
+

@@ -32,6 +32,15 @@
 - **Archivos afectados:** `frontend-info/src/app/register/page.tsx`, `frontend-info/src/services/auth.service.ts`, `frontend-info/src/services/apiClient.ts`
 - **Tests actualizados:** N/A (recomendado: tests de input RUT y flujo de registro end-to-end)
 
+### [ARR-014] Documentación operativa de consumo para ms-emergencies en frontend-info
+- **Fecha:** 2026-05-09
+- **Autor:** Claude
+- **Tipo:** Docs | Decisión técnica
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se actualizó la documentación del frontend para dejar explícito cómo consumir `ms-emergencies` desde el portal ciudadano y el dashboard de autoridades. Se agregó la base URL recomendada del Gateway (`http://localhost:8080`), el contrato de endpoints públicos/protegidos, ejemplos de request/response, y las tareas faltantes en el plan de implementación para integrar el mapa, el feed de anuncios y el manejo de errores de negocio.
+- **Archivos afectados:** `document/ENDPOINTS.md`, `document/especificaciones-tecnicas.md`, `document/plan-de-implementacion.md`
+- **Tests actualizados:** N/A
+
 ### [ARR-012] Centralización de configuración CORS en CorsConfig.java (MS Gateway)
 - **Fecha:** 2026-05-06
 - **Autor:** Claude

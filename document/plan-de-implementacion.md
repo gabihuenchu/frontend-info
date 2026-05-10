@@ -454,6 +454,8 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 - [ ] Implementar `POST /anuncios` — (requiere `ANUNCIO_PUBLICAR`)
 - [ ] Implementar `GET /anuncios` — activos, público sin auth
 - [ ] Publicar eventos: `emergency.created`, `emergency.status.changed`, `announcement.published`
+- [ ] Documentar el contrato real de consumo en `document/ENDPOINTS.md` para que el frontend use `http://localhost:8080`
+- [ ] Alinear el panel ciudadano con los endpoints públicos reales del MS: `GET /emergencies/active`, `GET /emergencies/active/geojson` y `GET /announcements`
 
 ### Entregables
 
@@ -539,6 +541,11 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
   - Popups con necesidades críticas
   - Filtros por región/comuna/tipo de necesidad
   - "Centros cerca de mí" (geolocalización del navegador)
+- [ ] Cliente API para emergencias y anuncios apuntando al gateway (`NEXT_PUBLIC_API_URL=http://localhost:8080`)
+- [ ] Hook `useActiveEmergencies` para consumir `GET /emergencies/active`
+- [ ] Hook `useActiveEmergenciesGeoJson` para consumir `GET /emergencies/active/geojson` y pintar polígonos
+- [ ] Hook `useAnnouncements` para consumir `GET /announcements?page=0&size=20`
+- [ ] Manejo de estados vacíos y errores `400/403/404/409` en el portal ciudadano
 - [ ] Wizard de donación guiada (4 pasos: centro → necesidades → ítems → confirmar/QR)
 - [ ] Feed de anuncios críticos con badges de severidad
 - [ ] Formulario de registro ciudadano con validación Zod internacional

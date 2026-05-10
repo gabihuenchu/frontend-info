@@ -686,6 +686,23 @@ public void configurarUmbrales(...) { ... }
 | `vigente_hasta`    | timestamptz  |                      | null = sin expiración                       |
 | `creado_en`        | timestamptz  | NOT NULL             |                                              |
 
+**Consumo desde frontend**
+
+- Base recomendada: `http://localhost:8080` (API Gateway).
+- Lecturas públicas para el portal ciudadano:
+  - `GET /emergencies/active` → listado de emergencias activas.
+  - `GET /emergencies/active/geojson` → poligonos GeoJSON para mapas.
+  - `GET /announcements?page=0&size=20` → anuncios vigentes paginados.
+- Operaciones para dashboard de autoridades:
+  - `POST /emergencies` → declarar emergencia.
+  - `PATCH /emergencies/{id}/status` → cambiar estado.
+  - `GET /emergencies/{id}` → detalle completo.
+  - `POST /announcements` → publicar anuncio asociado.
+- Recomendación de UI:
+  - Mapas: consumir primero GeoJSON y luego enriquecer con listado plano.
+  - Feed: paginar anuncios y resaltar severidad con badges.
+  - Errores: tratar `400`, `403`, `404` y `409` como mensajes de negocio legibles.
+
 ---
 
 ### Dominio: Operaciones de Recursos (`ms-resources`)

@@ -47,6 +47,68 @@
 
 ## Registro de Avances
 
+### [2026-05-09] Documentación de consumo de ms-emergencies para frontend-info
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+#### Completado
+- Se actualizó `ENDPOINTS.md` con el contrato de consumo de `ms-emergencies` desde el frontend.
+- Se reforzó `especificaciones-tecnicas.md` con el uso de `GET /emergencies/active`, `GET /emergencies/active/geojson` y `GET /announcements`.
+- Se agregaron tareas faltantes al `plan-de-implementacion.md` para conectar el mapa ciudadano, el feed de anuncios y el manejo de errores de negocio.
+- Se registró el cambio documental en `arreglos-y-cambios.md` para mantener trazabilidad.
+
+#### En progreso
+- Integración visual del mapa público con datos reales de emergencias.
+- Consumo de anuncios críticos desde el portal ciudadano.
+
+#### Bloqueadores
+- Ninguno.
+
+#### Próximos pasos
+- Implementar los hooks y clientes API documentados para `ms-emergencies`.
+- Conectar el mapa y el feed de anuncios al gateway.
+
+### [2026-05-09] Refactorización Panel de Emergencias y Sidebar Component
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+#### Completado
+- **Refactorización del Panel de Emergencias**: Transformación del modal de creación/edición a un panel lateral derecho persistente con tabs dinámicos (Detalles, Crear Emergencia, Centros de Acopio).
+- **Nuevo Componente Sidebar**: Creación de componente reutilizable `Sidebar` en `src/components/sidebar.tsx` con:
+  - Navegación lateral completa con iconos Lucide
+  - Sistema de menú activo con estados hover/focus
+  - Card de estado del sistema (conexión en tiempo real)
+  - Card de ayuda/CTA
+  - Sección de usuario dinámica con nombre, rol y toggle de tema oscuro/claro
+- **Migración Tailwind CSS**: Configuración estable de Tailwind v3 con PostCSS para compatibilidad con Next.js 16 y Turbopack:
+  - `postcss.config.js`: plugin `tailwindcss` + `autoprefixer`
+  - `globals.css`: directivas `@tailwind base/components/utilities` (sintaxis v3)
+  - Configuración validada y funcionando en entorno local
+- **Reemplazo de Emojis por Iconos**: Todos los emojis del dashboard de emergencias fueron reemplazados por iconos vectoriales de Lucide:
+  - Iconos de tipos de emergencia: Flame, Waves, CloudRain, Zap, Mountain
+  - Iconos de UI: ClipboardList, AlertTriangle, Warehouse, Clock, MapPin, Pencil, Trash2, Bell, etc.
+  - Iconos de KPIs: TrendingUp, Users, Truck, Plane
+  - Toggle de tema: Moon/Sun
+- **Panel Derecho Dinámico**: Implementación de `PanelDerecho` con:
+  - Tabs navegables entre vistas (detalles, crear/editar emergencia, centros, crear centro)
+  - Formularios integrados para creación de emergencias y centros de acopio
+  - Herramientas de mapa para dibujar zonas afectadas (Dibujar, Editar, Borrar)
+  - Lista de centros de acopio con distancia y estado operativo
+
+#### En progreso
+- Integración del Sidebar en otras páginas del dashboard
+- Implementación de drawing de polígonos reales en el mapa (Google Maps API)
+
+#### Bloqueadores
+- Google Maps API requiere API Key para mostrar mapa sin watermark (no bloqueante para desarrollo UI)
+
+#### Próximos pasos
+- Conectar el panel de emergencias con el backend real (endpoints de ms-emergencies)
+- Implementar funcionalidad de dibujo de polígonos con Google Maps Drawing API
+- Agregar integración de autenticación para mostrar nombre/rol real del usuario en sidebar
+
+---
+
 ### [2026-05-05] Conexión de Formulario de Registro e Integración de Redirección
 **Integrante(s):** Claude
 **Fase trabajada:** Fase 8 — Frontend Completo

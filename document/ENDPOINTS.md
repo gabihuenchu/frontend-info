@@ -1,6 +1,7 @@
 # 📋 MS Identidad y Acceso - Documentación de Endpoints
 
-**Base URL:** `http://localhost:8081`
+**Base URL (MS Identidad):** `http://localhost:8081`
+**Base URL recomendada desde frontend:** `http://localhost:8080` (API Gateway)
 
 ---
 
@@ -325,6 +326,116 @@
 - **Errores:** Los códigos de error incluyen mensajes descriptivos
 - **UUIDs:** Todos los IDs son de tipo UUID v4
 - **Validación:** Los DTOs incluyen validaciones que pueden retornar errores de validación (400 Bad Request)
+
+---
+
+## 🌪️ Emergencias y Anuncios - Consumo desde Frontend
+
+> Este bloque documenta el contrato de consumo para el portal ciudadano y el dashboard de autoridades. Desde el frontend se recomienda llamar siempre al API Gateway y no al microservicio directo.
+
+### Base URL de consumo
+- `http://localhost:8080`
+
+### Endpoints públicos para el portal ciudadano
+
+#### 1. Listar emergencias activas
+- **Método:** `GET`
+- **Ruta:** `/emergencies/active`
+- **Autenticación:** No requerida
+- **Respuesta:** lista de emergencias activas con datos geoespaciales básicos
+- **Uso frontend:** listado, tarjetas, alertas y filtros rápidos
+
+#### 2. Obtener GeoJSON de emergencias activas
+- **Método:** `GET`
+- **Ruta:** `/emergencies/active/geojson`
+- **Autenticación:** No requerida
+- **Respuesta:** `FeatureCollection` GeoJSON
+- **Uso frontend:** render de polígonos en mapa Leaflet / React Leaflet
+
+#### 3. Listar anuncios vigentes
+- **Método:** `GET`
+- **Ruta:** `/announcements?page=0&size=20`
+- **Autenticación:** No requerida
+- **Respuesta:** paginada, con `content`, `totalElements`, `totalPages`
+- **Uso frontend:** feed de anuncios críticos, banners y panel informativo
+
+### Endpoints protegidos para dashboard de autoridades
+
+#### 4. Declarar emergencia
+- **Método:** `POST`
+- **Ruta:** `/emergencies`
+- **Permiso requerido:** `EMERGENCIA_DECLARAR`
+- **Body esperado:** `tipo`, `severidad`, `region`, `epicentro`, `zonaImpacto`
+- **Respuesta:** `201 Created` con la emergencia creada
+
+#### 5. Cambiar estado de emergencia
+- **Método:** `PATCH`
+- **Ruta:** `/emergencies/{id}/status`
+- **Permiso requerido:** `EMERGENCIA_GESTIONAR`
+- **Body esperado:** `nuevoEstado`
+- **Respuesta:** `200 OK` con la emergencia actualizada
+
+#### 6. Obtener detalle de emergencia
+- **Método:** `GET`
+- **Ruta:** `/emergencies/{id}`
+- **Permiso requerido:** `EMERGENCIA_GESTIONAR`
+- **Respuesta:** detalle completo de la emergencia
+
+#### 7. Publicar anuncio
+- **Método:** `POST`
+- **Ruta:** `/announcements`
+- **Permiso requerido:** `ANUNCIO_PUBLICAR`
+- **Body esperado:** `emergenciaId`, `titulo`, `contenido`, `severidad`, `alcance`, `region`, `vigenteDesde`, `vigenteHasta`
+- **Respuesta:** `201 Created` con el anuncio publicado
+
+### Request y response de referencia
+
+#### Declarar emergencia
+```json
+{
+  "tipo": "TERREMOTO",
+  "severidad": "CRITICA",
+  "region": "Valparaíso",
+  "epicentro": { "latitud": -33.045, "longitud": -71.619 },
+  "zonaImpacto": [
+    { "latitud": -33.04, "longitud": -71.61 },
+    { "latitud": -33.04, "longitud": -71.62 },
+    { "latitud": -33.05, "longitud": -71.62 },
+    { "latitud": -33.05, "longitud": -71.61 },
+    { "latitud": -33.04, "longitud": -71.61 }
+  ]
+}
+```
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "estado": "ACTIVA",
+  "tipo": "TERREMOTO",
+  "severidad": "CRITICA",
+  "region": "Valparaíso"
+}
+```
+
+#### Publicar anuncio
+```json
+{
+  "emergenciaId": "550e8400-e29b-41d4-a716-446655440000",
+  "titulo": "Corte de agua en sector norte",
+  "contenido": "Se recomienda ahorrar agua potable hasta nuevo aviso.",
+  "severidad": "ALTO",
+  "alcance": "REGIONAL",
+  "region": "Valparaíso",
+  "vigenteDesde": "2026-05-09T12:00:00Z",
+  "vigenteHasta": "2026-05-10T12:00:00Z"
+}
+```
+
+### Recomendaciones de consumo
+- Centralizar las rutas en un único cliente `emergencies.service.ts` o `announcements.service.ts`.
+- Manejar `400`, `403`, `404` y `409` como errores de negocio visibles en UI.
+- Para mapas, consumir primero `GET /emergencies/active/geojson` y luego enriquecer con el listado `GET /emergencies/active`.
+- Para notificaciones en tiempo real, combinar polling con React Query mientras el WebSocket de notificaciones no esté integrado.
 
 ---
 

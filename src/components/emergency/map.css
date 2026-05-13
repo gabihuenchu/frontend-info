@@ -1,0 +1,102 @@
+/* Mapa de Emergencias */
+.emergency-map-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  z-index: 100;
+  font-size: 14px;
+}
+
+.map-hint {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  border-radius: 4px;
+}
+
+.hint-text {
+  margin: 0;
+  color: #1565c0;
+  font-size: 14px;
+}
+
+/* Info Window personalizado */
+.info-window-content {
+  min-width: 250px;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.info-window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.info-window-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.info-window-content p {
+  margin: 0.5rem 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.info-window-content strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.info-window-date {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+  color: #999;
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .info-window-content {
+    min-width: 200px;
+  }
+
+  .info-window-header {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .badge {
+    align-self: flex-start;
+  }
+}

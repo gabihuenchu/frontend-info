@@ -1,51 +1,142 @@
 # Avances — CatástrofesCL
-> Bitácora de progreso del proyecto. Actualizar al final de cada sesión o sprint de trabajo.
+
+## Bitácora de Progreso del Proyecto
 
 ---
 
-## Estado General del Proyecto
+## [2025-01-09] Integración Dashboard Emergencias con Backend
 
-| Fase | Nombre | Estado | % Completado |
-|---|---|---|---|
-| Fase 0 | Fundamentos e Infraestructura | 🔄 En progreso | 50% |
-| Fase 1 | MS Identidad y Acceso | ✅ Completado | 100% |
-| Fase 2 | MS Operaciones de Recursos | ⬜ No iniciado | 0% |
-| Fase 3 | MS Participación Ciudadana | ⬜ No iniciado | 0% |
-| Fase 4 | MS Logística | ⬜ No iniciado | 0% |
-| Fase 5 | MS Coordinación de Emergencias | ⬜ No iniciado | 0% |
-| Fase 6 | MS Notificaciones + Lambda | ⬜ No iniciado | 0% |
-| Fase 7 | Integración RabbitMQ Completa | 🔄 En progreso | 80% |
-| Fase 8 | Frontend Completo | 🔄 En progreso | 10% |
-| Fase 9 | QA, Hardening y Producción | ⬜ No iniciado | 0% |
-
-**Leyenda:** ⬜ No iniciado | 🔄 En progreso | ✅ Completado | 🔴 Bloqueado
-
----
-
-## Formato de Entrada de Avance
-
-```
-## [Fecha] Sprint / Sesión — Descripción breve
-
-**Integrante(s):** Nombre(s)
-**Fase trabajada:** Fase X — Nombre
+**Integrante(s):** Claude (Asistente AI)  
+**Fase trabajada:** Fase 5 — Emergencias y Anuncios / Fase 8 — Frontend  
+**Estado:** ✅ Completado
 
 ### Completado
-- Lista de tareas terminadas
 
-### En progreso
-- Tareas iniciadas pero no terminadas
+#### 1. Backend Integration (MS-2: Coordinación de Emergencias)
+- ✅ Servicio de API completo (`services/emergency.service.ts`)
+- ✅ Endpoints integrados: GET /activas, GET /, POST /, PATCH /:id/estado
+- ✅ Tipos TypeScript con validación completa
+- ✅ Manejo de errores RFC 7807
 
-### Bloqueadores
-- Problemas que impiden avanzar (crear issue en errores.md si aplica)
+#### 2. TanStack Query Implementation
+- ✅ Hooks personalizados (`hooks/useEmergencies.ts`)
+- ✅ Query keys estructurados
+- ✅ Refetch automático cada 30 segundos
+- ✅ Mutations con invalidación de cache
+- ✅ Manejo de estados de carga/error
 
-### Próximos pasos
-- Qué se hará en la siguiente sesión
-```
+#### 3. Authentication Flow
+- ✅ Firebase token integration
+- ✅ Interceptor de request con Bearer token
+- ✅ Auto-refresh de tokens expirados
+- ✅ Manejo de errores 401
+
+#### 4. UI/UX Improvements
+- ✅ Estados de carga con spinner animado
+- ✅ Estados de error con retry button
+- ✅ Estados vacíos informativos
+- ✅ Responsive design mantenido
+- ✅ Dark theme optimizado
+
+#### 5. Provider Configuration
+- ✅ ReactQueryProvider con config optimizada
+- ✅ Integración con layout principal
+- ✅ Auth provider anidado correctamente
+
+### Archivos Modificados/Creados
+
+**Creados (8):**
+- `src/services/emergency.service.ts`
+- `src/hooks/useEmergencies.ts`
+- `src/providers/ReactQueryProvider.tsx`
+- `src/app/dashboard/emergency/EmergencyDashboard.tsx`
+
+**Modificados (5):**
+- `src/services/apiClient.ts` - Auth integration
+- `src/app/layout.tsx` - Providers
+- `src/app/dashboard/emergency/page.tsx` - New component
+- `src/app/dashboard/emergency/emergency.css` - New states
+- `package.json` - TanStack Query dep
+
+**Eliminados (1):**
+- `src/app/dashboard/emergency/emergency.tsx` - Reemplazado
+
+### Próximos Pasos
+
+1. **Testing E2E:** Validar flujo completo con backend real
+2. **WebSocket Integration:** Actualizaciones en tiempo real para emergencias
+3. **Formulario Creación:** Implementar modal con validación Zod
+4. **Gráficos Estadísticos:** Integrar Recharts para visualización de datos
+5. **Filtros y Búsqueda:** Agregar funcionalidad de filtrado en tabla
 
 ---
 
-## Registro de Avances
+## Historial de Avances Anteriores
+
+<<<<<<< HEAD
+*(Aquí se mantendrían los avances previos del proyecto)*
+=======
+### [2026-05-09] Documentación de consumo de ms-emergencies para frontend-info
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+#### Completado
+- Se actualizó `ENDPOINTS.md` con el contrato de consumo de `ms-emergencies` desde el frontend.
+- Se reforzó `especificaciones-tecnicas.md` con el uso de `GET /emergencies/active`, `GET /emergencies/active/geojson` y `GET /announcements`.
+- Se agregaron tareas faltantes al `plan-de-implementacion.md` para conectar el mapa ciudadano, el feed de anuncios y el manejo de errores de negocio.
+- Se registró el cambio documental en `arreglos-y-cambios.md` para mantener trazabilidad.
+
+#### En progreso
+- Integración visual del mapa público con datos reales de emergencias.
+- Consumo de anuncios críticos desde el portal ciudadano.
+
+#### Bloqueadores
+- Ninguno.
+
+#### Próximos pasos
+- Implementar los hooks y clientes API documentados para `ms-emergencies`.
+- Conectar el mapa y el feed de anuncios al gateway.
+
+### [2026-05-09] Refactorización Panel de Emergencias y Sidebar Component
+**Integrante(s):** Claude
+**Fase trabajada:** Fase 8 — Frontend Completo
+
+#### Completado
+- **Refactorización del Panel de Emergencias**: Transformación del modal de creación/edición a un panel lateral derecho persistente con tabs dinámicos (Detalles, Crear Emergencia, Centros de Acopio).
+- **Nuevo Componente Sidebar**: Creación de componente reutilizable `Sidebar` en `src/components/sidebar.tsx` con:
+  - Navegación lateral completa con iconos Lucide
+  - Sistema de menú activo con estados hover/focus
+  - Card de estado del sistema (conexión en tiempo real)
+  - Card de ayuda/CTA
+  - Sección de usuario dinámica con nombre, rol y toggle de tema oscuro/claro
+- **Migración Tailwind CSS**: Configuración estable de Tailwind v3 con PostCSS para compatibilidad con Next.js 16 y Turbopack:
+  - `postcss.config.js`: plugin `tailwindcss` + `autoprefixer`
+  - `globals.css`: directivas `@tailwind base/components/utilities` (sintaxis v3)
+  - Configuración validada y funcionando en entorno local
+- **Reemplazo de Emojis por Iconos**: Todos los emojis del dashboard de emergencias fueron reemplazados por iconos vectoriales de Lucide:
+  - Iconos de tipos de emergencia: Flame, Waves, CloudRain, Zap, Mountain
+  - Iconos de UI: ClipboardList, AlertTriangle, Warehouse, Clock, MapPin, Pencil, Trash2, Bell, etc.
+  - Iconos de KPIs: TrendingUp, Users, Truck, Plane
+  - Toggle de tema: Moon/Sun
+- **Panel Derecho Dinámico**: Implementación de `PanelDerecho` con:
+  - Tabs navegables entre vistas (detalles, crear/editar emergencia, centros, crear centro)
+  - Formularios integrados para creación de emergencias y centros de acopio
+  - Herramientas de mapa para dibujar zonas afectadas (Dibujar, Editar, Borrar)
+  - Lista de centros de acopio con distancia y estado operativo
+
+#### En progreso
+- Integración del Sidebar en otras páginas del dashboard
+- Implementación de drawing de polígonos reales en el mapa (Google Maps API)
+
+#### Bloqueadores
+- Google Maps API requiere API Key para mostrar mapa sin watermark (no bloqueante para desarrollo UI)
+
+#### Próximos pasos
+- Conectar el panel de emergencias con el backend real (endpoints de ms-emergencies)
+- Implementar funcionalidad de dibujo de polígonos con Google Maps Drawing API
+- Agregar integración de autenticación para mostrar nombre/rol real del usuario en sidebar
+
+---
 
 ### [2026-05-05] Conexión de Formulario de Registro e Integración de Redirección
 **Integrante(s):** Claude
@@ -351,96 +442,25 @@
 #### Próximos pasos
 - Configurar `FIREBASE_SYNC_SECRET` en entorno.
 - Implementar y desplegar Cloud Function `auth.user().onCreate` para invocar `/auth/firebase/sync/system`.
+>>>>>>> 15444b317d8f95f6ecf85d81fa5dd1ae86a1b33b
 
 ---
 
-### [2026-04-24] Implementación de MS Identidad y Acceso (Fase 1)
+## Leyenda de Estados
 
-**Integrante(s):** Claude  
-**Fase trabajada:** Fase 1 — MS Identidad y Acceso
+- ⬜ No iniciado
+- 🔄 En progreso
+- ✅ Completado
+- ⚠️ Bloqueado/Issue
 
-#### Completado
-- Creación de ramas `develop` y `feature/fase-1-ms-identity` según Git Flow.
-- Configuración de `pom.xml` y `application.yml` (PostgreSQL, Redis, Firebase, Flyway).
-- Implementación de entidades JPA (`Usuario`, `Rol`, `Permiso`, etc.) en español, según reglas DEC-013.
-- Creación de 7 migraciones Flyway (V1 a V7) con el esquema completo y carga inicial de roles/permisos.
-- Implementación de repositorios y servicios (`AuthService`, `UsuarioService`, `PermisosService`, `RolService`).
-- Configuración de Spring Security y `FirebaseTokenFilter` (RBAC stateless, permisos en cache Redis).
-- Implementación de `UsuarioController` y `AuthController` con protección `@PreAuthorize`.
-- **(Nuevo en feature/fase-1-endpoints-faltantes):** Completados TODOS los endpoints del MS Identidad según la Fase 1: `GET /usuarios/yo`, endpoints de asignación/retiro de roles, endpoints de invitaciones, endpoints de solicitud de rol de voluntario, endpoints CRUD de roles/permisos.
-- Fusión de las ramas hacia `develop` en GitHub.
+## Tabla de Estado por Componente
 
-#### En progreso
-- Implementación de tests unitarios y de integración para MS Identidad (Testcontainers).
-- Infraestructura Docker local completa (Fase 0).
-
-#### Bloqueadores
-- Ninguno
-
-#### Próximos pasos
-- Completar los tests para MS Identidad.
-- Avanzar con la configuración local de Docker Compose (Fase 0).
-
----
-
-### [2026-04-19] Inicio del Proyecto — Documentación Base
-
-**Integrante(s):** Equipo completo  
-**Fase trabajada:** Fase 0 — Fundamentos
-
-#### Completado
-- Documento de Arquitectura de Solución entregado
-- Especificaciones técnicas definidas (`especificaciones-tecnicas.md`)
-- Plan de implementación por fases creado (`plan-de-implementacion.md`)
-- Decisiones técnicas documentadas en `arreglos-y-cambios.md`
-- Decisiones clave tomadas:
-  - Firebase Auth como proveedor de identidad (reemplaza JWT propio)
-  - OSRM para matching de voluntarios (rutas viales reales)
-  - Umbrales configurables solo por Administrador, por centro
-  - TanStack Query con hidratación SSR para tiempo real
-  - RabbitMQ: Topic Exchange + DLQ + Idempotencia
-
-#### En progreso
-- Configuración del entorno local (Docker Compose)
-- Creación del proyecto Firebase
-
-#### Bloqueadores
-- Ninguno
-
-#### Próximos pasos
-- Completar Fase 0: Docker Compose local + Firebase project + repositorios GitHub
-- Iniciar Fase 1: estructura base del MS Identidad y Acceso
-
----
-
-## Estadísticas de Progreso
-
-### Microservicios
-| Microservicio | Backend | Tests | Documentación API |
-|---|---|---|---|
-| MS Identidad y Acceso | ✅ | ⬜ | ⬜ |
-| MS Operaciones de Recursos | ⬜ | ⬜ | ⬜ |
-| MS Participación Ciudadana | ⬜ | ⬜ | ⬜ |
-| MS Logística | ⬜ | ⬜ | ⬜ |
-| MS Coordinación de Emergencias | ⬜ | ⬜ | ⬜ |
-| MS Notificaciones | ⬜ | ⬜ | ⬜ |
-
-### Frontend
-| Módulo | Implementado | Tests |
-|---|---|---|
-| Portal Ciudadano (Mapa + Donaciones) | ⬜ | ⬜ |
-| Dashboard Autoridades/Operadores | ⬜ | ⬜ |
-| Componentes shadcn/ui compartidos | ⬜ | ⬜ |
-| Integración WebSocket STOMP | ⬜ | ⬜ |
-
-### Infraestructura
-| Componente | Local (Docker) | Producción (AWS) |
-|---|---|---|
-| PostgreSQL + PostGIS | ⬜ | ⬜ |
-| Redis | ⬜ | ⬜ |
-| RabbitMQ | ⬜ | ⬜ |
-| Firebase Auth | ⬜ | ⬜ |
-| API Gateway | ⬜ | ⬜ |
-| EKS Cluster | N/A | ⬜ |
-| Lambda + SES | ⬜ | ⬜ |
-| CI/CD Pipeline | ⬜ | ⬜ |
+| Componente | Frontend | Backend | Integración | Estado |
+|-----------|----------|---------|-------------|--------|
+| Autenticación | ✅ | ✅ | ✅ | Completado |
+| Dashboard Emergencias | ✅ | ✅ | ✅ | Completado |
+| Gestión de Usuarios | 🔄 | ✅ | 🔄 | En progreso |
+| Centros de Acopio | ⬜ | 🔄 | ⬜ | No iniciado |
+| Inventario | ⬜ | ⬜ | ⬜ | No iniciado |
+| Donaciones | ⬜ | ⬜ | ⬜ | No iniciado |
+| Notificaciones | ⬜ | ⬜ | ⬜ | No iniciado |

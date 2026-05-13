@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const fallbackProjectId = 'catastrofescl-dev';
@@ -11,6 +11,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+let firebaseApp: FirebaseApp | null = null;
 let firebaseAppInitialized = false;
 
 function ensureFirebaseConfig() {
@@ -32,12 +33,23 @@ function ensureFirebaseConfig() {
 }
 
 export function getFirebaseAuthClient() {
+  // En modo desarrollo, si no hay credenciales, retornar null
+  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'your_api_key_here') {
+    console.warn('Firebase no configurado. Modo desarrollo sin autenticación.');
+    return null;
+  }
+
   ensureFirebaseConfig();
 
   if (!firebaseAppInitialized && !getApps().length) {
-    initializeApp(firebaseConfig as any);
+    firebaseApp = initializeApp(firebaseConfig as any);
     firebaseAppInitialized = true;
+  } else if (!firebaseApp && getApps().length) {
+    firebaseApp = getApps()[0];
   }
 
-  return getAuth();
+  return getAuth(firebaseApp);
 }
+
+// Export default para compatibilidad con import existentes
+export default getFirebaseAuthClient;

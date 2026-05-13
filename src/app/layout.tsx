@@ -1,32 +1,30 @@
-import type { Metadata } from 'next';
-import './inicio.css';
-import '@/styles/globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "../styles/globals.css";
+import { AuthProvider } from "@/providers/AuthProvider";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'CatástrofesCL — Sistema Nacional de Coordinación y Monitoreo',
-  description:
-    'Plataforma nacional de coordinación, monitoreo y gestión de recursos humanitarios para catástrofes naturales en Chile. Conectamos ciudadanos, autoridades y voluntarios.',
-  keywords: 'catástrofes, Chile, emergencias, monitoreo, donaciones, centros de acopio',
-  openGraph: {
-    title: 'CatástrofesCL — Sistema Nacional de Monitoreo',
-    description: 'Coordinación y gestión de recursos humanitarios para catástrofes en Chile.',
-    locale: 'es_CL',
-    type: 'website',
-  },
+  title: "CatástrofesCL - Portal de Emergencias",
+  description: "Portal ciudadano para la gestión de recursos humanitarios en catástrofes naturales en Chile",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="es">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body>{children}</body>
+      <body className={inter.className}>
+        <ReactQueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ReactQueryProvider>
+      </body>
     </html>
   );
 }

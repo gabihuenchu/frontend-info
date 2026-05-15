@@ -48,7 +48,13 @@ export function getFirebaseAuthClient() {
     firebaseApp = getApps()[0];
   }
 
-  return getAuth(firebaseApp);
+  const app = firebaseApp ?? getApps()[0];
+
+  if (!app) {
+    throw new Error('No se pudo inicializar Firebase App. Revisa la configuración del frontend.');
+  }
+
+  return getAuth(app);
 }
 
 // Export default para compatibilidad con import existentes

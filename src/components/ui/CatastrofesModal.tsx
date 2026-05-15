@@ -1,5 +1,4 @@
-import React from 'react';
-import { Modal } from '@gabihuenchu/ui-library';
+import React, { useEffect } from 'react';
 
 interface CatastrofesModalProps {
   isOpen: boolean;
@@ -22,33 +21,51 @@ const CatastrofesModal: React.FC<CatastrofesModalProps> = ({
   closeOnEscape = true,
   className = '',
 }) => {
-  const getCatastrofesSize = () => {
+  useEffect(() => {
+    if (!isOpen || !closeOnEscape) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeOnEscape, isOpen, onClose]);
+
+  const getCatastrofesSizeClass = () => {
     switch (size) {
       case 'small':
-        return 'small';
+        return 'catastrofes-modal--small';
       case 'medium':
-        return 'medium';
+        return 'catastrofes-modal--medium';
       case 'large':
-        return 'large';
+        return 'catastrofes-modal--large';
       case 'full':
-        return 'full';
+        return 'catastrofes-modal--full';
       default:
-        return 'medium';
+        return 'catastrofes-modal--medium';
     }
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      size={getCatastrofesSize()}
-      closeOnOverlayClick={closeOnOverlayClick}
-      closeOnEscape={closeOnEscape}
-      className={`catastrofes-modal ${className}`}
-    >
-      {children}
-    </Modal>
+    <div className="catastrofes-modal__overlay" onClick={closeOnOverlayClick ? onClose : undefined}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className={`catastrofes-modal ${getCatastrofesSizeClass()} ${className}`.trim()}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {title && <header className="catastrofes-modal__header"><h2>{title}</h2></header>}
+        <div className="catastrofes-modal__body">{children}</div>
+      </div>
+    </div>
   );
 };
 

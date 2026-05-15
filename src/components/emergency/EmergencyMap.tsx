@@ -35,7 +35,7 @@ export const EmergencyMap: React.FC<EmergencyMapProps> = ({
   selectedEmergencia,
   onSelectEmergencia,
 }) => {
-  const [mapRef, setMapRef] = React.useState<GoogleMap | null>(null);
+  const [mapRef, setMapRef] = React.useState<google.maps.Map | null>(null);
   const [infoWindowId, setInfoWindowId] = React.useState<string | null>(null);
 
   const handleMapClick = useCallback(

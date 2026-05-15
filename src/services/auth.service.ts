@@ -71,6 +71,9 @@ export const AuthService = {
   // 1. Registrar cuenta en Firebase y sincronizar perfil en backend.
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const auth = getFirebaseAuthClient();
+    if (!auth) {
+      throw new Error('Firebase Auth no está configurado. Revisa las variables NEXT_PUBLIC_FIREBASE_* en .env.local.');
+    }
 
     const credentials = await createUserWithEmailAndPassword(
       auth,
@@ -163,6 +166,9 @@ export const AuthService = {
   // 6. Login real con Firebase Auth + validación del perfil contra el Gateway.
   login: async (email: string, password: string): Promise<LoginResponse> => {
     const auth = getFirebaseAuthClient();
+    if (!auth) {
+      throw new Error('Firebase Auth no está configurado. Revisa las variables NEXT_PUBLIC_FIREBASE_* en .env.local.');
+    }
     const credentials = await signInWithEmailAndPassword(auth, email, password);
     const token = await credentials.user.getIdToken();
 

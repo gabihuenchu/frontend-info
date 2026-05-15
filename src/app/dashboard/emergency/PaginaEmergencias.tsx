@@ -26,7 +26,7 @@ import type {
   EstadoEmergencia,
   TipoEmergencia,
   NivelSeveridad,
-} from "@/services/emergencyService";
+} from "@/services/emergency.service";
 import {
   Flame, Waves, Home, Zap, Mountain, CloudRain,
   Square, Pencil, Trash2, ClipboardList, AlertTriangle,
@@ -729,9 +729,9 @@ function PanelDerecho({
               <div className="form-group">
                 <label className="panel-form-label">Coordenadas</label>
                 <div className="coords-wrap">
-                  <input type="text" className="form-input" placeholder="-33.0389" value={formCentro.lat} onChange={(e) => setFormCentro({ ...formCentro, lat: e.target.value })} />
+                  <input type="text" className="form-input" placeholder="-33.0389" value={formCentro.latitud} onChange={(e) => setFormCentro({ ...formCentro, latitud: e.target.value })} />
                   <span className="coords-sep">:</span>
-                  <input type="text" className="form-input" placeholder="-71.4378" value={formCentro.lng} onChange={(e) => setFormCentro({ ...formCentro, lng: e.target.value })} />
+                  <input type="text" className="form-input" placeholder="-71.4378" value={formCentro.longitud} onChange={(e) => setFormCentro({ ...formCentro, longitud: e.target.value })} />
                   <button className="coords-pin-btn"><MapPin size={16} /></button>
                 </div>
               </div>
@@ -847,13 +847,30 @@ export default function PaginaEmergencias() {
 
   // ── Render states ──
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState error={error as Error} onRetry={() => refetch()} />;
+
+  const hasError = Boolean(error);
 
   return (
     <div className={`dashboard-root ${theme}`}>
       {/* SIDEBAR */}
       <Sidebar dark={dark} setDark={setDark} />
 
+      {/* Error banner no bloqueante: muestra mensaje y permite reintento, pero sigue renderizando UI */}
+      {hasError && (
+        <div className="api-error-banner" style={{ position: 'fixed', top: 80, left: 24, right: 24, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(245, 101, 101, 0.12)', border: '1px solid rgba(245, 101, 101, 0.2)', padding: '10px 14px', borderRadius: 8 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <AlertCircle size={18} style={{ color: '#ef4444' }} />
+            <div>
+              <strong>Error al cargar emergencias</strong>
+              <div style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{(error as any)?.message ?? 'El servicio de emergencias no responde.'}</div>
+            </div>
+          </div>
+          <div>
+            <button onClick={() => refetch()} className="btn-guardar" style={{ marginRight: 8 }}>Reintentar</button>
+            <button onClick={() => setMostrarIA(false)} className="btn-panel-cancelar">Cerrar</button>
+          </div>
+        </div>
+      )}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* HEADER */}

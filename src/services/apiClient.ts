@@ -101,16 +101,40 @@ apiClient.interceptors.response.use(
       }
     }
     
-    // Manejar errores específicos del backend (RFC 7807)
-    if (error.response?.data) {
-      const errorData = error.response.data;
+    // Manejar errores específicos del backend (RFC 7807) y mejorar logging
+    if (error.response) {
+      const resp = error.response;
+      let parsedData: string | object = resp.data;
+
+      try {
+        // Intentar normalizar a objeto si es JSON en string
+        if (typeof resp.data === 'string') {
+          parsedData = JSON.parse(resp.data);
+        }
+      } catch {
+        // no hacer nada si no es JSON
+      }
+
+      // Si sigue siendo un objeto vacío o no contiene campos esperados, stringify para que no aparezca como '{}'
+      const safeData = (parsedData && Object.keys(parsedData as any).length > 0)
+        ? parsedData
+        : (typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data));
+
       console.error('Error del backend:', {
-        type: errorData.type,
-        title: errorData.title,
-        status: errorData.status,
-        detail: errorData.detail,
-        errorCode: errorData.errorCode,
+        status: resp.status,
+        statusText: resp.statusText,
+        headers: resp.headers,
+        data: safeData,
       });
+    } else if (error.request) {
+      // El request fue enviado pero no hubo respuesta (Network Error, CORS, timeout...)
+      console.error('No response from backend (possible network error or CORS):', {
+        message: error.message,
+        request: error.request && (error.request._header || error.request)
+      });
+    } else {
+      // Error al configurar la petición
+      console.error('Axios error (request setup):', error.message);
     }
     
     return Promise.reject(error);

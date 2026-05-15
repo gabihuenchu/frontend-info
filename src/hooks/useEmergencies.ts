@@ -23,7 +23,7 @@ import {
   type ActualizarEstadoRequest,
   type CrearCentroAcopioRequest,
   type KpiData,
-} from './emergencyService';
+} from '../services/emergency.service';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
@@ -44,6 +44,9 @@ export const useEmergenciasActivas = () =>
     queryFn: getEmergenciasActivas,
     refetchInterval: 30_000,
     staleTime: 15_000,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
 /** Todas las emergencias (para gestión/admin) */

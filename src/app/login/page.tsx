@@ -39,8 +39,18 @@ function LoginContent() {
         profile: session.profile,
       }));
 
-      // Redirigir a la página principal
-      router.push('/');
+      // Redirigir según rol: ADMINISTRADOR -> Dashboard de Emergencias
+      const profile: any = session.profile;
+      const hasAdminRole = !!(
+        profile?.roles?.some?.((r: any) => r === 'ADMINISTRADOR' || r?.nombre === 'ADMINISTRADOR') ||
+        profile?.roles?.find?.((r: any) => r === 'ADMINISTRADOR' || r?.nombre === 'ADMINISTRADOR')
+      );
+
+      if (hasAdminRole) {
+        router.push('/dashboard/emergency');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       console.error('Error en login:', err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {

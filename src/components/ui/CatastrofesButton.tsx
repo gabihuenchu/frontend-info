@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@gabihuenchu/ui-library';
 
 interface CatastrofesButtonProps {
   children: React.ReactNode;
@@ -18,29 +17,28 @@ const CatastrofesButton: React.FC<CatastrofesButtonProps> = ({
   onClick,
   className = '',
 }) => {
-  const getCatastrofesVariant = () => {
+  const getCatastrofesVariantClass = () => {
     switch (variant) {
       case 'primary':
-        return 'primary';
+        return 'btn-primary';
       case 'secondary':
-        return 'secondary';
+        return 'btn-secondary';
       case 'danger':
-        return 'danger';
+        return 'btn-danger';
       default:
-        return 'primary';
+        return 'btn-primary';
     }
   };
 
   return (
-    <Button
-      variant={getCatastrofesVariant()}
-      size={size}
+    <button
+      type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`catastrofes-button ${className}`}
+      className={`catastrofes-button ${getCatastrofesVariantClass()} catastrofes-button--${size} ${className}`.trim()}
     >
       {children}
-    </Button>
+    </button>
   );
 };
 

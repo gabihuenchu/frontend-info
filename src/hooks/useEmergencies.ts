@@ -1,11 +1,10 @@
-'use client';
+/**
+ * useEmergencies.ts
+ * Hooks de React Query para emergencias y centros de acopio
+ * Requiere: @tanstack/react-query v5
+ */
 
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  UseQueryOptions,
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getEmergenciasActivas,
   getAllEmergencias,
@@ -13,134 +12,140 @@ import {
   createEmergencia,
   updateEstadoEmergencia,
   deleteEmergencia,
-  CrearEmergenciaRequest,
-  ActualizarEstadoRequest,
+  getCentrosAcopio,
+  getCentrosCercanos,
+  createCentroAcopio,
+  updateCentroAcopio,
+  deleteCentroAcopio,
   calculateKpis,
-} from '@/services/emergency.service';
-import { Emergencia } from '@/types/emergency';
+  type Emergencia,
+  type CrearEmergenciaRequest,
+  type ActualizarEstadoRequest,
+  type CrearCentroAcopioRequest,
+  type KpiData,
+} from './emergencyService';
 
-/**
- * Keys para TanStack Query
- */
-export const emergencyKeys = {
-  all: ['emergencies'] as const,
-  lists: () => [...emergencyKeys.all, 'list'] as const,
-  list: (filters: string) => [...emergencyKeys.lists(), { filters }] as const,
-  details: () => [...emergencyKeys.all, 'detail'] as const,
-  detail: (id: string) => [...emergencyKeys.details(), id] as const,
-  kpis: () => [...emergencyKeys.all, 'kpis'] as const,
+// ─── Query Keys ───────────────────────────────────────────────────────────────
+
+export const QUERY_KEYS = {
+  emergencias: ['emergencias'] as const,
+  emergenciasActivas: ['emergencias', 'activas'] as const,
+  emergencia: (id: string) => ['emergencias', id] as const,
+  centros: ['centros-acopio'] as const,
+  centrosCercanos: (lat: number, lng: number) => ['centros-acopio', 'cercanos', lat, lng] as const,
 };
 
-/**
- * Hook para obtener emergencias activas
- * Refetch automático cada 30 segundos como fallback
- */
-export const useEmergenciasActivas = (
-  options?: UseQueryOptions<Emergencia[], Error>
-) => {
-  return useQuery({
-    queryKey: emergencyKeys.lists(),
+// ─── Emergencias — Queries ────────────────────────────────────────────────────
+
+/** Lista de emergencias activas — polling cada 30 s */
+export const useEmergenciasActivas = () =>
+  useQuery({
+    queryKey: QUERY_KEYS.emergenciasActivas,
     queryFn: getEmergenciasActivas,
-    refetchInterval: 30000, // 30 segundos para mantener datos actualizados
-    staleTime: 10000, // 10 segundos
-    retry: 3,
-    ...options,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
   });
-};
 
-/**
- * Hook para obtener todas las emergencias (gestión)
- */
-export const useAllEmergencias = (
-  options?: UseQueryOptions<Emergencia[], Error>
-) => {
-  return useQuery({
-    queryKey: emergencyKeys.list('all'),
+/** Todas las emergencias (para gestión/admin) */
+export const useAllEmergencias = () =>
+  useQuery({
+    queryKey: QUERY_KEYS.emergencias,
     queryFn: getAllEmergencias,
-    staleTime: 5000,
-    retry: 3,
-    ...options,
+    staleTime: 15_000,
   });
-};
 
-/**
- * Hook para obtener una emergencia específica
- */
-export const useEmergenciaById = (
-  id: string,
-  options?: UseQueryOptions<Emergencia, Error>
-) => {
-  return useQuery({
-    queryKey: emergencyKeys.detail(id),
-    queryFn: () => getEmergenciaById(id),
-    enabled: !!id,
-    staleTime: 10000,
-    retry: 2,
-    ...options,
+/** Una emergencia por ID */
+export const useEmergencia = (id: string | undefined) =>
+  useQuery({
+    queryKey: QUERY_KEYS.emergencia(id ?? ''),
+    queryFn: () => getEmergenciaById(id!),
+    enabled: Boolean(id),
   });
-};
 
-/**
- * Hook para crear una nueva emergencia
- */
+/** KPIs derivados (sin llamada extra al backend) */
+export const useEmergenciasKpis = (emergencias: Emergencia[]): KpiData =>
+  calculateKpis(emergencias);
+
+// ─── Emergencias — Mutations ──────────────────────────────────────────────────
+
 export const useCreateEmergencia = () => {
-  const queryClient = useQueryClient();
-
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: createEmergencia,
+    mutationFn: (data: CrearEmergenciaRequest) => createEmergencia(data),
     onSuccess: () => {
-      // Invalidar queries para forzar refetch
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.list('all') });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencias });
     },
   });
 };
 
-/**
- * Hook para actualizar el estado de una emergencia
- */
 export const useUpdateEstadoEmergencia = () => {
-  const queryClient = useQueryClient();
-
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ActualizarEstadoRequest }) =>
       updateEstadoEmergencia(id, data),
-    onSuccess: (_, variables) => {
-      // Invalidar queries específicas
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.list('all') });
-      queryClient.invalidateQueries({
-        queryKey: emergencyKeys.detail(variables.id),
-      });
+    onSuccess: (_updated, { id }) => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencia(id) });
     },
   });
 };
 
-/**
- * Hook para calcular KPIs basados en emergencias
- */
-export const useEmergenciasKpis = (
-  emergencias: Emergencia[] | undefined
-) => {
-  return {
-    data: emergencias ? calculateKpis(emergencias) : null,
-    isLoading: !emergencias,
-  };
+export const useDeleteEmergencia = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEmergencia(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencias });
+    },
+  });
 };
 
-/**
- * Hook para eliminar una emergencia
- */
-export const useDeleteEmergencia = () => {
-  const queryClient = useQueryClient();
+// ─── Centros de Acopio — Queries ──────────────────────────────────────────────
 
+export const useCentrosAcopio = () =>
+  useQuery({
+    queryKey: QUERY_KEYS.centros,
+    queryFn: getCentrosAcopio,
+    staleTime: 60_000,
+  });
+
+export const useCentrosCercanos = (
+  lat: number | undefined,
+  lng: number | undefined,
+  radioKm = 20
+) =>
+  useQuery({
+    queryKey: QUERY_KEYS.centrosCercanos(lat ?? 0, lng ?? 0),
+    queryFn: () => getCentrosCercanos(lat!, lng!, radioKm),
+    enabled: Boolean(lat && lng),
+    staleTime: 30_000,
+  });
+
+// ─── Centros de Acopio — Mutations ────────────────────────────────────────────
+
+export const useCreateCentroAcopio = () => {
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: deleteEmergencia,
-    onSuccess: () => {
-      // Invalidar todas las queries de emergencias
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.list('all') });
-      queryClient.invalidateQueries({ queryKey: emergencyKeys.all });
-    },
+    mutationFn: (data: CrearCentroAcopioRequest) => createCentroAcopio(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.centros }),
+  });
+};
+
+export const useUpdateCentroAcopio = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CrearCentroAcopioRequest> }) =>
+      updateCentroAcopio(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.centros }),
+  });
+};
+
+export const useDeleteCentroAcopio = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteCentroAcopio(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.centros }),
   });
 };

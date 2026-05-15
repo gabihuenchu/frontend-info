@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import './inicio.css';
 
 /* ── Iconos SVG inline (sin dependencias extra) ── */
 const IconCoordination = () => (

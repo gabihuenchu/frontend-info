@@ -6,12 +6,15 @@
  * + Panel de análisis IA con Anthropic API (claude-sonnet-4-20250514)
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
-import GoogleMapReact from "google-map-react";
+import { useState, useCallback, useRef, useEffect, useMemo, type ReactNode } from "react";
 import "@/styles/emergency.css";
 import Sidebar from "@/components/sidebar";
+import EmergencyMapGoogle, {
+  type HerramientaZonaMapa,
+} from "@/components/emergency/EmergencyMapGoogle";
 import {
   useEmergenciasActivas,
+  useEmergenciasGeoJson,
   useCreateEmergencia,
   useUpdateEstadoEmergencia,
   useDeleteEmergencia,
@@ -26,6 +29,13 @@ import type {
   EstadoEmergencia,
   TipoEmergencia,
   NivelSeveridad,
+  CrearEmergenciaRequest,
+} from "@/services/emergency.service";
+import {
+  mapTipoUiABackend,
+  cerrarAnilloZona,
+  centroidEpicentro,
+  severidadUiAApi,
 } from "@/services/emergency.service";
 import {
   Flame, Waves, Home, Zap, Mountain, CloudRain,
@@ -38,17 +48,21 @@ import {
 // ─── Helpers UI ───────────────────────────────────────────────────────────────
 
 const iconosPorTipo: Record<string, React.ReactNode> = {
+  TERREMOTO: <Zap size={16} />,
+  TSUNAMI: <Waves size={16} />,
+  INCENDIO: <Flame size={16} />,
+  INUNDACION: <CloudRain size={16} />,
+  ERUPCION: <Mountain size={16} />,
+  ALUVION: <Mountain size={16} />,
   "Incendios Forestales": <Flame size={16} />,
-  INCENDIO:               <Flame size={16} />,
-  "Alerta de Tsunami":    <Waves size={16} />,
-  Inundaciones:           <CloudRain size={16} />,
-  Terremoto:              <Zap size={16} />,
-  SISMO:                  <Zap size={16} />,
-  "Erupción Volcánica":   <Mountain size={16} />,
-  Aluvión:                <Mountain size={16} />,
-  ALUVION:                <Mountain size={16} />,
-  INFRAESTRUCTURA:        <Home size={16} />,
-  MAREJADA:               <Waves size={16} />,
+  "Alerta de Tsunami": <Waves size={16} />,
+  Inundaciones: <CloudRain size={16} />,
+  Terremoto: <Zap size={16} />,
+  SISMO: <Zap size={16} />,
+  "Erupción Volcánica": <Mountain size={16} />,
+  Aluvión: <Mountain size={16} />,
+  INFRAESTRUCTURA: <Home size={16} />,
+  MAREJADA: <Waves size={16} />,
 };
 
 const nivelIconoBgClass: Record<string, string> = {
@@ -69,40 +83,7 @@ const estadoPillClass: Record<string, string> = {
   Cerrado:        "estado-pill estado-cerrado",
 };
 
-const markerColor: Record<string, string> = {
-  ALTA: "#ef4444", MEDIA: "#f97316", BAJA: "#22c55e",
-  CRITICA: "#ef4444",
-};
-
-/** Convierte severidad (CRITICA/ALTA/MEDIA/BAJA) a NivelAlerta (ALTA/MEDIA/BAJA) */
-const severidadANivel = (sev: string): NivelAlerta => {
-  if (sev === "CRITICA" || sev === "ALTA") return "ALTA";
-  if (sev === "BAJA") return "BAJA";
-  return "MEDIA";
-};
-
-// ─── Marker Mapa ──────────────────────────────────────────────────────────────
-
-function MarkerMapa({
-  nivel, tipo,
-}: {
-  nivel: string; lat: number; lng: number; tipo: string;
-}) {
-  const color = markerColor[nivel] ?? "#f97316";
-  return (
-    <div className="map-marker">
-      <div
-        className="map-marker-inner"
-        style={{ backgroundColor: color, boxShadow: `0 0 14px ${color}80` }}
-      >
-        <span style={{ fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {iconosPorTipo[tipo] ?? <AlertTriangle size={14} />}
-        </span>
-      </div>
-      <div className="map-marker-ping" style={{ backgroundColor: color }} />
-    </div>
-  );
-}
+// ─── (Marcadores legacy eliminados: el mapa usa @react-google-maps/api) ───────
 
 // ─── Estados genéricos ────────────────────────────────────────────────────────
 
@@ -290,6 +271,9 @@ function PanelDerecho({
   isCreating,
   isUpdating,
   isDeleting,
+  herramientaMapa,
+  setHerramientaMapa,
+  epicentroPreview,
 }: {
   theme: string;
   vista: VistaPanel;
@@ -313,10 +297,13 @@ function PanelDerecho({
   isCreating: boolean;
   isUpdating: boolean;
   isDeleting: boolean;
+  herramientaMapa: HerramientaZonaMapa;
+  setHerramientaMapa: (h: HerramientaZonaMapa) => void;
+  epicentroPreview: { latitud: number; longitud: number } | null;
 }) {
   const [formEmergencia, setFormEmergencia] = useState({
     titulo: editData?.nombre ?? "",
-    tipo: (editData?.tipo ?? "Incendios Forestales") as TipoEmergencia,
+    tipo: (editData?.tipo ?? "TERREMOTO") as TipoEmergencia,
     severidad: "ALTA" as NivelSeveridad,
     descripcion: "",
     region: "",
@@ -331,20 +318,18 @@ function PanelDerecho({
     latitud: "", longitud: "", capacidad: "",
   });
 
-  const [zonaActiva, setZonaActiva] = useState("Dibujar zona");
-
-  const herramientasZona = [
+  const herramientasZona: { id: HerramientaZonaMapa; icono: ReactNode; label: string }[] = [
     { id: "Dibujar zona", icono: <Square size={18} />, label: "Dibujar zona" },
     { id: "Editar zona",  icono: <Pencil size={18} />, label: "Editar zona" },
     { id: "Borrar zona",  icono: <Trash2 size={18} />, label: "Borrar zona" },
   ];
 
   const handleCrearEmergencia = () => {
-    if (!formEmergencia.titulo.trim()) return;
+    if (!formEmergencia.region.trim()) return;
     onCrearEmergencia({
       ...formEmergencia,
-      latitud: Number(formEmergencia.latitud),
-      longitud: Number(formEmergencia.longitud),
+      latitud: epicentroPreview?.latitud ?? Number(formEmergencia.latitud),
+      longitud: epicentroPreview?.longitud ?? Number(formEmergencia.longitud),
       afectados: Number(formEmergencia.afectados),
     });
   };
@@ -374,7 +359,7 @@ function PanelDerecho({
         </button>
         <button
           className={`panel-tab${vista === "crear-emergencia" ? " panel-tab--active" : ""}`}
-          onClick={() => { setFormEmergencia({ titulo:"", tipo:"Incendios Forestales", severidad:"ALTA", descripcion:"", region:"", comuna:"", latitud:-33.45, longitud:-70.67, afectados:0 }); setVista("crear-emergencia"); }}
+          onClick={() => { setFormEmergencia({ titulo:"", tipo:"TERREMOTO", severidad:"ALTA", descripcion:"", region:"", comuna:"", latitud:-33.45, longitud:-70.67, afectados:0 }); setVista("crear-emergencia"); }}
         >
           <AlertTriangle size={14} className="mr-1" /> Crear Emergencia
         </button>
@@ -442,7 +427,7 @@ function PanelDerecho({
               <div style={{ margin: "10px 0 6px" }}>
                 <label className="panel-form-label">Cambiar estado</label>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
-                  {(["ACTIVA", "EN_PROCESO", "RESUELTA", "CERRADA"] as EstadoEmergencia[]).map((est) => (
+                  {(["ACTIVA", "CONTROLADA", "FINALIZADA"] as EstadoEmergencia[]).map((est) => (
                     <button
                       key={est}
                       className={`btn-informe${emergencia.estado === est ? " btn-estado-activo" : ""}`}
@@ -450,7 +435,7 @@ function PanelDerecho({
                       onClick={() => onUpdateEstado(est)}
                       disabled={isUpdating || emergencia.estado === est}
                     >
-                      {est.replace("_", " ")}
+                      {est === "ACTIVA" ? "Activa" : est === "CONTROLADA" ? "Controlada" : "Finalizada"}
                     </button>
                   ))}
                 </div>
@@ -462,12 +447,14 @@ function PanelDerecho({
                 </button>
                 <button
                   className="btn-guardar"
-                  style={{ flex: 1, fontSize: 10, background: "#ef4444", border: "none" }}
+                  style={{ flex: 1, fontSize: 10, background: "#b45309", border: "none" }}
                   onClick={onDeleteEmergencia}
                   disabled={isDeleting}
+                  type="button"
+                  title="Marca la emergencia como FINALIZADA en el servidor (no hay borrado físico)."
                 >
                   <Trash2 size={12} style={{ marginRight: 4 }} />
-                  {isDeleting ? "Eliminando..." : "ELIMINAR"}
+                  {isDeleting ? "Finalizando..." : "Finalizar emergencia"}
                 </button>
               </div>
             </div>
@@ -527,8 +514,8 @@ function PanelDerecho({
               {herramientasZona.map((h) => (
                 <button
                   key={h.id}
-                  className={`zona-tool-btn${zonaActiva === h.id ? " zona-tool-btn--active" : ""}`}
-                  onClick={() => setZonaActiva(h.id)}
+                  className={`zona-tool-btn${herramientaMapa === h.id ? " zona-tool-btn--active" : ""}`}
+                  onClick={() => setHerramientaMapa(h.id)}
                 >
                   <span className="zona-tool-icon">{h.icono}</span>
                   <span className="zona-tool-label">{h.label}</span>
@@ -538,7 +525,7 @@ function PanelDerecho({
 
             <div className="panel-lateral-body" style={{ gap: 14 }}>
               <div className="form-group">
-                <label className="panel-form-label">Título *</label>
+                <label className="panel-form-label">Título (opcional)</label>
                 <input
                   type="text"
                   className="panel-form-input"
@@ -557,8 +544,15 @@ function PanelDerecho({
                     value={formEmergencia.tipo}
                     onChange={(e) => setFormEmergencia({ ...formEmergencia, tipo: e.target.value as TipoEmergencia })}
                   >
-                    {["Incendios Forestales","Alerta de Tsunami","Inundaciones","Terremoto","Erupción Volcánica","Aluvión","INCENDIO","SISMO","ALUVION","INFRAESTRUCTURA","MAREJADA"].map((t) => (
-                      <option key={t}>{t}</option>
+                    {[
+                      ["TERREMOTO", "Terremoto"],
+                      ["TSUNAMI", "Tsunami / marejada"],
+                      ["INCENDIO", "Incendio"],
+                      ["INUNDACION", "Inundación"],
+                      ["ERUPCION", "Erupción volcánica"],
+                      ["ALUVION", "Aluvión"],
+                    ].map(([val, label]) => (
+                      <option key={val} value={val}>{label}</option>
                     ))}
                   </select>
                 </div>
@@ -590,7 +584,7 @@ function PanelDerecho({
                   />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="panel-form-label">Comuna</label>
+                  <label className="panel-form-label">Comuna (opcional)</label>
                   <input
                     type="text"
                     className="panel-form-input"
@@ -601,27 +595,17 @@ function PanelDerecho({
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: 10 }}>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="panel-form-label">Latitud</label>
-                  <input
-                    type="number"
-                    className="panel-form-input"
-                    placeholder="-33.45"
-                    value={formEmergencia.latitud}
-                    onChange={(e) => setFormEmergencia({ ...formEmergencia, latitud: Number(e.target.value) })}
-                  />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="panel-form-label">Longitud</label>
-                  <input
-                    type="number"
-                    className="panel-form-input"
-                    placeholder="-70.67"
-                    value={formEmergencia.longitud}
-                    onChange={(e) => setFormEmergencia({ ...formEmergencia, longitud: Number(e.target.value) })}
-                  />
-                </div>
+              <div className="form-group">
+                <label className="panel-form-label">Epicentro (desde polígono)</label>
+                {epicentroPreview ? (
+                  <p style={{ fontSize: 13, margin: 0, color: "var(--color-text-secondary)" }}>
+                    Lat {epicentroPreview.latitud.toFixed(5)}, Lng {epicentroPreview.longitud.toFixed(5)}
+                  </p>
+                ) : (
+                  <p style={{ fontSize: 12, margin: 0, color: "var(--color-text-secondary)" }}>
+                    Activa &quot;Dibujar zona&quot; en el mapa y traza el polígono de la zona afectada (mín. 3 vértices; se cerrará al guardar).
+                  </p>
+                )}
               </div>
 
               <div className="form-group">
@@ -759,6 +743,8 @@ function PanelDerecho({
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
+type BorradorLatLng = { lat: number; lng: number };
+
 export default function PaginaEmergencias() {
   const [dark, setDark] = useState(true);
   const [emergenciaSeleccionada, setEmergenciaSeleccionada] = useState<Emergencia | null>(null);
@@ -766,10 +752,23 @@ export default function PaginaEmergencias() {
   const [editData, setEditData] = useState<{ tipo: string; nivel: string; nombre: string } | undefined>();
   const [filtroRegion, setFiltroRegion] = useState("Todas las regiones");
   const [filtroTipo, setFiltroTipo] = useState("Todos los tipos");
-  const [zonaActiva, setZonaActiva] = useState("Dibujar zona");
+  const [herramientaMapa, setHerramientaMapa] = useState<HerramientaZonaMapa>("Dibujar zona");
+  const [poligonoBorrador, setPoligonoBorrador] = useState<BorradorLatLng[] | null>(null);
   const [mostrarIA, setMostrarIA] = useState(false);
+  /** Oculta el banner sin arreglar el 500; se resetea cuando el error desaparece. */
+  const [ocultarBannerEmergencias, setOcultarBannerEmergencias] = useState(false);
 
   const theme = dark ? "dark" : "light";
+
+  /** Sin sondeo automático mientras se dibuja o hay polígono sin guardar (evita “recargas” que cortan el trazo). */
+  const pausarSondeoEmergencias = useMemo(
+    () =>
+      panelVista === "crear-emergencia" &&
+      (herramientaMapa === "Dibujar zona" || Boolean(poligonoBorrador?.length)),
+    [panelVista, herramientaMapa, poligonoBorrador]
+  );
+
+  const intervaloEmergencias = pausarSondeoEmergencias ? false : 120_000;
 
   // ── Queries ──
   const {
@@ -777,17 +776,45 @@ export default function PaginaEmergencias() {
     isLoading,
     error,
     refetch,
-  } = useEmergenciasActivas();
+  } = useEmergenciasActivas({ refetchInterval: intervaloEmergencias });
+
+  const { data: geoJson, refetch: refetchGeoJson } = useEmergenciasGeoJson({
+    refetchInterval: intervaloEmergencias,
+  });
 
   const { data: centros = [], isLoading: centrosCargando } = useCentrosAcopio();
 
-  const kpis = useEmergenciasKpis(emergencias);
+  const epicentroPreview = useMemo(() => {
+    if (!poligonoBorrador || poligonoBorrador.length < 3) return null;
+    const ring = cerrarAnilloZona(
+      poligonoBorrador.map((p) => ({ longitud: p.lng, latitud: p.lat }))
+    );
+    const c = centroidEpicentro(ring);
+    return { latitud: c.latitud, longitud: c.longitud };
+  }, [poligonoBorrador]);
+
+  useEffect(() => {
+    if (herramientaMapa === "Borrar zona") {
+      setPoligonoBorrador(null);
+      setHerramientaMapa("Dibujar zona");
+    }
+    if (herramientaMapa === "Editar zona") {
+      setPoligonoBorrador(null);
+      setHerramientaMapa("Dibujar zona");
+    }
+  }, [herramientaMapa]);
+
+  useEffect(() => {
+    if (!error) setOcultarBannerEmergencias(false);
+  }, [error]);
 
   // ── Mutations ──
   const createMutation    = useCreateEmergencia();
   const updateMutation    = useUpdateEstadoEmergencia();
   const deleteMutation    = useDeleteEmergencia();
   const createCentroMut   = useCreateCentroAcopio();
+
+  const kpis = useEmergenciasKpis(emergencias);
 
   // ── Filtros aplicados ──
   const emergenciasFiltradas = emergencias.filter((e) => {
@@ -813,25 +840,77 @@ export default function PaginaEmergencias() {
     setPanelVista("crear-emergencia");
   }, []);
 
+  const onSelectEmergenciaId = useCallback(
+    (id: string) => {
+      const em = emergencias.find((e) => e.id === id);
+      if (em) {
+        setEmergenciaSeleccionada(em);
+        setPanelVista("detalles");
+      }
+    },
+    [emergencias]
+  );
+
   const handleCrearEmergencia = useCallback(
-    async (data: Parameters<typeof createMutation.mutateAsync>[0]) => {
-      await createMutation.mutateAsync(data);
+    async (data: {
+      titulo: string;
+      tipo: TipoEmergencia;
+      severidad: NivelSeveridad;
+      descripcion: string;
+      region: string;
+      comuna: string;
+      latitud: number;
+      longitud: number;
+      afectados: number;
+    }) => {
+      if (!poligonoBorrador || poligonoBorrador.length < 3) {
+        alert(
+          'Dibuja la zona afectada en el mapa: elige "Dibujar zona" y completa un polígono (mínimo 3 vértices).'
+        );
+        return;
+      }
+      const coordsDto = poligonoBorrador.map((p) => ({ longitud: p.lng, latitud: p.lat }));
+      const ring = cerrarAnilloZona(coordsDto);
+      const epicentro = centroidEpicentro(ring);
+      const partes = [data.region.trim(), data.comuna.trim()].filter(Boolean);
+      if (data.titulo.trim()) partes.unshift(data.titulo.trim());
+      const regionFinal = partes.join(" · ").slice(0, 100);
+
+      const payload: CrearEmergenciaRequest = {
+        tipo: mapTipoUiABackend(data.tipo),
+        severidad: severidadUiAApi(data.severidad),
+        region: regionFinal,
+        epicentro,
+        zonaImpacto: ring,
+      };
+      await createMutation.mutateAsync(payload);
+      setPoligonoBorrador(null);
+      setHerramientaMapa("Dibujar zona");
       setPanelVista("detalles");
     },
-    [createMutation]
+    [poligonoBorrador, createMutation]
   );
 
   const handleUpdateEstado = useCallback(
     async (estado: EstadoEmergencia) => {
       if (!emergenciaSeleccionada) return;
-      await updateMutation.mutateAsync({ id: emergenciaSeleccionada.id, data: { estado } });
+      await updateMutation.mutateAsync({
+        id: emergenciaSeleccionada.id,
+        data: { nuevoEstado: estado },
+      });
     },
     [emergenciaSeleccionada, updateMutation]
   );
 
   const handleDeleteEmergencia = useCallback(async () => {
     if (!emergenciaSeleccionada) return;
-    if (!confirm(`¿Eliminar "${emergenciaSeleccionada.titulo ?? emergenciaSeleccionada.tipo}"?`)) return;
+    if (
+      !confirm(
+        `¿Finalizar la emergencia "${emergenciaSeleccionada.titulo ?? emergenciaSeleccionada.tipo}"? ` +
+          "Se marcará como FINALIZADA en el sistema (no hay borrado físico en la API)."
+      )
+    )
+      return;
     await deleteMutation.mutateAsync(emergenciaSeleccionada.id);
     setEmergenciaSeleccionada(null);
     setPanelVista("detalles");
@@ -848,30 +927,47 @@ export default function PaginaEmergencias() {
   // ── Render states ──
   if (isLoading) return <LoadingState />;
 
-  const hasError = Boolean(error);
+  const mostrarBannerErrorEmergencias = Boolean(error) && !ocultarBannerEmergencias;
 
   return (
     <div className={`dashboard-root ${theme}`}>
       {/* SIDEBAR */}
       <Sidebar dark={dark} setDark={setDark} />
 
-      {/* Error banner no bloqueante: muestra mensaje y permite reintento, pero sigue renderizando UI */}
-      {hasError && (
-        <div className="api-error-banner" style={{ position: 'fixed', top: 80, left: 24, right: 24, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(245, 101, 101, 0.12)', border: '1px solid rgba(245, 101, 101, 0.2)', padding: '10px 14px', borderRadius: 8 }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <AlertCircle size={18} style={{ color: '#ef4444' }} />
-            <div>
-              <strong>Error al cargar emergencias</strong>
-              <div style={{ fontSize: 13, color: 'var(--color-text-secondary)' }}>{(error as any)?.message ?? 'El servicio de emergencias no responde.'}</div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+        {mostrarBannerErrorEmergencias && (
+          <div className={`api-error-banner ${theme}`} role="alert">
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <AlertCircle size={18} style={{ color: "#ef4444", flexShrink: 0, marginTop: 2 }} />
+              <div className="api-error-banner__text">
+                <strong>Error al cargar emergencias</strong>
+                <div style={{ fontSize: 13, opacity: 0.9, marginTop: 4 }}>
+                  {(error as Error)?.message ?? "El servicio de emergencias no responde."}
+                </div>
+              </div>
+            </div>
+            <div className="api-error-banner__actions">
+              <button
+                type="button"
+                className="btn-guardar"
+                onClick={() => {
+                  setOcultarBannerEmergencias(false);
+                  void refetch();
+                  void refetchGeoJson();
+                }}
+              >
+                Reintentar
+              </button>
+              <button
+                type="button"
+                className="btn-panel-cancelar"
+                onClick={() => setOcultarBannerEmergencias(true)}
+              >
+                Ocultar aviso
+              </button>
             </div>
           </div>
-          <div>
-            <button onClick={() => refetch()} className="btn-guardar" style={{ marginRight: 8 }}>Reintentar</button>
-            <button onClick={() => setMostrarIA(false)} className="btn-panel-cancelar">Cerrar</button>
-          </div>
-        </div>
-      )}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        )}
 
         {/* HEADER */}
         <header className="dashboard-header">
@@ -897,7 +993,7 @@ export default function PaginaEmergencias() {
               <Brain size={18} />
               <span className="bell-badge" style={{ background: "#3b82f6" }}>IA</span>
             </button>
-            <button className="header-bell" title="Actualizar" onClick={() => refetch()}>
+            <button className="header-bell" title="Actualizar" onClick={() => { void refetch(); void refetchGeoJson(); }}>
               <RefreshCw size={18} />
             </button>
             <button className="header-bell">
@@ -931,7 +1027,6 @@ export default function PaginaEmergencias() {
 
               {emergenciasFiltradas.map((em) => {
                 const activa = emergenciaSeleccionada?.id === em.id;
-                const nivel = severidadANivel(em.severidad);
                 return (
                   <div key={em.id} className={`emergencia-card${activa ? " selected" : ""}`}>
                     <div className="emergencia-card-header">
@@ -969,57 +1064,37 @@ export default function PaginaEmergencias() {
 
           {/* MAPA */}
           <div className="mapa-container">
-            <GoogleMapReact
-              bootstrapURLKeys={{ key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "" }}
-              defaultCenter={{ lat: -35.5, lng: -71.0 }}
-              defaultZoom={5}
-              options={{
-                styles: dark
-                  ? [
-                      { elementType: "geometry",             stylers: [{ color: "#1a1a14" }] },
-                      { elementType: "labels.text.fill",     stylers: [{ color: "#7a7a6a" }] },
-                      { elementType: "labels.text.stroke",   stylers: [{ color: "#1a1a14" }] },
-                      { featureType: "water", elementType: "geometry", stylers: [{ color: "#0a0f1a" }] },
-                      { featureType: "road",  elementType: "geometry", stylers: [{ color: "#2a2a1e" }] },
-                      { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#3a3a2a" }] },
-                    ]
-                  : [],
-                disableDefaultUI: true,
-                zoomControl: false,
-              }}
-              onClick={({ lat, lng }) => {
-                // Al hacer clic en el mapa, pre-rellenar coords en el formulario
-                setEditData(undefined);
-                setPanelVista("crear-emergencia");
-              }}
-            >
-              {emergenciasFiltradas.map((em) => (
-                <MarkerMapa
-                  key={em.id}
-                  lat={em.latitud}
-                  lng={em.longitud}
-                  nivel={severidadANivel(em.severidad)}
-                  tipo={em.tipo}
-                />
-              ))}
-            </GoogleMapReact>
+            <EmergencyMapGoogle
+              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""}
+              dark={dark}
+              emergencias={emergenciasFiltradas}
+              geoJson={geoJson}
+              herramientaZona={herramientaMapa}
+              poligonoBorrador={poligonoBorrador}
+              onPoligonoBorradorChange={setPoligonoBorrador}
+              selectedId={emergenciaSeleccionada?.id ?? null}
+              onSelectEmergenciaId={onSelectEmergenciaId}
+            />
 
             <div className="mapa-zoom-controls">
-              <button className="mapa-zoom-btn">+</button>
+              <button type="button" className="mapa-zoom-btn" aria-label="Acercar (usa rueda del mouse)">+</button>
               <div className="mapa-divider" />
-              <button className="mapa-zoom-btn">−</button>
+              <button type="button" className="mapa-zoom-btn" aria-label="Alejar">−</button>
             </div>
 
             <div className="mapa-zone-tools">
-              {[
-                { label: "Dibujar zona", icon: <Square size={14} /> },
-                { label: "Editar zona",  icon: <Pencil size={14} /> },
-                { label: "Borrar zona",  icon: <Trash2 size={14} /> },
-              ].map((btn) => (
+              {(
+                [
+                  { label: "Dibujar zona" as const, icon: <Square size={14} /> },
+                  { label: "Editar zona" as const, icon: <Pencil size={14} /> },
+                  { label: "Borrar zona" as const, icon: <Trash2 size={14} /> },
+                ] as const
+              ).map((btn) => (
                 <button
                   key={btn.label}
-                  className={`zone-tool-btn${zonaActiva === btn.label ? " active" : ""}`}
-                  onClick={() => setZonaActiva(btn.label)}
+                  type="button"
+                  className={`zone-tool-btn${herramientaMapa === btn.label ? " active" : ""}`}
+                  onClick={() => setHerramientaMapa(btn.label)}
                 >
                   {btn.icon}
                   <span style={{ marginLeft: 4 }}>{btn.label}</span>
@@ -1058,6 +1133,9 @@ export default function PaginaEmergencias() {
             isCreating={createMutation.isPending}
             isUpdating={updateMutation.isPending}
             isDeleting={deleteMutation.isPending}
+            herramientaMapa={herramientaMapa}
+            setHerramientaMapa={setHerramientaMapa}
+            epicentroPreview={epicentroPreview}
           />
         </div>
 

@@ -7,6 +7,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getEmergenciasActivas,
+  getEmergenciasGeoJson,
   getAllEmergencias,
   getEmergenciaById,
   createEmergencia,
@@ -30,21 +31,39 @@ import {
 export const QUERY_KEYS = {
   emergencias: ['emergencias'] as const,
   emergenciasActivas: ['emergencias', 'activas'] as const,
+  emergenciasGeoJson: ['emergencias', 'geojson'] as const,
   emergencia: (id: string) => ['emergencias', id] as const,
   centros: ['centros-acopio'] as const,
   centrosCercanos: (lat: number, lng: number) => ['centros-acopio', 'cercanos', lat, lng] as const,
 };
 
+/** Opciones de sondeo (false = sin intervalo; útil mientras el usuario dibuja en el mapa). */
+export type EmergenciasPollOptions = {
+  refetchInterval?: number | false;
+};
+
 // ─── Emergencias — Queries ────────────────────────────────────────────────────
 
-/** Lista de emergencias activas — polling cada 30 s */
-export const useEmergenciasActivas = () =>
+/** Lista de emergencias activas — polling por defecto cada 2 min (evita cortar el dibujo en el mapa). */
+export const useEmergenciasActivas = (opts?: EmergenciasPollOptions) =>
   useQuery({
     queryKey: QUERY_KEYS.emergenciasActivas,
     queryFn: getEmergenciasActivas,
-    refetchInterval: 30_000,
-    staleTime: 15_000,
-    keepPreviousData: true,
+    refetchInterval: opts?.refetchInterval ?? 120_000,
+    staleTime: 60_000,
+    placeholderData: (p) => p,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+/** Polígonos activos (GeoJSON) para capa en mapa */
+export const useEmergenciasGeoJson = (opts?: EmergenciasPollOptions) =>
+  useQuery({
+    queryKey: QUERY_KEYS.emergenciasGeoJson,
+    queryFn: getEmergenciasGeoJson,
+    refetchInterval: opts?.refetchInterval ?? 120_000,
+    staleTime: 60_000,
+    placeholderData: (p) => p,
     refetchOnWindowFocus: false,
     retry: 1,
   });
@@ -77,6 +96,7 @@ export const useCreateEmergencia = () => {
     mutationFn: (data: CrearEmergenciaRequest) => createEmergencia(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasGeoJson });
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencias });
     },
   });
@@ -89,6 +109,7 @@ export const useUpdateEstadoEmergencia = () => {
       updateEstadoEmergencia(id, data),
     onSuccess: (_updated, { id }) => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasGeoJson });
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencia(id) });
     },
   });
@@ -100,6 +121,7 @@ export const useDeleteEmergencia = () => {
     mutationFn: (id: string) => deleteEmergencia(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasActivas });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.emergenciasGeoJson });
       qc.invalidateQueries({ queryKey: QUERY_KEYS.emergencias });
     },
   });

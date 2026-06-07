@@ -19,11 +19,15 @@ import {
   updateCentroAcopio,
   deleteCentroAcopio,
   calculateKpis,
+  getAnuncios,
+  isCentrosAcopioApiEnabled,
   type Emergencia,
   type CrearEmergenciaRequest,
   type ActualizarEstadoRequest,
   type CrearCentroAcopioRequest,
   type KpiData,
+  type AnuncioResponseDto,
+  type PageResponse,
 } from '../services/emergency.service';
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
@@ -35,6 +39,7 @@ export const QUERY_KEYS = {
   emergencia: (id: string) => ['emergencias', id] as const,
   centros: ['centros-acopio'] as const,
   centrosCercanos: (lat: number, lng: number) => ['centros-acopio', 'cercanos', lat, lng] as const,
+  anuncios: ['anuncios'] as const,
 };
 
 /** Opciones de sondeo (false = sin intervalo; útil mientras el usuario dibuja en el mapa). */
@@ -134,6 +139,8 @@ export const useCentrosAcopio = () =>
     queryKey: QUERY_KEYS.centros,
     queryFn: getCentrosAcopio,
     staleTime: 60_000,
+    enabled: isCentrosAcopioApiEnabled(),
+    placeholderData: [],
   });
 
 export const useCentrosCercanos = (
@@ -144,7 +151,7 @@ export const useCentrosCercanos = (
   useQuery({
     queryKey: QUERY_KEYS.centrosCercanos(lat ?? 0, lng ?? 0),
     queryFn: () => getCentrosCercanos(lat!, lng!, radioKm),
-    enabled: Boolean(lat && lng),
+    enabled: isCentrosAcopioApiEnabled() && Boolean(lat && lng),
     staleTime: 30_000,
   });
 
@@ -174,3 +181,22 @@ export const useDeleteCentroAcopio = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.centros }),
   });
 };
+
+// ─── Anuncios — Queries ───────────────────────────────────────────────────────
+
+/** Anuncios vigentes con polling; ante fallos repetidos aplica backoff y deja de consultar para no saturar el gateway. */
+export const useAnuncios = () =>
+  useQuery<PageResponse<AnuncioResponseDto>>({
+    queryKey: QUERY_KEYS.anuncios,
+    queryFn: () => getAnuncios(0, 50),
+    refetchInterval: (query) => {
+      const failures = query.state.fetchFailureCount;
+      if (failures >= 8) return false;
+      if (failures > 0) return Math.min(120_000, 5_000 * 2 ** Math.min(failures, 6));
+      return 5_000;
+    },
+    staleTime: 3_000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 30_000),
+  });

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import apiClient from './apiClient';
 import {
   createUserWithEmailAndPassword,
@@ -6,6 +7,19 @@ import {
   signOut,
 } from 'firebase/auth';
 import { getFirebaseAuthClient } from './firebaseClient';
+
+/**
+ * Cliente HTTP sin interceptors para POST /auth/register.
+ * Evita cualquier Authorization residual y el reintento 401 del apiClient,
+ * que en flujos de registro pueden dejar inconsistencias difíciles de depurar.
+ */
+const registerHttp = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
 
 export interface RegisterRequest {
   correo: string;
@@ -68,8 +82,39 @@ export interface RegisterResponse {
 }
 
 export const AuthService = {
-  // 1. Registrar cuenta en Firebase y sincronizar perfil en backend.
+  /**
+   * Registro unificado: el backend (ms-identity) crea el usuario en Firebase Auth
+   * Admin SDK y lo persiste en PostgreSQL en la misma petición.
+   * Evita el flujo anterior (createUser + sync) donde un Bearer mal inyectado daba 401
+   * y dejaba usuarios solo en Firebase.
+   */
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
+    const registroPayload: RegistroFirebaseRequest = {
+      correo: data.correo.trim(),
+      password: data.password,
+      nombres: data.nombres.trim(),
+      apellidos: data.apellidos.trim(),
+      tipoDocumento: data.tipoDocumento.trim(),
+      numeroDocumento: data.numeroDocumento?.trim(),
+      telefono: data.telefono?.trim(),
+      pais: data.pais,
+    };
+
+    try {
+      const response = await registerHttp.post('/auth/register', registroPayload);
+
+      return {
+        profile: response.data,
+        email: data.correo,
+      };
+    } catch (error) {
+      console.error('Error en registro (backend):', error);
+      throw error;
+    }
+  },
+
+  /** @deprecated Usar register() que llama POST /auth/register; se mantiene por compatibilidad */
+  registerLegacyClientFirebase: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const auth = getFirebaseAuthClient();
     if (!auth) {
       throw new Error('Firebase Auth no está configurado. Revisa las variables NEXT_PUBLIC_FIREBASE_* en .env.local.');
@@ -93,10 +138,8 @@ export const AuthService = {
         pais: data.pais,
       };
 
-      // Obtener el token del usuario creado en Firebase
       const token = await credentials.user.getIdToken();
 
-      // DEBUG: mostrar token corto y payload para depuración local
       try {
         console.log('DEBUG: idToken (first 32 chars):', token?.substring(0, 32));
         console.log('DEBUG: registroPayload', registroPayload);
@@ -104,7 +147,6 @@ export const AuthService = {
         // no romper en producción si console falla
       }
 
-      // Sincronizar el perfil en el backend usando el endpoint autenticado
       const syncResponse = await AuthService.syncFirebase({
         nombres: data.nombres,
         apellidos: data.apellidos,
@@ -171,11 +213,10 @@ export const AuthService = {
     }
     const credentials = await signInWithEmailAndPassword(auth, email, password);
     const token = await credentials.user.getIdToken();
+    const authHeaders = { Authorization: `Bearer ${token}` };
 
-    const profileResponse = await apiClient.get('/usuarios/yo', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
+    // ms-identity auto-provisiona en BD al validar el Bearer (FirebaseTokenFilter).
+    const profileResponse = await apiClient.get('/usuarios/yo', { headers: authHeaders });
     return {
       token,
       profile: profileResponse.data,

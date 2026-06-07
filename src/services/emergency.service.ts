@@ -19,6 +19,11 @@ export type SeveridadEmergenciaApi = 'BAJA' | 'MEDIA' | 'ALTA' | 'CATASTROFICA';
 
 export type EstadoEmergenciaApi = 'ACTIVA' | 'CONTROLADA' | 'FINALIZADA';
 
+// ─── Tipos Anuncios (Backend) ─────────────────────────────────────────────────
+
+export type SeveridadAnuncio = 'INFORMATIVO' | 'IMPORTANTE' | 'URGENTE' | 'EMERGENCIA';
+export type AlcanceAnuncio = 'NACIONAL' | 'REGIONAL' | 'COMUNAL';
+
 export interface GeoJsonPointDto {
   type: 'Point';
   coordinates: [number, number];
@@ -39,6 +44,8 @@ export interface EmergenciaResponseDto {
   zonaImpacto: GeoJsonPolygonDto | null;
   declaradaPorUsuarioId: string;
   declaradaEn: string;
+  centrosAcopio?: CentroAcopioEmergenciaResponseDto[];
+  procesamientoColaEmergenciaCreadaEn?: string | null;
   actualizadaEn: string;
 }
 
@@ -58,6 +65,42 @@ export interface EmergenciaGeoJsonFeature {
 export interface EmergenciasGeoJsonCollection {
   type: 'FeatureCollection';
   features: EmergenciaGeoJsonFeature[];
+}
+
+// ─── Tipos Centro Acopio Emergencia Response ──────────────────────────────────
+
+export interface CentroAcopioEmergenciaResponseDto {
+  id: string;
+  nombre: string;
+  ubicacion: GeoJsonPointDto | null;
+  capacidadEstimada: number | null;
+}
+
+// ─── Tipo Anuncio Response (Backend) ──────────────────────────────────────────
+
+export interface AnuncioResponseDto {
+  id: string;
+  emergenciaId: string;
+  autorUsuarioId: string;
+  titulo: string;
+  contenido: string;
+  severidad: SeveridadAnuncio;
+  alcance: AlcanceAnuncio;
+  region: string | null;
+  vigenteDesde: string;
+  vigenteHasta: string | null;
+  creadoEn: string;
+}
+
+/** Spring Page<T> response wrapper */
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
 }
 
 // ─── Tipos UI ─────────────────────────────────────────────────────────────────
@@ -121,12 +164,20 @@ export interface CoordenadaDto {
   latitud: number;
 }
 
+/** Coincide exactamente con DeclararEmergenciaRequest del backend */
+export interface SolicitudCentroAcopioRequest {
+  nombre: string;
+  ubicacion: CoordenadaDto;
+  capacidadEstimada?: number;
+}
+
 export interface CrearEmergenciaRequest {
   tipo: TipoEmergenciaApi;
   severidad: SeveridadEmergenciaApi;
   region: string;
   epicentro: CoordenadaDto;
   zonaImpacto: CoordenadaDto[] | null;
+  centrosAcopio?: SolicitudCentroAcopioRequest[];
 }
 
 export interface ActualizarEstadoRequest {
@@ -169,6 +220,7 @@ export function mapTipoUiABackend(tipoUi: string): TipoEmergenciaApi {
     INCENDIO: 'INCENDIO',
     INUNDACION: 'INUNDACION',
     ERUPCION: 'ERUPCION',
+    ERUPCION_VOLCANICA: 'ERUPCION',
     ALUVION: 'ALUVION',
     Terremoto: 'TERREMOTO',
     SISMO: 'TERREMOTO',
@@ -281,8 +333,15 @@ export const deleteEmergencia = async (id: string): Promise<void> => {
 };
 
 // ─── Centros de acopio ────────────────────────────────────────────────────────
+// El MS de recursos no está integrado en el gateway aún; no llamar a /centros-acopio por defecto.
+// Para reactivar el cliente cuando exista el servicio: NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true
+
+export function isCentrosAcopioApiEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO === 'true';
+}
 
 export const getCentrosAcopio = async (): Promise<CentroAcopio[]> => {
+  if (!isCentrosAcopioApiEnabled()) return [];
   const res = await apiClient.get<CentroAcopio[]>('/centros-acopio');
   return res.data;
 };
@@ -292,15 +351,23 @@ export const getCentrosCercanos = async (
   lng: number,
   radioKm = 20
 ): Promise<CentroAcopio[]> => {
+  if (!isCentrosAcopioApiEnabled()) return [];
   const res = await apiClient.get<CentroAcopio[]>('/centros-acopio/cercanos', {
     params: { lat, lng, radio: radioKm },
   });
   return res.data;
 };
 
+function rejectCentrosDeshabilitados(): never {
+  throw new Error(
+    'El módulo de centros de acopio no está disponible. Cuando el microservicio esté listo, define NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true.'
+  );
+}
+
 export const createCentroAcopio = async (
   data: CrearCentroAcopioRequest
 ): Promise<CentroAcopio> => {
+  if (!isCentrosAcopioApiEnabled()) rejectCentrosDeshabilitados();
   const res = await apiClient.post<CentroAcopio>('/centros-acopio', data);
   return res.data;
 };
@@ -309,12 +376,24 @@ export const updateCentroAcopio = async (
   id: string,
   data: Partial<CrearCentroAcopioRequest>
 ): Promise<CentroAcopio> => {
+  if (!isCentrosAcopioApiEnabled()) rejectCentrosDeshabilitados();
   const res = await apiClient.patch<CentroAcopio>(`/centros-acopio/${id}`, data);
   return res.data;
 };
 
 export const deleteCentroAcopio = async (id: string): Promise<void> => {
+  if (!isCentrosAcopioApiEnabled()) rejectCentrosDeshabilitados();
   await apiClient.delete(`/centros-acopio/${id}`);
+};
+
+// ─── Anuncios / Notificaciones ────────────────────────────────────────────────
+
+/** Obtiene los anuncios vigentes (paginados). El backend ordena por severidad desc + vigenteDesde */
+export const getAnuncios = async (page = 0, size = 50): Promise<PageResponse<AnuncioResponseDto>> => {
+  const res = await apiClient.get<PageResponse<AnuncioResponseDto>>('/anuncios', {
+    params: { page, size },
+  });
+  return res.data;
 };
 
 // ─── KPIs ─────────────────────────────────────────────────────────────────────

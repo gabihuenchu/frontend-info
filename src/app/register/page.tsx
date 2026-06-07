@@ -61,7 +61,9 @@ export default function RegisterPage() {
       router.push('/login?registered=true');
     } catch (err: any) {
       console.error('Error en registro:', err);
-      if (err.code === 'auth/email-already-in-use') {
+      if (err.response?.status === 409 || err.response?.data?.errorCode === 'EMAIL_ALREADY_EXISTS') {
+        setError('Ese correo ya está registrado. Usa Iniciar sesión para entrar.');
+      } else if (err.code === 'auth/email-already-in-use') {
         setError('Ese correo ya está registrado en Firebase.');
       } else if (err.code === 'auth/invalid-email') {
         setError('El correo electrónico no es válido.');

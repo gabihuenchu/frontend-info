@@ -12,25 +12,50 @@ const apiClient = axios.create({
   },
 });
 
+function readTokenFromLocalStorage(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      return null;
+    }
+    const parsed = JSON.parse(storedUser) as { token?: string };
+    if (parsed?.token && typeof parsed.token === 'string') {
+      return parsed.token;
+    }
+  } catch (e) {
+    console.error('Error al parsear usuario de localStorage:', e);
+  }
+  return null;
+}
+
 /**
- * Obtiene el token de Firebase del usuario actual
+ * Obtiene el token para Authorization: Bearer (Firebase idToken o el guardado tras login).
  */
 export const getFirebaseToken = async (): Promise<string | null> => {
   try {
     const auth = getFirebaseAuthClient();
+    if (auth?.currentUser) {
+      return await auth.currentUser.getIdToken();
+    }
+
+    const fromStorage = readTokenFromLocalStorage();
+    if (fromStorage) {
+      return fromStorage;
+    }
+
     if (!auth) {
-      console.warn('Firebase no inicializado');
+      console.warn(
+        'Firebase no está configurado (NEXT_PUBLIC_FIREBASE_*). ' +
+          'Configure Firebase o inicie sesión para guardar el token en localStorage.'
+      );
       return null;
     }
-    const user = auth.currentUser;
-    
-    if (!user) {
-      console.warn('No hay usuario autenticado');
-      return null;
-    }
-    
-    const token = await user.getIdToken();
-    return token;
+
+    console.warn('No hay usuario autenticado (ni en Firebase ni en localStorage)');
+    return null;
   } catch (error) {
     console.error('Error al obtener token de Firebase:', error);
     return null;
@@ -64,12 +89,23 @@ export const refreshFirebaseToken = async (): Promise<string | null> => {
 // Interceptor para agregar token de Firebase en cada request
 apiClient.interceptors.request.use(
   async (config) => {
+    // Registro/login sin token: si axios envía un Bearer viejo/inválido, ms-identity
+    // puede responder 401 antes de llegar al controlador (FirebaseTokenFilter).
+    const path = config.url ?? '';
+    const isPublicAuth =
+      path.includes('/auth/register') ||
+      path.includes('/auth/login') ||
+      path.includes('/auth/invitacion/aceptar');
+    if (isPublicAuth) {
+      return config;
+    }
+
     const token = await getFirebaseToken();
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -115,17 +151,29 @@ apiClient.interceptors.response.use(
         // no hacer nada si no es JSON
       }
 
-      // Si sigue siendo un objeto vacío o no contiene campos esperados, stringify para que no aparezca como '{}'
-      const safeData = (parsedData && Object.keys(parsedData as any).length > 0)
-        ? parsedData
-        : (typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data));
+      const problem = parsedData as {
+        title?: string;
+        detail?: string;
+        errorCode?: string;
+        instance?: string;
+      } | null;
 
-      console.error('Error del backend:', {
-        status: resp.status,
-        statusText: resp.statusText,
-        headers: resp.headers,
-        data: safeData,
-      });
+      const safeData =
+        problem?.detail || problem?.title
+          ? {
+              status: resp.status,
+              title: problem.title,
+              detail: problem.detail,
+              errorCode: problem.errorCode,
+              instance: problem.instance,
+            }
+          : parsedData && Object.keys(parsedData as object).length > 0
+            ? parsedData
+            : typeof resp.data === 'string'
+              ? resp.data
+              : JSON.stringify(resp.data);
+
+      console.error('Error del backend:', safeData);
     } else if (error.request) {
       // El request fue enviado pero no hubo respuesta (Network Error, CORS, timeout...)
       console.error('No response from backend (possible network error or CORS):', {

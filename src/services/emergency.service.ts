@@ -270,6 +270,9 @@ export function mapEmergenciaResponse(dto: EmergenciaResponseDto): Emergencia {
   };
 }
 
+/** Mínimo de vértices únicos antes de cerrar el anillo (4 coordenadas totales con cierre). */
+export const MIN_VERTICES_ZONA_IMPACTO = 3;
+
 /** Cierra el anillo del polígono (primer punto = último) para PostGIS / JTS */
 export function cerrarAnilloZona(coords: CoordenadaDto[]): CoordenadaDto[] {
   if (coords.length === 0) return coords;
@@ -277,6 +280,27 @@ export function cerrarAnilloZona(coords: CoordenadaDto[]): CoordenadaDto[] {
   const last = coords[coords.length - 1];
   if (first.longitud === last.longitud && first.latitud === last.latitud) return coords;
   return [...coords, { ...first }];
+}
+
+/**
+ * Valida y cierra la zona para DeclararEmergenciaRequest.
+ * El backend exige ≥ 4 CoordenadaDto con anillo cerrado (mín. 3 vértices únicos).
+ */
+export function prepararZonaImpactoParaApi(
+  puntos: CoordenadaDto[]
+): { ring: CoordenadaDto[]; epicentro: CoordenadaDto } | null {
+  if (puntos.length < MIN_VERTICES_ZONA_IMPACTO) return null;
+  const ring = cerrarAnilloZona(puntos);
+  if (ring.length < 4) return null;
+  return { ring, epicentro: centroidEpicentro(ring) };
+}
+
+export function latLngRingFromGeoJson(
+  polygon: GeoJsonPolygonDto | null | undefined
+): Array<{ lat: number; lng: number }> {
+  const ring = polygon?.coordinates?.[0];
+  if (!ring?.length) return [];
+  return ring.map(([lng, lat]) => ({ lat, lng }));
 }
 
 export function centroidEpicentro(ring: CoordenadaDto[]): CoordenadaDto {

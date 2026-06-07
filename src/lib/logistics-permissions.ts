@@ -6,7 +6,26 @@ export interface PerfilConPermisos {
 }
 
 export function normalizarRoles(profile: PerfilConPermisos | null | undefined): string[] {
-  return (profile?.roles ?? []).map((r) => (typeof r === 'string' ? r : r?.nombre ?? ''));
+  const raw = profile?.roles ?? [];
+  return raw
+    .map((r) => {
+      if (typeof r === 'string') return r.trim();
+      if (r && typeof r === 'object') {
+        const obj = r as { nombre?: string; name?: string; codigo?: string };
+        return (obj.nombre ?? obj.name ?? obj.codigo ?? '').trim();
+      }
+      return '';
+    })
+    .filter(Boolean);
+}
+
+/** Texto legible para mostrar roles en UI (ej. ADMINISTRADOR → Administrador). */
+export function formatearRolesUsuario(profile: PerfilConPermisos | null | undefined): string {
+  const roles = normalizarRoles(profile);
+  if (roles.length === 0) return 'Sin rol';
+  return roles
+    .map((r) => r.charAt(0) + r.slice(1).toLowerCase().replace(/_/g, ' '))
+    .join(' · ');
 }
 
 export function tienePermiso(profile: PerfilConPermisos | null | undefined, permiso: string): boolean {

@@ -4,6 +4,46 @@
 
 ---
 
+### [2026-06-04] Módulo logística dashboard + sidebar unificado
+**Integrante(s):** Camilo / Claude (Cursor)  
+**Fase trabajada:** Fase 8 — Frontend Completo (integración Fase 4 logística)
+
+#### Completado
+- **Módulo logística** en `frontend-info`: rutas `/dashboard/logistica`, `/transferencias`, `/misiones`, `/rutas-voluntario`, `/matching-osrm`, `/inventario`, `/centros-acopio`, `/reportes`, `/ajustes`.
+- Capa de datos: `types/logistics.ts`, `services/logistics.service.ts`, `hooks/useLogistics.ts`, `lib/logistics-permissions.ts`, mocks para KPIs/listados sin `GET` en backend.
+- Componentes: `LogisticsMap`, `LogisticsKpiCards`, `TransferenciasTable`, `LogisticsRightPanel`, `LogisticsLayout`, `DashboardPageHeader`.
+- **Shell dashboard único:** `dashboard/layout.tsx` con un solo `Sidebar` + `DashboardThemeProvider`; eliminado sidebar duplicado en emergencias/logística.
+- **Sidebar — menú definitivo:** Gestión Usuarios, Emergencias, Centros de acopio, Logística (submenú RBAC), Inventario, Gestión Ciudadana (Necesidades / Donaciones).
+- **Estilos sidebar unificados:** clase `sidebar--app` en `emergency.css`, variable `--dark-bg-sidebar: #10170D` (mismo color en logística y emergencias).
+- **Correcciones mapa:** hook `useGoogleMaps` con loader ID único; dibujo de zonas por clics (sin `DrawingManager`, retirado en Maps API 3.65).
+- Login ADMIN redirige a `/dashboard/logistica`.
+
+#### En progreso
+- Páginas del menú sin UI: `/dashboard/usuarios`, `/dashboard/ciudadana/necesidades`, `/dashboard/ciudadana/donaciones`.
+- Listados reales de transferencias/misiones (backend sin endpoints `GET` de colección).
+- Integración E2E logística vía gateway `:8080`.
+
+#### Bloqueadores
+- Ninguno para navegación y UI; datos de listado dependen de APIs pendientes en `ms-logistics`.
+
+#### Próximos pasos
+- Implementar vistas Gestión Usuarios y Gestión Ciudadana.
+- Añadir `ms-logistics` a `compose.yaml` raíz y validar matching OSRM end-to-end.
+- Sustituir mocks por TanStack Query cuando existan `GET /transferencias` y `GET /misiones`.
+
+---
+
+### [2026-06-06] Documentación flujo auth Firebase ↔ PostgreSQL
+**Origen:** FE / IDN  
+**Fase:** 1 — Identidad + Frontend  
+
+#### Completado
+- Guía [flujo-autenticacion.md](./flujo-autenticacion.md): login (valida Firebase + auto-sync BD), registro (`POST /auth/register` en ambos sistemas).
+- Mensajes de login alineados (cuenta inexistente en Firebase).
+- Enlace desde [ENDPOINTS.md](./ENDPOINTS.md).
+
+---
+
 ## [2025-01-09] Integración Dashboard Emergencias con Backend
 
 **Integrante(s):** Claude (Asistente AI)  
@@ -73,9 +113,6 @@
 
 ## Historial de Avances Anteriores
 
-<<<<<<< HEAD
-*(Aquí se mantendrían los avances previos del proyecto)*
-=======
 ### [2026-05-09] Documentación de consumo de ms-emergencies para frontend-info
 **Integrante(s):** Claude
 **Fase trabajada:** Fase 8 — Frontend Completo
@@ -442,7 +479,6 @@
 #### Próximos pasos
 - Configurar `FIREBASE_SYNC_SECRET` en entorno.
 - Implementar y desplegar Cloud Function `auth.user().onCreate` para invocar `/auth/firebase/sync/system`.
->>>>>>> 15444b317d8f95f6ecf85d81fa5dd1ae86a1b33b
 
 ---
 
@@ -458,9 +494,12 @@
 | Componente | Frontend | Backend | Integración | Estado |
 |-----------|----------|---------|-------------|--------|
 | Autenticación | ✅ | ✅ | ✅ | Completado |
-| Dashboard Emergencias | ✅ | ✅ | ✅ | Completado |
-| Gestión de Usuarios | 🔄 | ✅ | 🔄 | En progreso |
-| Centros de Acopio | ⬜ | 🔄 | ⬜ | No iniciado |
-| Inventario | ⬜ | ⬜ | ⬜ | No iniciado |
-| Donaciones | ⬜ | ⬜ | ⬜ | No iniciado |
+| Dashboard Emergencias | ✅ | ✅ | 🔄 | Completado (UI); validar E2E dibujo polígono |
+| Dashboard Logística | 🔄 | ✅ | 🔄 | UI + mocks; APIs listado pendientes |
+| Sidebar / shell dashboard | ✅ | — | ✅ | Menú unificado y tema consistente |
+| Gestión de Usuarios | 🔄 | ✅ | ⬜ | Enlace en menú; página pendiente |
+| Centros de Acopio | 🔄 | 🔄 | ⬜ | Ruta FE + gestión en emergencias |
+| Inventario | 🔄 | ⬜ | ⬜ | Página placeholder logística |
+| Gestión Ciudadana | 🔄 | ⬜ | ⬜ | Menú Necesidades/Donaciones; páginas pendientes |
+| Donaciones | ⬜ | ⬜ | ⬜ | No iniciado (ms-citizen) |
 | Notificaciones | ⬜ | ⬜ | ⬜ | No iniciado |

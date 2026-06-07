@@ -1,195 +1,392 @@
-"use client";
-
-import {
-  Home,
-  TriangleAlert,
-  Warehouse,
-  Boxes,
-  FileText,
-  Map,
-  Users,
-  CircleHelp,
-  HandHeart,
-  User,
-  Moon,
-  Sun,
-} from "lucide-react";
-
-interface SidebarProps {
-  dark: boolean;
-  setDark: React.Dispatch<React.SetStateAction<boolean>>;
-  userName?: string;
-  userRole?: string;
-}
-
-export default function Sidebar({ 
-  dark, 
-  setDark, 
-  userName = "Usuario", 
-  userRole = "Sin rol" 
-}: SidebarProps) {
-  const menuItems = [
-    {
-      icon: <Home size={18} />,
-      label: "Inicio",
-      active: false,
-    },
-    {
-      icon: <TriangleAlert size={18} />,
-      label: "Emergencias",
-      active: true,
-    },
-    {
-      icon: <Warehouse size={18} />,
-      label: "Centros de acopio",
-      active: false,
-    },
-    {
-      icon: <Boxes size={18} />,
-      label: "Recursos",
-      active: false,
-    },
-    {
-      icon: <FileText size={18} />,
-      label: "Reportes",
-      active: false,
-    },
-    {
-      icon: <Map size={18} />,
-      label: "Mapas",
-      active: false,
-    },
-    {
-      icon: <Users size={18} />,
-      label: "Voluntarios",
-      active: false,
-    },
-    {
-      icon: <CircleHelp size={18} />,
-      label: "Ayuda",
-      active: false,
-    },
-  ];
-
-  return (
-    <aside className="w-[280px] h-screen bg-[#10170D] border-r border-white/5 flex flex-col px-5 py-6 text-white overflow-hidden">
-
-      {/* LOGO */}
-      <div className="flex-shrink-0">
-
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-[#2B3210] flex items-center justify-center font-bold text-white border border-[#3f4d22]">
-            CL
-          </div>
-
-          <h1 className="text-lg font-bold tracking-wide">
-            CATÁSTROFES
-            <span className="text-[#8BAE5A]">CL</span>
-          </h1>
-        </div>
-
-        {/* NAVIGATION */}
-        <nav className="flex flex-col gap-1 flex-1 overflow-y-auto min-h-0">
-
-          {menuItems.map((item) => (
-            <button
-              key={item.label}
-              className={`
-                flex items-center gap-3 px-4 py-2.5 rounded-xl
-                transition-all duration-200
-                text-sm font-medium
-                ${
-                  item.active
-                    ? "bg-[#2B3210] text-white shadow-lg"
-                    : "text-gray-300 hover:bg-white/5 hover:text-white"
-                }
-              `}
-            >
-              <span
-                className={`${
-                  item.active ? "text-red-500" : "text-gray-400"
-                }`}
-              >
-                {item.icon}
-              </span>
-
-              <span>{item.label}</span>
-            </button>
-          ))}
-
-        </nav>
-
-        {/* STATUS */}
-        <div className="mt-4 bg-[#161F12] border border-[#2f3a22] rounded-xl p-3 flex-shrink-0">
-
-          <p className="text-xs text-gray-400 mb-2">
-            Sistema en tiempo real
-          </p>
-
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-
-            <span className="text-sm font-medium text-green-400">
-              Conectado
-            </span>
-          </div>
-
-        </div>
-
-        {/* HELP CARD */}
-        <div className="mt-3 bg-gradient-to-br from-[#1A2414] to-[#141B10] border border-[#2f3a22] rounded-xl p-3 flex-shrink-0">
-
-          <div className="flex items-start gap-2">
-
-            <div className="mt-0.5 text-[#8BAE5A]">
-              <HandHeart size={18} />
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-white leading-tight">
-                Tu ayuda marca la diferencia.
-              </p>
-
-              <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                Infórmate, colabora y salva vidas.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-      {/* USER */}
-      <div className="border-t border-white/5 pt-4 mt-4 flex-shrink-0">
-
-        <div className="flex items-center gap-3">
-
-          <div className="w-11 h-11 rounded-full bg-[#2B3210] border border-[#3f4d22] flex items-center justify-center text-white">
-            <User size={20} />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate">
-              {userName}
-            </p>
-
-            <p className="text-xs text-gray-400">
-              {userRole}
-            </p>
-          </div>
-
-          {/* Toggle simple */}
-          <button
-            onClick={() => setDark((prev) => !prev)}
-            className="w-10 h-10 rounded-xl bg-[#1A2414] border border-[#2f3a22] hover:bg-[#24301B] transition-colors"
-          >
-            {dark ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
-
-        </div>
-
-      </div>
-    </aside>
-  );
-}
+"use client";
+
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { signOut } from "firebase/auth";
+import { getFirebaseAuthClient } from "@/services/firebaseClient";
+import { useAuth } from "@/providers/AuthProvider";
+import { UsuarioService } from "@/services/usuario.service";
+import {
+  puedeVerLogistica,
+  puedeVerMatchingOsrm,
+  puedeVerSeccionAdmin,
+  normalizarRoles,
+  tienePermiso,
+  type PerfilConPermisos,
+} from "@/lib/logistics-permissions";
+import { PERMISOS_LOGISTICA } from "@/types/logistics";
+import {
+  TriangleAlert,
+  Warehouse,
+  HandHeart,
+  User,
+  Moon,
+  Sun,
+  LogOut,
+  Truck,
+  ChevronDown,
+  ChevronRight,
+  LayoutDashboard,
+  ArrowLeftRight,
+  Target,
+  Route,
+  GitBranch,
+  Package,
+  UserCog,
+  HeartHandshake,
+  ClipboardList,
+  Gift,
+} from "lucide-react";
+
+interface SidebarProps {
+  dark: boolean;
+  setDark: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+type NavLink = {
+  type: "link";
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  visible?: boolean;
+  activeIconClass?: string;
+};
+
+type NavGroup = {
+  type: "group";
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  visible?: boolean;
+  children: Array<{ label: string; href: string; icon?: React.ReactNode; visible: boolean }>;
+};
+
+type NavItem = NavLink | NavGroup;
+
+const LOGISTICA_PREFIX = "/dashboard/logistica";
+const CIUDADANA_PREFIX = "/dashboard/ciudadana";
+
+const LOGISTICA_SUB_ROUTES = [
+  "/dashboard/logistica",
+  "/dashboard/logistica/transferencias",
+  "/dashboard/logistica/misiones",
+  "/dashboard/logistica/rutas-voluntario",
+  "/dashboard/logistica/matching-osrm",
+];
+
+export default function Sidebar({ dark, setDark }: SidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<PerfilConPermisos & { nombres?: string; apellidos?: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    logistica: LOGISTICA_SUB_ROUTES.some(
+      (r) => pathname === r || pathname.startsWith(`${r}/`)
+    ),
+    ciudadana: pathname.startsWith(CIUDADANA_PREFIX),
+  });
+
+  useEffect(() => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      logistica:
+        LOGISTICA_SUB_ROUTES.some(
+          (r) => pathname === r || pathname.startsWith(`${r}/`)
+        ) || prev.logistica,
+      ciudadana: pathname.startsWith(CIUDADANA_PREFIX) || prev.ciudadana,
+    }));
+  }, [pathname]);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const token = await user.getIdToken();
+        const p = await UsuarioService.getMyProfile(token);
+        setProfile(p);
+      } catch (error) {
+        console.error("Error al obtener perfil del usuario:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    void fetchUserProfile();
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      const auth = getFirebaseAuthClient();
+      if (auth) await signOut(auth);
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+    router.push("/");
+  };
+
+  const userName = profile
+    ? `${profile.nombres || ""} ${profile.apellidos || ""}`.trim()
+    : "Cargando...";
+
+  const userRole = normalizarRoles(profile)[0] || "Sin rol";
+
+  const showLogistica = puedeVerLogistica(profile);
+  const showAdmin = puedeVerSeccionAdmin(profile);
+
+  const logisticaChildren = useMemo(
+    () =>
+      [
+        {
+          label: "Resumen logístico",
+          href: "/dashboard/logistica",
+          icon: <LayoutDashboard size={16} />,
+          visible: showLogistica,
+        },
+        {
+          label: "Transferencias",
+          href: "/dashboard/logistica/transferencias",
+          icon: <ArrowLeftRight size={16} />,
+          visible:
+            tienePermiso(profile, PERMISOS_LOGISTICA.SOLICITAR) ||
+            tienePermiso(profile, PERMISOS_LOGISTICA.APROBAR),
+        },
+        {
+          label: "Misiones",
+          href: "/dashboard/logistica/misiones",
+          icon: <Target size={16} />,
+          visible: tienePermiso(profile, PERMISOS_LOGISTICA.MISION),
+        },
+        {
+          label: "Rutas voluntario",
+          href: "/dashboard/logistica/rutas-voluntario",
+          icon: <Route size={16} />,
+          visible: tienePermiso(profile, PERMISOS_LOGISTICA.RUTA),
+        },
+        {
+          label: "Matching OSRM",
+          href: "/dashboard/logistica/matching-osrm",
+          icon: <GitBranch size={16} />,
+          visible: puedeVerMatchingOsrm(profile),
+        },
+      ].filter((c) => c.visible),
+    [profile, showLogistica]
+  );
+
+  const ciudadanaChildren = useMemo(
+    () =>
+      [
+        {
+          label: "Necesidades",
+          href: "/dashboard/ciudadana/necesidades",
+          icon: <ClipboardList size={16} />,
+          visible: true,
+        },
+        {
+          label: "Donaciones",
+          href: "/dashboard/ciudadana/donaciones",
+          icon: <Gift size={16} />,
+          visible: true,
+        },
+      ].filter((c) => c.visible),
+    []
+  );
+
+  const menuItems: NavItem[] = [
+    {
+      type: "link",
+      icon: <UserCog size={18} />,
+      label: "Gestión Usuarios",
+      href: "/dashboard/usuarios",
+      visible: showAdmin,
+    },
+    {
+      type: "link",
+      icon: <TriangleAlert size={18} />,
+      label: "Emergencias",
+      href: "/dashboard/emergency",
+      activeIconClass: "alert",
+    },
+    {
+      type: "link",
+      icon: <Warehouse size={18} />,
+      label: "Centros de acopio",
+      href: "/dashboard/logistica/centros-acopio",
+    },
+    ...(showLogistica && logisticaChildren.length > 0
+      ? [
+          {
+            type: "group" as const,
+            id: "logistica",
+            icon: <Truck size={18} />,
+            label: "Logística",
+            children: logisticaChildren,
+          },
+        ]
+      : []),
+    ...(showLogistica || showAdmin
+      ? [
+          {
+            type: "link" as const,
+            icon: <Package size={18} />,
+            label: "Inventario",
+            href: "/dashboard/logistica/inventario",
+          },
+        ]
+      : []),
+    ...(ciudadanaChildren.length > 0
+      ? [
+          {
+            type: "group" as const,
+            id: "ciudadana",
+            icon: <HeartHandshake size={18} />,
+            label: "Gestión Ciudadana",
+            children: ciudadanaChildren,
+          },
+        ]
+      : []),
+  ].filter((item) => item.visible !== false);
+
+  const isPathActive = (href: string) => {
+    if (href === "/dashboard/logistica") return pathname === href;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const isGroupActive = (groupId: string) => {
+    if (groupId === "logistica") {
+      return LOGISTICA_SUB_ROUTES.some((r) => isPathActive(r));
+    }
+    if (groupId === "ciudadana") {
+      return pathname.startsWith(CIUDADANA_PREFIX);
+    }
+    return false;
+  };
+
+  const toggleGroup = (groupId: string) => {
+    setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  return (
+    <aside className="sidebar sidebar--app">
+      <div className="sidebar--app-inner">
+        <div className="sidebar--app-logo">
+          <div className="sidebar--app-logo-icon">CL</div>
+          <h1 className="sidebar--app-logo-text">
+            CATÁSTROFES
+            <span className="brand-green">CL</span>
+          </h1>
+        </div>
+
+        <nav className="sidebar-nav sidebar-nav--app">
+          {menuItems.map((item) => {
+            if (item.type === "group") {
+              const groupActive = isGroupActive(item.id);
+              const isOpen = openGroups[item.id] ?? false;
+
+              return (
+                <div key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(item.id)}
+                    className={`nav-item nav-item--app${groupActive ? " active" : ""}`}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
+                    {isOpen ? (
+                      <ChevronDown size={16} style={{ color: "#6b7280" }} />
+                    ) : (
+                      <ChevronRight size={16} style={{ color: "#6b7280" }} />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div style={{ marginTop: 2, marginBottom: 4 }}>
+                      {item.children.map((child) => (
+                        <button
+                          key={child.href}
+                          type="button"
+                          onClick={() => router.push(child.href)}
+                          className={`nav-sub-item${isPathActive(child.href) ? " active" : ""}`}
+                        >
+                          {child.icon}
+                          <span>{child.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            const active = isPathActive(item.href);
+            const iconClass =
+              active && item.activeIconClass === "alert"
+                ? "nav-icon nav-icon--alert"
+                : "nav-icon";
+
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => router.push(item.href)}
+                className={`nav-item nav-item--app${active ? " active" : ""}`}
+              >
+                <span className={iconClass}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar--app-widget sidebar--app-widget--status">
+          <p className="sidebar--app-widget-label">Sistema en tiempo real</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="status-dot" />
+            <span style={{ fontSize: "0.875rem", fontWeight: 500, color: "#4ade80" }}>Conectado</span>
+          </div>
+        </div>
+
+        <div className="sidebar--app-widget sidebar--app-widget--help">
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+            <div style={{ marginTop: 2, color: "var(--green-brand-text)" }}>
+              <HandHeart size={18} />
+            </div>
+            <div>
+              <p className="sidebar--app-widget-title">Tu ayuda marca la diferencia.</p>
+              <p className="sidebar--app-widget-sub">Infórmate, colabora y salva vidas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="sidebar--app-user">
+        <div className="sidebar--app-user-row">
+          <div className="sidebar--app-avatar">
+            <User size={20} />
+          </div>
+          <div className="sidebar--app-user-info">
+            <p className="sidebar--app-user-name">{loading ? "…" : userName}</p>
+            <p className="sidebar--app-user-role">{userRole}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setDark((prev) => !prev)}
+            className="sidebar--app-icon-btn"
+            title="Cambiar tema"
+          >
+            {dark ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="sidebar--app-icon-btn sidebar--app-icon-btn--logout"
+            title="Cerrar sesión"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+}

@@ -13,8 +13,8 @@
 ### Estrategia de sincronización Firebase Auth → BD por entorno
 
 **Entorno local (activo y prioritario)**
-- Flujo principal: `Frontend` registra/autentica en Firebase Auth y luego llama `POST /auth/firebase/sync` con `idToken`.
-- Resultado esperado: usuario sincronizado en PostgreSQL local (`ms-identity`) inmediatamente después del registro/login.
+- **Registro:** `POST /auth/register` (Firebase Admin SDK + PostgreSQL en una petición). Ver [flujo-autenticacion.md](./flujo-autenticacion.md).
+- **Login:** Firebase `signIn` + `GET /usuarios/yo`; `ms-identity` auto-provisiona en BD si falta (`FirebaseTokenFilter`).
 
 **Entorno producción (ruta objetivo)**
 - Flujo principal: trigger `auth.user().onCreate` (Cloud Function) invoca `POST /auth/firebase/sync/system`.
@@ -554,13 +554,17 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 
 ### Frontend Dashboard (Autoridades/Operadores — Next.js Client Components)
 
+- [x] Layout dashboard unificado con sidebar compartido (`dashboard/layout.tsx`, RBAC por permisos)
 - [ ] Dashboard KPIs en tiempo real (TanStack Query + WebSocket STOMP)
-- [ ] Gestión de centros de acopio e inventarios
-- [ ] Flujos de transferencias (tabla con estados + acciones)
-- [ ] Gestión de misiones de despacho
-- [ ] Mapa operativo táctico con capas de datos enriquecidas
+- [x] Gestión de centros de acopio e inventarios (rutas FE; centros vía módulo emergencias; inventario placeholder)
+- [x] Flujos de transferencias (tabla con estados + acciones; mocks donde falta `GET` listado)
+- [x] Gestión de misiones de despacho (UI + hooks; listado mock pendiente API)
+- [x] Mapa operativo táctico con capas de datos enriquecidas (logística + emergencias; Google Maps unificado)
+- [x] Matching OSRM voluntarios (página `/dashboard/logistica/matching-osrm`)
 - [ ] Publicación de anuncios críticos (formulario con preview)
-- [ ] Administración de emergencias activas
+- [x] Administración de emergencias activas (dashboard con API real + dibujo zonas por clics)
+- [ ] Gestión de usuarios (enlace menú; página `/dashboard/usuarios` pendiente)
+- [ ] Gestión ciudadana — Necesidades y Donaciones (menú; páginas pendientes)
 - [ ] Gestión de umbrales de inventario por centro (Admin only)
 - [ ] Gráficos con Recharts: evolución de stock, distribución de donaciones
 

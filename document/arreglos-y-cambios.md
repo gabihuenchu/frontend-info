@@ -20,8 +20,33 @@
 
 ## Cambios Aplicados
 
-<<<<<<< HEAD
-=======
+### [ARR-017] Menú lateral definitivo del dashboard (estructura por módulos)
+- **Fecha:** 2026-06-04
+- **Autor:** Camilo / Claude
+- **Tipo:** Feature | Refactor
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se redefinió el menú del `Sidebar` según la estructura acordada: Gestión Usuarios, Emergencias, Centros de acopio, Logística (acordeón con submenú RBAC), Inventario, Gestión Ciudadana (Necesidades / Donaciones). Se eliminaron entradas no solicitadas (Inicio, Recursos, Reportes, Mapas, Voluntarios, Ayuda). Soporte de dos acordeones independientes (`logistica`, `ciudadana`).
+- **Archivos afectados:** `src/components/sidebar.tsx`
+- **Tests actualizados:** N/A
+
+### [ARR-016] Unificación visual del sidebar entre emergencias y logística
+- **Fecha:** 2026-06-04
+- **Autor:** Camilo / Claude
+- **Tipo:** Bugfix | Refactor
+- **Error relacionado:** N/A
+- **Descripción del cambio:** El sidebar cambiaba de color al navegar entre módulos por mezcla de Tailwind hardcodeado (`#10170D`) y variables CSS distintas (`#131310`). Se centralizó el estilo en `sidebar--app` dentro de `emergency.css`, con `--dark-bg-sidebar: #10170D` fijo en modo claro y oscuro para el panel lateral.
+- **Archivos afectados:** `src/styles/emergency.css`, `src/components/sidebar.tsx`, `src/app/dashboard/layout.tsx`
+- **Tests actualizados:** N/A
+
+### [ARR-015] Shell dashboard único y módulo logística en frontend-info
+- **Fecha:** 2026-06-04
+- **Autor:** Camilo / Claude
+- **Tipo:** Feature | Refactor
+- **Error relacionado:** N/A
+- **Descripción del cambio:** Se implementó el módulo logística en el dashboard (rutas, servicios, hooks, componentes, permisos RBAC) y se unificó el chrome del dashboard: un solo sidebar en `dashboard/layout.tsx`, `DashboardThemeProvider` compartido, eliminación de shells duplicados. Corrección del loader de Google Maps (`useGoogleMaps` ID único) y dibujo de zonas sin `DrawingManager` (API 3.65).
+- **Archivos afectados:** `src/app/dashboard/layout.tsx`, `src/app/dashboard/logistica/**`, `src/components/logistics/**`, `src/components/sidebar.tsx`, `src/providers/DashboardThemeProvider.tsx`, `src/hooks/useGoogleMaps.ts`, `src/styles/logistics.css`, `src/app/dashboard/emergency/PaginaEmergencias.tsx`
+- **Tests actualizados:** N/A
+
 ### [ARR-013] Cambios en flujo de registro y validación RUT (frontend)
 - **Fecha:** 2026-05-06
 - **Autor:** Camilo / Claude
@@ -61,7 +86,6 @@
 - **Archivos afectados:** `pom.xml`, `application.yml`, `GatewayApplication.java`, `FirebaseAuthenticationFilter.java`, `RateLimitingFilter.java`, `SecurityHeadersFilter.java`, `GatewayExceptionHandler.java`, `.env`
 - **Tests actualizados:** N/A
 
->>>>>>> 15444b317d8f95f6ecf85d81fa5dd1ae86a1b33b
 ### [ARR-010] Cierre técnico de Fase 1 con endpoints faltantes y suite de pruebas inicial
 - **Fecha:** 2026-05-04
 - **Autor:** Claude

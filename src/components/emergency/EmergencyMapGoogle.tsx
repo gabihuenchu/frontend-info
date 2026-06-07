@@ -2,12 +2,14 @@
 
 /**
  * Mapa Google: polígonos GeoJSON (zonas activas), epicentros, dibujo de zona de impacto.
- * Requiere NEXT_PUBLIC_GOOGLE_MAPS_API_KEY y librería "Maps JavaScript API" + "Drawing".
+ * Requiere NEXT_PUBLIC_GOOGLE_MAPS_API_KEY y Maps JavaScript API.
+ * El dibujo de zonas usa clics en el mapa (DrawingManager fue retirado en Maps JS API 3.65).
  */
 
 import { useCallback, useMemo, type CSSProperties } from "react";
-import { DrawingManager, GoogleMap, Marker, Polygon, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 
+import { useCatastrofesGoogleMaps } from "@/hooks/useGoogleMaps";
 import type { Emergencia, EmergenciasGeoJsonCollection } from "@/services/emergency.service";
 
 const mapContainerStyle: CSSProperties = {
@@ -55,24 +57,21 @@ export default function EmergencyMapGoogle({
   selectedId,
   onSelectEmergenciaId,
 }: EmergencyMapGoogleProps) {
-  const libraries = useMemo(() => ["drawing"] as const, []);
+  const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
 
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "catastrofescl-emergency-map",
-    googleMapsApiKey: apiKey,
-    libraries: libraries as unknown as ("drawing" | "geometry")[],
-  });
+  const dibujarActivo = herramientaZona === "Dibujar zona";
 
-  const onPolygonComplete = useCallback(
-    (poly: google.maps.Polygon) => {
-      const pathArr = poly.getPath().getArray().map((ll) => ({ lat: ll.lat(), lng: ll.lng() }));
-      poly.setMap(null);
-      onPoligonoBorradorChange(pathArr);
+  const handleMapClick = useCallback(
+    (event: google.maps.MapMouseEvent) => {
+      if (!dibujarActivo || !event.latLng) return;
+      const point = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      const prev = poligonoBorrador ?? [];
+      onPoligonoBorradorChange([...prev, point]);
     },
-    [onPoligonoBorradorChange]
+    [dibujarActivo, poligonoBorrador, onPoligonoBorradorChange]
   );
 
-  const geoFeatures = geoJson?.features ?? [];
+  const geoFeatures = useMemo(() => geoJson?.features ?? [], [geoJson?.features]);
 
   if (!apiKey?.trim()) {
     return (
@@ -86,7 +85,7 @@ export default function EmergencyMapGoogle({
   if (loadError) {
     return (
       <div style={{ padding: 24, color: "#fca5a5", fontSize: 13 }}>
-        No se pudo cargar Google Maps. Verifica NEXT_PUBLIC_GOOGLE_MAPS_API_KEY y APIs habilitadas (Maps JavaScript API, Drawing).
+        No se pudo cargar Google Maps. Verifica NEXT_PUBLIC_GOOGLE_MAPS_API_KEY y que Maps JavaScript API esté habilitada.
       </div>
     );
   }
@@ -99,16 +98,16 @@ export default function EmergencyMapGoogle({
     );
   }
 
-  const dibujarActivo = herramientaZona === "Dibujar zona";
-
   return (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
       center={defaultCenter}
       zoom={6}
+      onClick={handleMapClick}
       options={{
         disableDefaultUI: true,
         zoomControl: false,
+        draggableCursor: dibujarActivo ? "crosshair" : undefined,
         styles: dark ? darkMapStyles : [],
       }}
     >
@@ -127,7 +126,7 @@ export default function EmergencyMapGoogle({
               fillOpacity: isSel ? 0.28 : 0.18,
               strokeColor: isSel ? "#ea580c" : "#2563eb",
               strokeWeight: isSel ? 3 : 2,
-              clickable: true,
+              clickable: !dibujarActivo,
             }}
           />
         );
@@ -147,6 +146,22 @@ export default function EmergencyMapGoogle({
         />
       )}
 
+      {poligonoBorrador?.map((point, index) => (
+        <Marker
+          key={`draft-${index}`}
+          position={point}
+          clickable={false}
+          icon={{
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            fillColor: "#16a34a",
+            fillOpacity: 1,
+            strokeColor: "#fff",
+            strokeWeight: 1,
+          }}
+        />
+      ))}
+
       {emergencias.map((em) => (
         <Marker
           key={`m-${em.id}`}
@@ -163,23 +178,6 @@ export default function EmergencyMapGoogle({
           }}
         />
       ))}
-
-      {dibujarActivo && (
-        <DrawingManager
-          onPolygonComplete={onPolygonComplete}
-          options={{
-            drawingControl: false,
-            drawingMode: google.maps.drawing.OverlayType.POLYGON,
-            polygonOptions: {
-              fillColor: "#22c55e",
-              fillOpacity: 0.25,
-              strokeColor: "#16a34a",
-              strokeWeight: 2,
-              clickable: false,
-            },
-          }}
-        />
-      )}
     </GoogleMap>
   );
 }

@@ -7,8 +7,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo, type ReactNode } from "react";
-import "@/styles/emergency.css";
-import Sidebar from "@/components/sidebar";
+import { useDashboardTheme } from "@/providers/DashboardThemeProvider";
 import EmergencyMapGoogle, {
   type HerramientaZonaMapa,
 } from "@/components/emergency/EmergencyMapGoogle";
@@ -21,6 +20,7 @@ import {
   useEmergenciasKpis,
   useCentrosAcopio,
   useCreateCentroAcopio,
+  useAnuncios,
 } from "@/hooks/useEmergencies";
 import type {
   Emergencia,
@@ -30,12 +30,14 @@ import type {
   TipoEmergencia,
   NivelSeveridad,
   CrearEmergenciaRequest,
+  AnuncioResponseDto,
 } from "@/services/emergency.service";
 import {
   mapTipoUiABackend,
   cerrarAnilloZona,
   centroidEpicentro,
   severidadUiAApi,
+  isCentrosAcopioApiEnabled,
 } from "@/services/emergency.service";
 import {
   Flame, Waves, Home, Zap, Mountain, CloudRain,
@@ -253,15 +255,18 @@ ${contexto || "No hay emergencias activas en este momento."}`,
 
 // ─── Panel Derecho con Tabs ───────────────────────────────────────────────────
 
-type VistaPanel = "detalles" | "crear-emergencia" | "centros" | "crear-centro";
+type VistaPanel = "detalles" | "crear-emergencia" | "centros" | "crear-centro" | "anuncios";
 
 function PanelDerecho({
   theme,
   vista,
   setVista,
   emergencia,
+  centrosApiHabilitada,
   centros,
   centrosCargando,
+  anuncios,
+  anunciosCargando,
   onEditarEmergencia,
   onUpdateEstado,
   onDeleteEmergencia,
@@ -279,15 +284,17 @@ function PanelDerecho({
   vista: VistaPanel;
   setVista: (v: VistaPanel) => void;
   emergencia: Emergencia | null;
+  /** Desactivado mientras el MS de centros no esté en el gateway (`NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO`). */
+  centrosApiHabilitada: boolean;
   centros: CentroAcopio[];
   centrosCargando: boolean;
+  anuncios: AnuncioResponseDto[];
+  anunciosCargando: boolean;
   onEditarEmergencia: () => void;
   onUpdateEstado: (estado: EstadoEmergencia) => void;
   onDeleteEmergencia: () => void;
   onCrearEmergencia: (data: {
-    titulo: string; tipo: TipoEmergencia; severidad: NivelSeveridad;
-    descripcion: string; region: string; comuna: string;
-    latitud: number; longitud: number; afectados: number;
+    tipo: TipoEmergencia; severidad: NivelSeveridad; region: string;
   }) => void;
   onCrearCentro: (data: {
     nombre: string; direccion: string; ciudad: string;
@@ -302,15 +309,9 @@ function PanelDerecho({
   epicentroPreview: { latitud: number; longitud: number } | null;
 }) {
   const [formEmergencia, setFormEmergencia] = useState({
-    titulo: editData?.nombre ?? "",
     tipo: (editData?.tipo ?? "TERREMOTO") as TipoEmergencia,
     severidad: "ALTA" as NivelSeveridad,
-    descripcion: "",
     region: "",
-    comuna: "",
-    latitud: -33.45,
-    longitud: -70.67,
-    afectados: 0,
   });
 
   const [formCentro, setFormCentro] = useState({
@@ -328,9 +329,6 @@ function PanelDerecho({
     if (!formEmergencia.region.trim()) return;
     onCrearEmergencia({
       ...formEmergencia,
-      latitud: epicentroPreview?.latitud ?? Number(formEmergencia.latitud),
-      longitud: epicentroPreview?.longitud ?? Number(formEmergencia.longitud),
-      afectados: Number(formEmergencia.afectados),
     });
   };
 
@@ -359,15 +357,27 @@ function PanelDerecho({
         </button>
         <button
           className={`panel-tab${vista === "crear-emergencia" ? " panel-tab--active" : ""}`}
-          onClick={() => { setFormEmergencia({ titulo:"", tipo:"TERREMOTO", severidad:"ALTA", descripcion:"", region:"", comuna:"", latitud:-33.45, longitud:-70.67, afectados:0 }); setVista("crear-emergencia"); }}
+          onClick={() => {
+            setFormEmergencia({ tipo: "TERREMOTO", severidad: "ALTA", region: "" });
+            setVista("crear-emergencia");
+          }}
         >
           <AlertTriangle size={14} className="mr-1" /> Crear Emergencia
         </button>
+        {centrosApiHabilitada && (
         <button
           className={`panel-tab${(vista === "centros" || vista === "crear-centro") ? " panel-tab--active" : ""}`}
           onClick={() => setVista("centros")}
         >
           <Warehouse size={14} className="mr-1" /> Centros
+        </button>
+        )}
+        <button
+          className={`panel-tab${vista === "anuncios" ? " panel-tab--active" : ""}`}
+          onClick={() => setVista("anuncios")}
+        >
+          <Bell size={14} className="mr-1" /> Anuncios
+          {anuncios.length > 0 && <span className="count-badge" style={{ marginLeft: 4, fontSize: 9 }}>{anuncios.length}</span>}
         </button>
       </div>
 
@@ -459,7 +469,8 @@ function PanelDerecho({
               </div>
             </div>
 
-            {/* Centros cercanos */}
+            {/* Centros cercanos — solo si el MS de recursos está habilitado en build */}
+            {centrosApiHabilitada && (
             <div style={{ marginTop: 20 }}>
               <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
                 <h3 className="panel-section-title" style={{ margin: 0 }}>Centros de Acopio Cercanos</h3>
@@ -492,6 +503,7 @@ function PanelDerecho({
                 </div>
               )}
             </div>
+            )}
           </div>
         )}
 
@@ -525,18 +537,7 @@ function PanelDerecho({
 
             <div className="panel-lateral-body" style={{ gap: 14 }}>
               <div className="form-group">
-                <label className="panel-form-label">Título (opcional)</label>
-                <input
-                  type="text"
-                  className="panel-form-input"
-                  placeholder="Ej: Incendio Forestal Quilpué"
-                  value={formEmergencia.titulo}
-                  onChange={(e) => setFormEmergencia({ ...formEmergencia, titulo: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="panel-form-label">Tipo de emergencia</label>
+                <label className="panel-form-label">Tipo de emergencia *</label>
                 <div className="panel-form-select-wrap">
                   <span className="panel-form-icon">{iconosPorTipo[formEmergencia.tipo]}</span>
                   <select
@@ -559,7 +560,7 @@ function PanelDerecho({
               </div>
 
               <div className="form-group">
-                <label className="panel-form-label">Severidad</label>
+                <label className="panel-form-label">Severidad *</label>
                 <div className="panel-form-select-wrap">
                   <span className={`panel-form-dot dot-${formEmergencia.severidad.toLowerCase()}`} />
                   <select
@@ -572,66 +573,41 @@ function PanelDerecho({
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: 10 }}>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="panel-form-label">Región *</label>
-                  <input
-                    type="text"
-                    className="panel-form-input"
-                    placeholder="Ej: Valparaíso"
-                    value={formEmergencia.region}
-                    onChange={(e) => setFormEmergencia({ ...formEmergencia, region: e.target.value })}
-                  />
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label className="panel-form-label">Comuna (opcional)</label>
-                  <input
-                    type="text"
-                    className="panel-form-input"
-                    placeholder="Ej: Quilpué"
-                    value={formEmergencia.comuna}
-                    onChange={(e) => setFormEmergencia({ ...formEmergencia, comuna: e.target.value })}
-                  />
-                </div>
+              <div className="form-group">
+                <label className="panel-form-label">Región *</label>
+                <input
+                  type="text"
+                  className="panel-form-input"
+                  placeholder="Ej: Valparaíso"
+                  value={formEmergencia.region}
+                  onChange={(e) => setFormEmergencia({ ...formEmergencia, region: e.target.value })}
+                />
               </div>
 
               <div className="form-group">
-                <label className="panel-form-label">Epicentro (desde polígono)</label>
+                <label className="panel-form-label">Epicentro y Zona de Impacto</label>
                 {epicentroPreview ? (
-                  <p style={{ fontSize: 13, margin: 0, color: "var(--color-text-secondary)" }}>
-                    Lat {epicentroPreview.latitud.toFixed(5)}, Lng {epicentroPreview.longitud.toFixed(5)}
-                  </p>
+                  <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <p style={{ fontSize: 13, margin: 0, color: "var(--color-text-secondary)", fontWeight: 600 }}>
+                      ✓ Epicentro calculado
+                    </p>
+                    <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4 }}>
+                      Lat: {epicentroPreview.latitud.toFixed(5)} | Lng: {epicentroPreview.longitud.toFixed(5)}
+                    </p>
+                  </div>
                 ) : (
-                  <p style={{ fontSize: 12, margin: 0, color: "var(--color-text-secondary)" }}>
-                    Activa &quot;Dibujar zona&quot; en el mapa y traza el polígono de la zona afectada (mín. 3 vértices; se cerrará al guardar).
-                  </p>
+                  <div style={{ background: "rgba(239, 68, 68, 0.05)", padding: "10px", borderRadius: "8px", border: "1px dashed rgba(239, 68, 68, 0.2)" }}>
+                    <p style={{ fontSize: 12, margin: 0, color: "#fca5a5" }}>
+                      ⚠️ Falta zona en el mapa
+                    </p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>
+                      Usa "Dibujar zona" en el mapa para marcar el área afectada.
+                    </p>
+                  </div>
                 )}
               </div>
-
-              <div className="form-group">
-                <label className="panel-form-label">Afectados estimados</label>
-                <input
-                  type="number"
-                  className="panel-form-input"
-                  placeholder="0"
-                  min={0}
-                  value={formEmergencia.afectados}
-                  onChange={(e) => setFormEmergencia({ ...formEmergencia, afectados: Number(e.target.value) })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="panel-form-label">Descripción</label>
-                <textarea
-                  className="panel-form-input"
-                  rows={3}
-                  placeholder="Descripción detallada de la emergencia..."
-                  value={formEmergencia.descripcion}
-                  onChange={(e) => setFormEmergencia({ ...formEmergencia, descripcion: e.target.value })}
-                  style={{ resize: "vertical" }}
-                />
-              </div>
             </div>
+
 
             <div className="panel-lateral-actions" style={{ marginTop: "auto", paddingTop: 16 }}>
               <button className="btn-panel-cancelar" onClick={() => setVista("detalles")}>Cancelar</button>
@@ -643,7 +619,7 @@ function PanelDerecho({
         )}
 
         {/* ── LISTA CENTROS ── */}
-        {vista === "centros" && (
+        {centrosApiHabilitada && vista === "centros" && (
           <div className="panel-vista">
             <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
               <h3 className="panel-section-title" style={{ margin: 0 }}>Centros de Acopio</h3>
@@ -684,7 +660,7 @@ function PanelDerecho({
         )}
 
         {/* ── CREAR CENTRO ── */}
-        {vista === "crear-centro" && (
+        {centrosApiHabilitada && vista === "crear-centro" && (
           <div className="panel-vista">
             <div className="panel-form-header">
               <h2 className="panel-form-title">CREAR CENTRO DE ACOPIO</h2>
@@ -736,7 +712,55 @@ function PanelDerecho({
             </div>
           </div>
         )}
+
+        {vista === "anuncios" && (
+          <div className="panel-vista">
+            <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+              <h3 className="panel-section-title" style={{ margin: 0 }}>Anuncios y Notificaciones</h3>
+              <div className="flex items-center gap-2">
+                <span className="live-indicator"></span>
+                <span style={{ fontSize: 10, color: "var(--color-text-secondary)", fontWeight: 600 }}>VIVO</span>
+              </div>
+            </div>
+
+            {anunciosCargando && anuncios.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 40, color: "var(--color-text-secondary)" }}>
+                <Loader2 size={24} className="animate-spin" style={{ margin: "0 auto 12px" }} />
+                <p style={{ fontSize: 13 }}>Sincronizando con RabbitMQ...</p>
+              </div>
+            ) : (
+              <div className="anuncios-feed" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {anuncios.map((anuncio) => (
+                  <div key={anuncio.id} className={`anuncio-card severity-${anuncio.severidad.toLowerCase()}`}>
+                    <div className="anuncio-card-header">
+                      <span className="anuncio-severity-tag">{anuncio.severidad}</span>
+                      <span className="anuncio-date">
+                        {new Date(anuncio.creadoEn).toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <h4 className="anuncio-card-title">{anuncio.titulo}</h4>
+                    <p className="anuncio-card-content">{anuncio.contenido}</p>
+                    <div className="anuncio-card-footer">
+                      <div className="flex items-center gap-1">
+                        <MapPin size={10} />
+                        <span>{anuncio.region || "Nacional"}</span>
+                      </div>
+                      <span className="anuncio-alcance">{anuncio.alcance}</span>
+                    </div>
+                  </div>
+                ))}
+                {anuncios.length === 0 && (
+                  <div style={{ textAlign: "center", padding: 30, background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.1)" }}>
+                    <Bell size={24} style={{ margin: "0 auto 12px", opacity: 0.3 }} />
+                    <p style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>Esperando nuevas notificaciones...</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
     </div>
   );
 }
@@ -746,7 +770,7 @@ function PanelDerecho({
 type BorradorLatLng = { lat: number; lng: number };
 
 export default function PaginaEmergencias() {
-  const [dark, setDark] = useState(true);
+  const { dark, theme } = useDashboardTheme();
   const [emergenciaSeleccionada, setEmergenciaSeleccionada] = useState<Emergencia | null>(null);
   const [panelVista, setPanelVista] = useState<VistaPanel>("detalles");
   const [editData, setEditData] = useState<{ tipo: string; nivel: string; nombre: string } | undefined>();
@@ -758,7 +782,16 @@ export default function PaginaEmergencias() {
   /** Oculta el banner sin arreglar el 500; se resetea cuando el error desaparece. */
   const [ocultarBannerEmergencias, setOcultarBannerEmergencias] = useState(false);
 
-  const theme = dark ? "dark" : "light";
+  const centrosApiHabilitada = isCentrosAcopioApiEnabled();
+
+  useEffect(() => {
+    if (
+      !centrosApiHabilitada &&
+      (panelVista === "centros" || panelVista === "crear-centro")
+    ) {
+      setPanelVista("detalles");
+    }
+  }, [centrosApiHabilitada, panelVista]);
 
   /** Sin sondeo automático mientras se dibuja o hay polígono sin guardar (evita “recargas” que cortan el trazo). */
   const pausarSondeoEmergencias = useMemo(
@@ -783,6 +816,9 @@ export default function PaginaEmergencias() {
   });
 
   const { data: centros = [], isLoading: centrosCargando } = useCentrosAcopio();
+
+  const { data: anunciosData, isLoading: anunciosCargando } = useAnuncios();
+  const anuncios = anunciosData?.content || [];
 
   const epicentroPreview = useMemo(() => {
     if (!poligonoBorrador || poligonoBorrador.length < 3) return null;
@@ -853,15 +889,9 @@ export default function PaginaEmergencias() {
 
   const handleCrearEmergencia = useCallback(
     async (data: {
-      titulo: string;
       tipo: TipoEmergencia;
       severidad: NivelSeveridad;
-      descripcion: string;
       region: string;
-      comuna: string;
-      latitud: number;
-      longitud: number;
-      afectados: number;
     }) => {
       if (!poligonoBorrador || poligonoBorrador.length < 3) {
         alert(
@@ -872,14 +902,12 @@ export default function PaginaEmergencias() {
       const coordsDto = poligonoBorrador.map((p) => ({ longitud: p.lng, latitud: p.lat }));
       const ring = cerrarAnilloZona(coordsDto);
       const epicentro = centroidEpicentro(ring);
-      const partes = [data.region.trim(), data.comuna.trim()].filter(Boolean);
-      if (data.titulo.trim()) partes.unshift(data.titulo.trim());
-      const regionFinal = partes.join(" · ").slice(0, 100);
 
+      // Solo enviamos los campos que DeclararEmergenciaRequest espera
       const payload: CrearEmergenciaRequest = {
         tipo: mapTipoUiABackend(data.tipo),
         severidad: severidadUiAApi(data.severidad),
-        region: regionFinal,
+        region: data.region,
         epicentro,
         zonaImpacto: ring,
       };
@@ -890,6 +918,7 @@ export default function PaginaEmergencias() {
     },
     [poligonoBorrador, createMutation]
   );
+
 
   const handleUpdateEstado = useCallback(
     async (estado: EstadoEmergencia) => {
@@ -925,16 +954,18 @@ export default function PaginaEmergencias() {
   );
 
   // ── Render states ──
-  if (isLoading) return <LoadingState />;
+  if (isLoading) {
+    return (
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingState />
+      </div>
+    );
+  }
 
   const mostrarBannerErrorEmergencias = Boolean(error) && !ocultarBannerEmergencias;
 
   return (
-    <div className={`dashboard-root ${theme}`}>
-      {/* SIDEBAR */}
-      <Sidebar dark={dark} setDark={setDark} />
-
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+    <>
         {mostrarBannerErrorEmergencias && (
           <div className={`api-error-banner ${theme}`} role="alert">
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -1006,6 +1037,7 @@ export default function PaginaEmergencias() {
           </div>
         </header>
 
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
         {/* CUERPO */}
         <div className="dashboard-body">
 
@@ -1122,8 +1154,11 @@ export default function PaginaEmergencias() {
             vista={panelVista}
             setVista={setPanelVista}
             emergencia={emergenciaSeleccionada}
+            centrosApiHabilitada={centrosApiHabilitada}
             centros={centros}
             centrosCargando={centrosCargando}
+            anuncios={anuncios}
+            anunciosCargando={anunciosCargando}
             onEditarEmergencia={() => abrirCrearEmergencia(emergenciaSeleccionada ?? undefined)}
             onUpdateEstado={handleUpdateEstado}
             onDeleteEmergencia={handleDeleteEmergencia}
@@ -1145,7 +1180,9 @@ export default function PaginaEmergencias() {
             { icono: <TrendingUp size={18} />, valor: String(kpis.totalActivas),                                  etiqueta: "Emergencias activas",           colorClass: "kpi-emergencias" },
             { icono: <Users size={18} />,      valor: kpis.totalAfectados.toLocaleString("es-CL"),                etiqueta: "Personas afectadas",            colorClass: "kpi-personas" },
             { icono: <AlertTriangle size={18}/>,valor: String(kpis.totalCriticas),                                etiqueta: "Emergencias críticas",          colorClass: "kpi-emergencias" },
-            { icono: <Home size={18} />,        valor: String(centros.filter((c) => c.estado === "Abierto").length), etiqueta: "Centros de acopio operativos",  colorClass: "" },
+            ...(centrosApiHabilitada
+              ? [{ icono: <Home size={18} />, valor: String(centros.filter((c) => c.estado === "Abierto").length), etiqueta: "Centros de acopio operativos", colorClass: "" }]
+              : []),
             { icono: <MapPin size={18} />,      valor: String(kpis.regionesMasAfectadas.length),                  etiqueta: "Regiones afectadas",            colorClass: "" },
           ].map((kpi) => (
             <div key={kpi.etiqueta} className="kpi-item">
@@ -1157,7 +1194,7 @@ export default function PaginaEmergencias() {
             </div>
           ))}
         </div>
-      </div>
+        </div>
 
       {/* PANEL IA — overlay */}
       {mostrarIA && (
@@ -1166,7 +1203,7 @@ export default function PaginaEmergencias() {
           onClose={() => setMostrarIA(false)}
         />
       )}
-    </div>
+    </>
   );
 }
 

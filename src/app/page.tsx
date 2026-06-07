@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAnuncios } from '@/hooks/useEmergencies';
+import { MapPin, Clock, AlertTriangle, Bell, Loader2 } from 'lucide-react';
 import './inicio.css';
 
 /* ── Iconos SVG inline (sin dependencias extra) ── */
@@ -124,6 +126,10 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroBgLoaded, setHeroBgLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // ── Alertas en Tiempo Real (Polling 5s) ──
+  const { data: anunciosData, isLoading: anunciosCargando } = useAnuncios();
+  const anuncios = (anunciosData?.content || []).slice(0, 6); // Mostrar top 6
 
   /* Scroll → header opaco */
   useEffect(() => {
@@ -328,6 +334,68 @@ export default function Home() {
                 </p>
               </article>
             ))}
+          </div>
+        </section>
+
+        {/* ══════ SECCIÓN ALERTAS (RabbitMQ Notifications) ══════ */}
+        <section id="alertas" className="alerts-section">
+          <div className="container">
+            <div className="section-header-center">
+              <div className="alert-badge-live">
+                <span className="live-dot"></span>
+                SISTEMA DE ALERTAS NACIONAL
+              </div>
+              <h2 className="section-title-large">Últimas Notificaciones de Emergencia</h2>
+              <p className="section-desc-center">
+                Información oficial generada automáticamente y en tiempo real sobre catástrofes activas en el territorio.
+              </p>
+            </div>
+
+            {anunciosCargando && anuncios.length === 0 ? (
+              <div className="alerts-loading">
+                <Loader2 className="animate-spin" />
+                <p>Sincronizando con el centro de alertas...</p>
+              </div>
+            ) : (
+              <div className="alerts-masonry">
+                {anuncios.map((anuncio, idx) => (
+                  <div key={anuncio.id} className={`alert-card-public severity-${anuncio.severidad.toLowerCase()}`} style={{ animationDelay: `${idx * 100}ms` }}>
+                    <div className="alert-card-header">
+                      <div className="severity-indicator">
+                        <AlertTriangle size={14} />
+                        <span>{anuncio.severidad}</span>
+                      </div>
+                      <div className="alert-time">
+                        <Clock size={12} />
+                        <span>{new Date(anuncio.creadoEn).toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+                    <h3 className="alert-card-title">{anuncio.titulo}</h3>
+                    <p className="alert-card-text">{anuncio.contenido}</p>
+                    <div className="alert-card-footer">
+                      <div className="alert-location">
+                        <MapPin size={12} />
+                        <span>{anuncio.region || "Cobertura Nacional"}</span>
+                      </div>
+                      <div className="alert-scope">{anuncio.alcance}</div>
+                    </div>
+                  </div>
+                ))}
+
+                {anuncios.length === 0 && (
+                  <div className="no-alerts">
+                    <Bell size={48} opacity={0.2} />
+                    <p>No hay alertas críticas reportadas en los últimos minutos.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="alerts-actions">
+              <button className="btn-secondary" onClick={() => router.push('/dashboard')}>
+                Ver mapa interactivo
+              </button>
+            </div>
           </div>
         </section>
 

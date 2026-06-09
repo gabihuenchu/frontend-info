@@ -45,6 +45,8 @@ interface EmergencyMapGoogleProps {
   onPoligonoBorradorChange: (path: google.maps.LatLngLiteral[] | null) => void;
   selectedId: string | null;
   onSelectEmergenciaId: (id: string) => void;
+  /** Si false, no se enfoca ni selecciona emergencias al clic en polígonos/marcadores (modo crear). */
+  seleccionEnMapaHabilitada?: boolean;
 }
 
 function fitMapToPaths(
@@ -68,11 +70,13 @@ export default function EmergencyMapGoogle({
   onPoligonoBorradorChange,
   selectedId,
   onSelectEmergenciaId,
+  seleccionEnMapaHabilitada = true,
 }: EmergencyMapGoogleProps) {
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
   const mapRef = useRef<google.maps.Map | null>(null);
 
   const dibujarActivo = herramientaZona === "Dibujar zona";
+  const mapaSeleccionable = seleccionEnMapaHabilitada && !dibujarActivo;
 
   const handleMapClick = useCallback(
     (event: google.maps.MapMouseEvent) => {
@@ -130,7 +134,7 @@ export default function EmergencyMapGoogle({
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !selectedId) return;
+    if (!map || !selectedId || !seleccionEnMapaHabilitada) return;
     const paths = pathsForEmergency(selectedId);
     if (paths.length >= 3) {
       fitMapToPaths(map, paths);
@@ -138,7 +142,7 @@ export default function EmergencyMapGoogle({
       map.panTo(paths[0]);
       map.setZoom(Math.max(map.getZoom() ?? 8, 10));
     }
-  }, [selectedId, pathsForEmergency]);
+  }, [selectedId, pathsForEmergency, seleccionEnMapaHabilitada]);
 
   if (!apiKey?.trim()) {
     return (
@@ -199,7 +203,7 @@ export default function EmergencyMapGoogle({
               fillOpacity: isSel ? 0.35 : 0.2,
               strokeColor: isSel ? "#ea580c" : "#2563eb",
               strokeWeight: isSel ? 3 : 2,
-              clickable: !dibujarActivo,
+              clickable: mapaSeleccionable,
               zIndex: isSel ? 3 : 1,
             }}
           />
@@ -220,7 +224,7 @@ export default function EmergencyMapGoogle({
               fillOpacity: isSel ? 0.35 : 0.2,
               strokeColor: isSel ? "#ea580c" : "#2563eb",
               strokeWeight: isSel ? 3 : 2,
-              clickable: !dibujarActivo,
+              clickable: mapaSeleccionable,
               zIndex: isSel ? 3 : 1,
             }}
           />
@@ -261,7 +265,7 @@ export default function EmergencyMapGoogle({
         <Marker
           key={`m-${em.id}`}
           position={{ lat: em.latitud, lng: em.longitud }}
-          onClick={() => onSelectEmergenciaId(em.id)}
+          onClick={mapaSeleccionable ? () => onSelectEmergenciaId(em.id) : undefined}
           title={em.region}
           icon={{
             path: google.maps.SymbolPath.CIRCLE,

@@ -92,6 +92,15 @@ export interface AnuncioResponseDto {
   creadoEn: string;
 }
 
+export interface ActualizarAnuncioRequest {
+  titulo: string;
+  contenido: string;
+  severidad: SeveridadAnuncio;
+  alcance: AlcanceAnuncio;
+  region?: string | null;
+  vigenteHasta?: string | null;
+}
+
 /** Spring Page<T> response wrapper */
 export interface PageResponse<T> {
   content: T[];
@@ -417,6 +426,14 @@ export const getAnuncios = async (page = 0, size = 50): Promise<PageResponse<Anu
   const res = await apiClient.get<PageResponse<AnuncioResponseDto>>('/anuncios', {
     params: { page, size },
   });
+  return res.data;
+};
+
+export const updateAnuncio = async (
+  id: string,
+  data: ActualizarAnuncioRequest
+): Promise<AnuncioResponseDto> => {
+  const res = await apiClient.patch<AnuncioResponseDto>(`/anuncios/${id}`, data);
   return res.data;
 };
 

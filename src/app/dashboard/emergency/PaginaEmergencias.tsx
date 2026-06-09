@@ -11,6 +11,7 @@ import { useDashboardTheme } from "@/providers/DashboardThemeProvider";
 import EmergencyMapGoogle, {
   type HerramientaZonaMapa,
 } from "@/components/emergency/EmergencyMapGoogle";
+import AnuncioCardEditable from "@/components/emergency/AnuncioCardEditable";
 import {
   useEmergenciasActivas,
   useEmergenciasGeoJson,
@@ -21,6 +22,7 @@ import {
   useCentrosAcopio,
   useCreateCentroAcopio,
   useAnuncios,
+  useUpdateAnuncio,
 } from "@/hooks/useEmergencies";
 import type {
   Emergencia,
@@ -31,6 +33,7 @@ import type {
   NivelSeveridad,
   CrearEmergenciaRequest,
   AnuncioResponseDto,
+  ActualizarAnuncioRequest,
 } from "@/services/emergency.service";
 import {
   mapTipoUiABackend,
@@ -41,6 +44,7 @@ import {
   prepararZonaImpactoParaApi,
   MIN_VERTICES_ZONA_IMPACTO,
 } from "@/services/emergency.service";
+import { formatApiError } from "@/lib/api-errors";
 import {
   Flame, Waves, Home, Zap, Mountain, CloudRain,
   Square, Pencil, Trash2, ClipboardList, AlertTriangle,
@@ -147,7 +151,7 @@ function PanelIA({
   const contexto = emergencias
     .map(
       (e) =>
-        `• ${e.titulo ?? e.tipo} | Tipo: ${e.tipo} | Severidad: ${e.severidad} | Estado: ${e.estado} | Región: ${e.region} | Afectados: ${e.afectados ?? e.personasAfectadas ?? 0}`
+        `• ${e.titulo ?? e.tipo} | Tipo: ${e.tipo} | Severidad: ${e.severidad} | Estado: ${e.estado} | Región: ${e.region}`
     )
     .join("\n");
 
@@ -276,7 +280,10 @@ function PanelDerecho({
   anuncios,
   anunciosCargando,
   regionesAnuncio,
+  onActualizarAnuncio,
+  actualizandoAnuncioId,
   onEditarEmergencia,
+  onIniciarCreacionNuevaEmergencia,
   onUpdateEstado,
   onDeleteEmergencia,
   onCrearEmergencia,
@@ -301,15 +308,18 @@ function PanelDerecho({
   anuncios: AnuncioResponseDto[];
   anunciosCargando: boolean;
   onEditarEmergencia: () => void;
+  onIniciarCreacionNuevaEmergencia: () => void;
   onUpdateEstado: (estado: EstadoEmergencia) => void;
   onDeleteEmergencia: () => void;
   regionesAnuncio: string[];
+  onActualizarAnuncio: (id: string, data: ActualizarAnuncioRequest) => Promise<void>;
+  actualizandoAnuncioId: string | null;
   onCrearEmergencia: (data: {
     tipo: TipoEmergencia;
     severidad: NivelSeveridad;
     region: string;
     estado: EstadoEmergencia;
-  }) => void;
+  }) => Promise<void>;
   onCrearCentro: (data: {
     nombre: string; direccion: string; ciudad: string;
     region: string; latitud?: number; longitud?: number; capacidad?: string;
@@ -329,6 +339,8 @@ function PanelDerecho({
     region: "",
     estado: "ACTIVA" as EstadoEmergencia,
   });
+
+  const [errorCrear, setErrorCrear] = useState<string | null>(null);
 
   const [estadoPendiente, setEstadoPendiente] = useState<EstadoEmergencia>("ACTIVA");
   const [filtroRegionAnuncios, setFiltroRegionAnuncios] = useState("Todas las regiones");
@@ -350,11 +362,17 @@ function PanelDerecho({
     { id: "Borrar zona",  icono: <Trash2 size={18} />, label: "Borrar zona" },
   ];
 
-  const handleCrearEmergencia = () => {
-    if (!formEmergencia.region.trim()) return;
-    onCrearEmergencia({
-      ...formEmergencia,
-    });
+  const handleCrearEmergencia = async () => {
+    if (!formEmergencia.region.trim()) {
+      setErrorCrear("Ingresa la región de la emergencia.");
+      return;
+    }
+    setErrorCrear(null);
+    try {
+      await onCrearEmergencia({ ...formEmergencia });
+    } catch (err) {
+      setErrorCrear(formatApiError(err));
+    }
   };
 
   const handleCrearCentro = () => {
@@ -384,7 +402,8 @@ function PanelDerecho({
           className={`panel-tab${vista === "crear-emergencia" ? " panel-tab--active" : ""}`}
           onClick={() => {
             setFormEmergencia({ tipo: "TERREMOTO", severidad: "ALTA", region: "", estado: "ACTIVA" });
-            setVista("crear-emergencia");
+            setErrorCrear(null);
+            onIniciarCreacionNuevaEmergencia();
           }}
         >
           <AlertTriangle size={14} className="mr-1" /> Crear Emergencia
@@ -459,47 +478,66 @@ function PanelDerecho({
                 <p className="detalle-desc">{emergencia.descripcion}</p>
               ) : null}
 
-              <div className="detalle-kpis">
-                <div className="kpi-cell">
-                  <p className="kpi-valor">
-                    {(emergencia.afectados ?? emergencia.personasAfectadas ?? 0).toLocaleString("es-CL")}
-                  </p>
-                  <p className="kpi-label">Personas afectadas</p>
+              {(emergencia.comunasAfectadas != null || emergencia.hectareasQuemadas != null) && (
+                <div className="detalle-kpis">
+                  {emergencia.comunasAfectadas != null && (
+                    <div className="kpi-cell">
+                      <p className="kpi-valor">{emergencia.comunasAfectadas}</p>
+                      <p className="kpi-label">Comunas afectadas</p>
+                    </div>
+                  )}
+                  {emergencia.hectareasQuemadas != null && (
+                    <div className="kpi-cell">
+                      <p className="kpi-valor">{emergencia.hectareasQuemadas.toLocaleString("es-CL")}</p>
+                      <p className="kpi-label">Hectáreas quemadas</p>
+                    </div>
+                  )}
                 </div>
-                {emergencia.comunasAfectadas != null && (
-                  <div className="kpi-cell">
-                    <p className="kpi-valor">{emergencia.comunasAfectadas}</p>
-                    <p className="kpi-label">Comunas afectadas</p>
-                  </div>
-                )}
-                {emergencia.hectareasQuemadas != null && (
-                  <div className="kpi-cell">
-                    <p className="kpi-valor">{emergencia.hectareasQuemadas.toLocaleString("es-CL")}</p>
-                    <p className="kpi-label">Hectáreas quemadas</p>
-                  </div>
-                )}
-              </div>
+              )}
 
-              <div style={{ margin: "10px 0 6px" }}>
+              <div className="panel-cambio-estado">
                 <label className="panel-form-label">Cambiar estado</label>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
-                  {(["ACTIVA", "CONTROLADA", "FINALIZADA"] as EstadoEmergencia[]).map((est) => (
-                    <button
-                      key={est}
-                      type="button"
-                      className={`btn-informe${estadoPendiente === est ? " btn-estado-activo" : ""}`}
-                      style={{ fontSize: 10, padding: "4px 8px", flex: "0 0 auto" }}
-                      onClick={() => setEstadoPendiente(est)}
-                      disabled={isUpdating}
-                    >
-                      {estadoLabel[est]}
-                    </button>
-                  ))}
+                <p className="panel-estado-actual">
+                  Guardado: <strong>{estadoLabel[emergencia.estado]}</strong>
+                </p>
+                <div className="panel-estado-opciones" role="group" aria-label="Seleccionar nuevo estado">
+                  {(["ACTIVA", "CONTROLADA", "FINALIZADA"] as EstadoEmergencia[]).map((est) => {
+                    const seleccionado = estadoPendiente === est;
+                    const esActual = emergencia.estado === est;
+                    return (
+                      <button
+                        key={est}
+                        type="button"
+                        aria-pressed={seleccionado}
+                        className={[
+                          "btn-estado-opcion",
+                          `btn-estado-opcion--${est.toLowerCase()}`,
+                          seleccionado ? "btn-estado-opcion--seleccionado" : "",
+                          esActual ? "btn-estado-opcion--actual" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        onClick={() => setEstadoPendiente(est)}
+                        disabled={isUpdating}
+                      >
+                        {estadoLabel[est]}
+                        {esActual && <span className="btn-estado-opcion-badge">actual</span>}
+                      </button>
+                    );
+                  })}
                 </div>
+                {estadoPendiente !== emergencia.estado ? (
+                  <p className="panel-estado-pendiente">
+                    Seleccionado: <strong>{estadoLabel[estadoPendiente]}</strong> — pulsa Guardar para aplicar
+                  </p>
+                ) : (
+                  <p className="panel-estado-pendiente panel-estado-pendiente--igual">
+                    El estado seleccionado coincide con el guardado
+                  </p>
+                )}
                 <button
                   type="button"
-                  className="btn-guardar"
-                  style={{ marginTop: 8, width: "100%", fontSize: 11 }}
+                  className="btn-guardar btn-guardar-estado"
                   onClick={() => onUpdateEstado(estadoPendiente)}
                   disabled={isUpdating || estadoPendiente === emergencia.estado}
                 >
@@ -636,7 +674,10 @@ function PanelDerecho({
                   className="panel-form-input"
                   placeholder="Ej: Valparaíso"
                   value={formEmergencia.region}
-                  onChange={(e) => setFormEmergencia({ ...formEmergencia, region: e.target.value })}
+                  onChange={(e) => {
+                    setErrorCrear(null);
+                    setFormEmergencia({ ...formEmergencia, region: e.target.value });
+                  }}
                 />
               </div>
 
@@ -685,9 +726,32 @@ function PanelDerecho({
             </div>
 
 
+            {errorCrear && (
+              <div
+                role="alert"
+                style={{
+                  marginTop: 12,
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.35)",
+                  color: "#fca5a5",
+                  fontSize: 12,
+                  lineHeight: 1.45,
+                }}
+              >
+                <AlertCircle size={14} style={{ display: "inline", marginRight: 6, verticalAlign: "text-bottom" }} />
+                {errorCrear}
+              </div>
+            )}
+
             <div className="panel-lateral-actions" style={{ marginTop: "auto", paddingTop: 16 }}>
               <button className="btn-panel-cancelar" onClick={() => setVista("detalles")}>Cancelar</button>
-              <button className="btn-panel-guardar" onClick={handleCrearEmergencia} disabled={isCreating}>
+              <button
+                className="btn-panel-guardar"
+                onClick={() => void handleCrearEmergencia()}
+                disabled={isCreating || !epicentroPreview}
+              >
                 {isCreating ? <><Loader2 size={12} className="animate-spin" style={{ marginRight: 4 }} /> Guardando...</> : "Guardar emergencia"}
               </button>
             </div>
@@ -821,31 +885,21 @@ function PanelDerecho({
                 <p style={{ fontSize: 13 }}>Sincronizando con RabbitMQ...</p>
               </div>
             ) : (
-              <div className="anuncios-feed" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="anuncios-feed">
                 {anuncios
                   .filter((a) => {
                     if (filtroRegionAnuncios === "Todas las regiones") return true;
                     return (a.region ?? "").toLowerCase() === filtroRegionAnuncios.toLowerCase();
                   })
                   .map((anuncio) => (
-                  <div key={anuncio.id} className={`anuncio-card severity-${anuncio.severidad.toLowerCase()}`}>
-                    <div className="anuncio-card-header">
-                      <span className="anuncio-severity-tag">{anuncio.severidad}</span>
-                      <span className="anuncio-date">
-                        {new Date(anuncio.creadoEn).toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    <h4 className="anuncio-card-title">{anuncio.titulo}</h4>
-                    <p className="anuncio-card-content">{anuncio.contenido}</p>
-                    <div className="anuncio-card-footer">
-                      <div className="flex items-center gap-1">
-                        <MapPin size={10} />
-                        <span>{anuncio.region || "Nacional"}</span>
-                      </div>
-                      <span className="anuncio-alcance">{anuncio.alcance}</span>
-                    </div>
-                  </div>
-                ))}
+                    <AnuncioCardEditable
+                      key={anuncio.id}
+                      anuncio={anuncio}
+                      regiones={regionesAnuncio}
+                      onGuardar={onActualizarAnuncio}
+                      guardando={actualizandoAnuncioId === anuncio.id}
+                    />
+                  ))}
                 {anuncios.filter((a) => {
                   if (filtroRegionAnuncios === "Todas las regiones") return true;
                   return (a.region ?? "").toLowerCase() === filtroRegionAnuncios.toLowerCase();
@@ -953,6 +1007,7 @@ export default function PaginaEmergencias() {
   const updateMutation    = useUpdateEstadoEmergencia();
   const deleteMutation    = useDeleteEmergencia();
   const createCentroMut   = useCreateCentroAcopio();
+  const updateAnuncioMut  = useUpdateAnuncio();
 
   const kpis = useEmergenciasKpis(emergencias);
 
@@ -967,6 +1022,14 @@ export default function PaginaEmergencias() {
   const tipos    = Array.from(new Set(emergencias.map((e) => e.tipo)));
 
   // ── Handlers ──
+  const iniciarCreacionNuevaEmergencia = useCallback(() => {
+    setEditData(undefined);
+    setEmergenciaSeleccionada(null);
+    setPoligonoBorrador(null);
+    setHerramientaMapa("Dibujar zona");
+    setPanelVista("crear-emergencia");
+  }, []);
+
   const abrirCrearEmergencia = useCallback((em?: Emergencia) => {
     if (em) {
       setEditData({
@@ -974,11 +1037,12 @@ export default function PaginaEmergencias() {
         nivel: em.severidad,
         nombre: em.titulo ?? em.tipo,
       });
-    } else {
-      setEditData(undefined);
+      setEmergenciaSeleccionada(em);
+      setPanelVista("crear-emergencia");
+      return;
     }
-    setPanelVista("crear-emergencia");
-  }, []);
+    iniciarCreacionNuevaEmergencia();
+  }, [iniciarCreacionNuevaEmergencia]);
 
   const seleccionarEmergencia = useCallback(
     (em: Emergencia, vista: VistaPanel = "detalles") => {
@@ -990,17 +1054,28 @@ export default function PaginaEmergencias() {
 
   const onSelectEmergenciaId = useCallback(
     (id: string) => {
+      if (panelVista === "crear-emergencia") return;
       const em = emergencias.find((e) => e.id === id);
       if (em) seleccionarEmergencia(em, "detalles");
     },
-    [emergencias, seleccionarEmergencia]
+    [emergencias, panelVista, seleccionarEmergencia]
   );
+
+  const enModoCrearEmergencia = panelVista === "crear-emergencia";
+  const mapSelectedId = enModoCrearEmergencia ? null : emergenciaSeleccionada?.id ?? null;
 
   useEffect(() => {
     if (!emergenciaSeleccionada) return;
     const fresh = emergencias.find((e) => e.id === emergenciaSeleccionada.id);
     if (fresh) setEmergenciaSeleccionada(fresh);
   }, [emergencias, emergenciaSeleccionada?.id]);
+
+  const handleActualizarAnuncio = useCallback(
+    async (id: string, data: ActualizarAnuncioRequest) => {
+      await updateAnuncioMut.mutateAsync({ id, data });
+    },
+    [updateAnuncioMut]
+  );
 
   const regionesAnuncio = useMemo(() => {
     const fromAnuncios = anuncios.map((a) => a.region).filter(Boolean) as string[];
@@ -1016,17 +1091,15 @@ export default function PaginaEmergencias() {
       estado: EstadoEmergencia;
     }) => {
       if (!poligonoBorrador?.length) {
-        alert('Dibuja la zona en el mapa con la herramienta "Dibujar zona".');
-        return;
+        throw new Error('Dibuja la zona en el mapa con la herramienta "Dibujar zona".');
       }
       const puntos = poligonoBorrador.map((p) => ({ longitud: p.lng, latitud: p.lat }));
       const preparada = prepararZonaImpactoParaApi(puntos);
       if (!preparada) {
-        alert(
+        throw new Error(
           `El polígono debe tener al menos ${MIN_VERTICES_ZONA_IMPACTO} vértices (4 coordenadas cerradas). ` +
             "Haz más clics en el mapa antes de guardar."
         );
-        return;
       }
 
       const payload: CrearEmergenciaRequest = {
@@ -1167,7 +1240,7 @@ export default function PaginaEmergencias() {
               <Bell size={18} />
               <span className="bell-badge">{emergenciasFiltradas.length}</span>
             </button>
-            <button className="btn-nueva-emergencia" onClick={() => { setEditData(undefined); setPanelVista("crear-emergencia"); }}>
+            <button className="btn-nueva-emergencia" onClick={iniciarCreacionNuevaEmergencia}>
               <span>+</span><span>Nueva emergencia</span>
             </button>
           </div>
@@ -1194,9 +1267,29 @@ export default function PaginaEmergencias() {
               )}
 
               {emergenciasFiltradas.map((em) => {
-                const activa = emergenciaSeleccionada?.id === em.id;
+                const activa = !enModoCrearEmergencia && emergenciaSeleccionada?.id === em.id;
                 return (
-                  <div key={em.id} className={`emergencia-card${activa ? " selected" : ""}`}>
+                  <div
+                    key={em.id}
+                    className={`emergencia-card${activa ? " selected" : ""}${enModoCrearEmergencia ? "" : " emergencia-card--clickable"}`}
+                    role="button"
+                    tabIndex={enModoCrearEmergencia ? -1 : 0}
+                    onClick={
+                      enModoCrearEmergencia
+                        ? undefined
+                        : () => seleccionarEmergencia(em, "detalles")
+                    }
+                    onKeyDown={
+                      enModoCrearEmergencia
+                        ? undefined
+                        : (e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              seleccionarEmergencia(em, "detalles");
+                            }
+                          }
+                    }
+                  >
                     <div className="emergencia-card-header">
                       <div className="flex items-center gap-2">
                         <div className={`emergencia-icon-wrap ${nivelIconoBgClass[em.severidad] ?? "icon-media"}`}>
@@ -1217,11 +1310,20 @@ export default function PaginaEmergencias() {
                     <div className="emergencia-actions">
                       <button
                         className="card-action-btn"
-                        onClick={() => seleccionarEmergencia(em, "detalles")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          seleccionarEmergencia(em, "detalles");
+                        }}
                       >
                         <ClipboardList size={12} className="mr-1" /> Detalles
                       </button>
-                      <button className="card-action-btn card-action-btn--edit" onClick={() => abrirCrearEmergencia(em)}>
+                      <button
+                        className="card-action-btn card-action-btn--edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          abrirCrearEmergencia(em);
+                        }}
+                      >
                         <Edit3 size={12} className="mr-1" /> Editar
                       </button>
                     </div>
@@ -1243,8 +1345,9 @@ export default function PaginaEmergencias() {
               herramientaZona={herramientaMapa}
               poligonoBorrador={poligonoBorrador}
               onPoligonoBorradorChange={setPoligonoBorrador}
-              selectedId={emergenciaSeleccionada?.id ?? null}
+              selectedId={mapSelectedId}
               onSelectEmergenciaId={onSelectEmergenciaId}
+              seleccionEnMapaHabilitada={!enModoCrearEmergencia}
             />
 
             <div className="mapa-zoom-controls">
@@ -1299,7 +1402,14 @@ export default function PaginaEmergencias() {
             anuncios={anuncios}
             anunciosCargando={anunciosCargando}
             regionesAnuncio={regionesAnuncio}
+            onActualizarAnuncio={handleActualizarAnuncio}
+            actualizandoAnuncioId={
+              updateAnuncioMut.isPending && updateAnuncioMut.variables
+                ? updateAnuncioMut.variables.id
+                : null
+            }
             onEditarEmergencia={() => abrirCrearEmergencia(emergenciaSeleccionada ?? undefined)}
+            onIniciarCreacionNuevaEmergencia={iniciarCreacionNuevaEmergencia}
             onUpdateEstado={handleUpdateEstado}
             onDeleteEmergencia={handleDeleteEmergencia}
             onCrearEmergencia={handleCrearEmergencia}
@@ -1319,7 +1429,6 @@ export default function PaginaEmergencias() {
         <div className="kpis-bar">
           {[
             { icono: <TrendingUp size={18} />, valor: String(kpis.totalActivas),                                  etiqueta: "Emergencias activas",           colorClass: "kpi-emergencias" },
-            { icono: <Users size={18} />,      valor: kpis.totalAfectados.toLocaleString("es-CL"),                etiqueta: "Personas afectadas",            colorClass: "kpi-personas" },
             { icono: <AlertTriangle size={18}/>,valor: String(kpis.totalCriticas),                                etiqueta: "Emergencias críticas",          colorClass: "kpi-emergencias" },
             ...(centrosApiHabilitada
               ? [{ icono: <Home size={18} />, valor: String(centros.filter((c) => c.estado === "Abierto").length), etiqueta: "Centros de acopio operativos", colorClass: "" }]

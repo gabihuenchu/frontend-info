@@ -20,12 +20,14 @@ import {
   deleteCentroAcopio,
   calculateKpis,
   getAnuncios,
+  updateAnuncio,
   isCentrosAcopioApiEnabled,
   type Emergencia,
   type CrearEmergenciaRequest,
   type ActualizarEstadoRequest,
   type CrearCentroAcopioRequest,
   type KpiData,
+  type ActualizarAnuncioRequest,
   type AnuncioResponseDto,
   type PageResponse,
 } from '../services/emergency.service';
@@ -200,3 +202,12 @@ export const useAnuncios = () =>
     retry: 2,
     retryDelay: (attempt) => Math.min(1_000 * 2 ** attempt, 30_000),
   });
+
+export const useUpdateAnuncio = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ActualizarAnuncioRequest }) =>
+      updateAnuncio(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.anuncios }),
+  });
+};

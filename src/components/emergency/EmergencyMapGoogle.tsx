@@ -6,11 +6,12 @@
  * El dibujo de zonas usa clics en el mapa (DrawingManager fue retirado en Maps JS API 3.65).
  */
 
-import { useCallback, useMemo, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 
 import { useCatastrofesGoogleMaps } from "@/hooks/useGoogleMaps";
 import type { Emergencia, EmergenciasGeoJsonCollection } from "@/services/emergency.service";
+import { latLngRingFromGeoJson } from "@/services/emergency.service";
 
 const mapContainerStyle: CSSProperties = {
   width: "100%",
@@ -44,6 +45,19 @@ interface EmergencyMapGoogleProps {
   onPoligonoBorradorChange: (path: google.maps.LatLngLiteral[] | null) => void;
   selectedId: string | null;
   onSelectEmergenciaId: (id: string) => void;
+  /** Si false, no se enfoca ni selecciona emergencias al clic en polígonos/marcadores (modo crear). */
+  seleccionEnMapaHabilitada?: boolean;
+}
+
+function fitMapToPaths(
+  map: google.maps.Map,
+  paths: google.maps.LatLngLiteral[],
+  padding = 56
+) {
+  if (paths.length === 0) return;
+  const bounds = new google.maps.LatLngBounds();
+  for (const p of paths) bounds.extend(p);
+  map.fitBounds(bounds, padding);
 }
 
 export default function EmergencyMapGoogle({
@@ -56,10 +70,13 @@ export default function EmergencyMapGoogle({
   onPoligonoBorradorChange,
   selectedId,
   onSelectEmergenciaId,
+  seleccionEnMapaHabilitada = true,
 }: EmergencyMapGoogleProps) {
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   const dibujarActivo = herramientaZona === "Dibujar zona";
+  const mapaSeleccionable = seleccionEnMapaHabilitada && !dibujarActivo;
 
   const handleMapClick = useCallback(
     (event: google.maps.MapMouseEvent) => {
@@ -72,6 +89,60 @@ export default function EmergencyMapGoogle({
   );
 
   const geoFeatures = useMemo(() => geoJson?.features ?? [], [geoJson?.features]);
+
+  const geoIds = useMemo(
+    () => new Set(geoFeatures.map((f) => f.properties.id)),
+    [geoFeatures]
+  );
+
+  const emergenciasConZonaExtra = useMemo(
+    () =>
+      emergencias.filter(
+        (em) => em.zonaImpacto && !geoIds.has(em.id)
+      ),
+    [emergencias, geoIds]
+  );
+
+  const emergenciasSinPoligono = useMemo(
+    () =>
+      emergencias.filter((em) => {
+        const enGeo = geoIds.has(em.id);
+        const tieneZona = Boolean(em.zonaImpacto?.coordinates?.[0]?.length);
+        return !enGeo && !tieneZona;
+      }),
+    [emergencias, geoIds]
+  );
+
+  const pathsForEmergency = useCallback(
+    (id: string): google.maps.LatLngLiteral[] => {
+      const feature = geoFeatures.find((f) => f.properties.id === id);
+      if (feature?.geometry?.coordinates?.[0]) {
+        return ringToLatLngPath(feature.geometry.coordinates[0] as [number, number][]);
+      }
+      const em = emergencias.find((e) => e.id === id);
+      if (em?.zonaImpacto) {
+        return latLngRingFromGeoJson(em.zonaImpacto);
+      }
+      const emPoint = emergencias.find((e) => e.id === id);
+      if (emPoint && emPoint.latitud && emPoint.longitud) {
+        return [{ lat: emPoint.latitud, lng: emPoint.longitud }];
+      }
+      return [];
+    },
+    [geoFeatures, emergencias]
+  );
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !selectedId || !seleccionEnMapaHabilitada) return;
+    const paths = pathsForEmergency(selectedId);
+    if (paths.length >= 3) {
+      fitMapToPaths(map, paths);
+    } else if (paths.length === 1) {
+      map.panTo(paths[0]);
+      map.setZoom(Math.max(map.getZoom() ?? 8, 10));
+    }
+  }, [selectedId, pathsForEmergency, seleccionEnMapaHabilitada]);
 
   if (!apiKey?.trim()) {
     return (
@@ -104,6 +175,12 @@ export default function EmergencyMapGoogle({
       center={defaultCenter}
       zoom={6}
       onClick={handleMapClick}
+      onLoad={(map) => {
+        mapRef.current = map;
+      }}
+      onUnmount={() => {
+        mapRef.current = null;
+      }}
       options={{
         disableDefaultUI: true,
         zoomControl: false,
@@ -123,10 +200,32 @@ export default function EmergencyMapGoogle({
             onClick={() => onSelectEmergenciaId(f.properties.id)}
             options={{
               fillColor: isSel ? "#f97316" : "#3b82f6",
-              fillOpacity: isSel ? 0.28 : 0.18,
+              fillOpacity: isSel ? 0.35 : 0.2,
               strokeColor: isSel ? "#ea580c" : "#2563eb",
               strokeWeight: isSel ? 3 : 2,
-              clickable: !dibujarActivo,
+              clickable: mapaSeleccionable,
+              zIndex: isSel ? 3 : 1,
+            }}
+          />
+        );
+      })}
+
+      {emergenciasConZonaExtra.map((em) => {
+        const paths = latLngRingFromGeoJson(em.zonaImpacto);
+        if (paths.length < 3) return null;
+        const isSel = em.id === selectedId;
+        return (
+          <Polygon
+            key={`zona-${em.id}`}
+            paths={paths}
+            onClick={() => onSelectEmergenciaId(em.id)}
+            options={{
+              fillColor: isSel ? "#f97316" : "#3b82f6",
+              fillOpacity: isSel ? 0.35 : 0.2,
+              strokeColor: isSel ? "#ea580c" : "#2563eb",
+              strokeWeight: isSel ? 3 : 2,
+              clickable: mapaSeleccionable,
+              zIndex: isSel ? 3 : 1,
             }}
           />
         );
@@ -141,7 +240,7 @@ export default function EmergencyMapGoogle({
             strokeColor: "#16a34a",
             strokeWeight: 2,
             clickable: false,
-            zIndex: 2,
+            zIndex: 4,
           }}
         />
       )}
@@ -162,11 +261,11 @@ export default function EmergencyMapGoogle({
         />
       ))}
 
-      {emergencias.map((em) => (
+      {emergenciasSinPoligono.map((em) => (
         <Marker
           key={`m-${em.id}`}
           position={{ lat: em.latitud, lng: em.longitud }}
-          onClick={() => onSelectEmergenciaId(em.id)}
+          onClick={mapaSeleccionable ? () => onSelectEmergenciaId(em.id) : undefined}
           title={em.region}
           icon={{
             path: google.maps.SymbolPath.CIRCLE,

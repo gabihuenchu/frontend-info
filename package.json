@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@gabihuenchu/ui-library": "file:../ui-library-standalone",
+    "@hookform/resolvers": "^5.4.0",
     "@react-google-maps/api": "^2.20.8",
     "@tailwindcss/postcss": "^4.2.4",
     "@tanstack/react-query": "^5.100.9",
@@ -31,7 +32,10 @@
     "next": "^16.2.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "typescript": "^6.0.3"
+    "react-hook-form": "^7.75.0",
+    "sonner": "^2.0.7",
+    "typescript": "^6.0.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/google-map-react": "^2.1.10",

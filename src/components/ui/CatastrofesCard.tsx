@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@gabihuenchu/ui-library';
 
 interface CatastrofesCardProps {
   children: React.ReactNode;
@@ -20,30 +19,31 @@ const CatastrofesCard: React.FC<CatastrofesCardProps> = ({
   variant = 'default',
   className = '',
 }) => {
-  const getCatastrofesVariant = () => {
+  const getCatastrofesVariantClass = () => {
     switch (variant) {
       case 'default':
-        return 'default';
+        return 'catastrofes-card--default';
       case 'elevated':
-        return 'elevated';
+        return 'catastrofes-card--elevated';
       case 'bordered':
-        return 'bordered';
+        return 'catastrofes-card--bordered';
       default:
-        return 'default';
+        return 'catastrofes-card--default';
     }
   };
 
   return (
-    <Card
-      title={title}
-      subtitle={subtitle}
-      image={image}
-      footer={footer}
-      variant={getCatastrofesVariant()}
-      className={`catastrofes-card ${className}`}
-    >
-      {children}
-    </Card>
+    <div className={`catastrofes-card ${getCatastrofesVariantClass()} ${className}`.trim()}>
+      {image && <img className="catastrofes-card__image" src={image} alt={title ?? 'Card image'} />}
+      {(title || subtitle) && (
+        <div className="catastrofes-card__header">
+          {title && <h3 className="catastrofes-card__title">{title}</h3>}
+          {subtitle && <p className="catastrofes-card__subtitle">{subtitle}</p>}
+        </div>
+      )}
+      <div className="catastrofes-card__body">{children}</div>
+      {footer && <div className="catastrofes-card__footer">{footer}</div>}
+    </div>
   );
 };
 

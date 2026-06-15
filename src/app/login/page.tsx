@@ -39,18 +39,49 @@ function LoginContent() {
         profile: session.profile,
       }));
 
-      // Redirigir a la página principal
-      router.push('/');
+      const profile = session.profile as { roles?: Array<string | { nombre?: string }> } | null;
+      const roleNames = (profile?.roles ?? []).map((r) =>
+        typeof r === 'string' ? r : r?.nombre ?? ''
+      );
+      const hasAdminRole = roleNames.includes('ADMINISTRADOR');
+      const nextPath = searchParams.get('next');
+
+      if (hasAdminRole) {
+        router.push(
+          nextPath?.startsWith('/dashboard')
+            ? nextPath
+            : '/dashboard/logistica'
+        );
+      } else if (nextPath?.startsWith('/dashboard')) {
+        setError('Tu cuenta no tiene rol ADMINISTRADOR. Contacta al administrador del sistema.');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       console.error('Error en login:', err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
-        setError('Credenciales inválidas o usuario no autorizado.');
+      const backendDetail =
+        typeof err.response?.data?.detail === 'string' ? err.response.data.detail : null;
+
+      if (
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/wrong-password' ||
+        err.code === 'auth/user-not-found'
+      ) {
+        setError(
+          'No existe una cuenta con ese correo y contraseña en Firebase. Verifica tus datos o créala en Registrarse.'
+        );
       } else if (err.response?.status === 401 || err.response?.status === 403) {
-        setError('Tu cuenta no está sincronizada todavía o no tienes acceso al perfil.');
+        setError(
+          backendDetail ||
+            'No se pudo validar tu sesión en el sistema. Intenta de nuevo o contacta al administrador.'
+        );
       } else if (err.response?.status === 404) {
-        setError('El correo electrónico no está registrado.');
+        setError(
+          backendDetail ||
+            'Tu sesión en Firebase es válida, pero no se pudo cargar el perfil. Intenta de nuevo en unos segundos.'
+        );
       } else {
-        setError('Error al intentar iniciar sesión. Inténtalo más tarde.');
+        setError(backendDetail || 'Error al intentar iniciar sesión. Inténtalo más tarde.');
       }
     } finally {
       setLoading(false);

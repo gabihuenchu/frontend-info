@@ -1,7 +1,9 @@
 # 📋 MS Identidad y Acceso - Documentación de Endpoints
 
-**Base URL (MS Identidad):** `http://localhost:8081`
+**Base URL (MS Identidad):** `http://localhost:8081`  
 **Base URL recomendada desde frontend:** `http://localhost:8080` (API Gateway)
+
+> **Flujos login/registro (Firebase + BD):** ver [flujo-autenticacion.md](./flujo-autenticacion.md)
 
 ---
 

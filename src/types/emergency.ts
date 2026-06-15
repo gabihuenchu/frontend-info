@@ -23,6 +23,11 @@ export type EstadoEmergencia =
   | 'CONTROLADA' 
   | 'FINALIZADA';
 
+export interface CoordenadaDto {
+  latitud: number;
+  longitud: number;
+}
+
 export interface Emergencia {
   id: string;
   titulo: string;
@@ -41,15 +46,11 @@ export interface Emergencia {
 }
 
 export interface CrearEmergenciaRequest {
-  titulo: string;
-  descripcion: string;
   tipo: TipoEmergencia;
   severidad: NivelSeveridad;
   region: string;
-  comuna: string;
-  latitud: number;
-  longitud: number;
-  afectados?: number;
+  epicentro: CoordenadaDto;
+  zonaImpacto: CoordenadaDto[];
 }
 
 export interface ActualizarEstadoRequest {

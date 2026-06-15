@@ -2,50 +2,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAnuncios, useEmergenciasActivas } from '@/hooks/useEmergencies';
+import type { Emergencia, EstadoEmergencia, NivelSeveridad, TipoEmergencia } from '@/services/emergency.service';
+import {
+  MapPin, Clock, AlertTriangle, Bell, Loader2, Flame, Waves, CloudRain,
+  Mountain, Zap, Activity, CalendarDays, Users, Box, HeartHandshake, Map,
+} from 'lucide-react';
 import './inicio.css';
 
-/* ── Iconos SVG inline (sin dependencias extra) ── */
-const IconCoordination = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <path d="M16 4L4 10V22L16 28L28 22V10L16 4Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-    <path d="M16 4V28M4 10L16 16L28 10" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-  </svg>
-);
-
-const IconMonitoring = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <circle cx="16" cy="16" r="11" stroke="currentColor" strokeWidth="1.8"/>
-    <path d="M16 10V16L20 20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
-    <path d="M16 5V3M16 29V27M5 16H3M29 16H27" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-  </svg>
-);
-
-const IconResources = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <rect x="4" y="14" width="10" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-    <rect x="18" y="8" width="10" height="20" rx="1.5" stroke="currentColor" strokeWidth="1.8"/>
-    <path d="M4 10L16 4L28 8" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-  </svg>
-);
-
-const IconCitizen = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <circle cx="12" cy="10" r="4" stroke="currentColor" strokeWidth="1.8"/>
-    <path d="M4 26C4 22.134 7.582 19 12 19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    <circle cx="22" cy="18" r="3" stroke="currentColor" strokeWidth="1.8"/>
-    <path d="M16 28C16 25.239 18.686 23 22 23C25.314 23 28 25.239 28 28" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-  </svg>
-);
-
-const IconChile = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <path d="M16 4C9.373 4 4 9.373 4 16C4 22.627 9.373 28 16 28C22.627 28 28 22.627 28 16C28 9.373 22.627 4 16 4Z" stroke="currentColor" strokeWidth="1.8"/>
-    <path d="M10 16H22M16 10V22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    <path d="M12 12L20 20M20 12L12 20" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.4"/>
-  </svg>
-);
-
+/* ── Iconos SVG inline ── */
 const IconArrow = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
@@ -72,44 +37,103 @@ const CloseIcon = () => (
   </svg>
 );
 
-/* ── Datos de beneficios ── */
-const benefits = [
+type BenefitTheme = 'green' | 'orange' | 'blue' | 'purple';
+
+/* ── Datos de beneficios (hero) ── */
+const benefits: {
+  id: string;
+  theme: BenefitTheme;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}[] = [
   {
     id: 'coordinacion',
-    icon: <IconCoordination />,
-    title: 'Coordinación\nEfectiva',
-    subtitle: 'Respuesta articulada entre autoridades, operadores y ciudadanos',
+    theme: 'green',
+    icon: <Users size={18} strokeWidth={1.75} />,
+    title: 'Coordinación Efectiva',
+    subtitle: 'Respuesta articulada entre autoridades, operadores y ciudadanos.',
   },
   {
     id: 'monitoreo',
-    icon: <IconMonitoring />,
-    title: 'Monitoreo\n24/7',
-    subtitle: 'Alertas y estado de emergencias en tiempo real',
+    theme: 'orange',
+    icon: <Clock size={18} strokeWidth={1.75} />,
+    title: 'Monitoreo 24/7',
+    subtitle: 'Alertas y estado de emergencias en tiempo real desde el centro de coordinación.',
   },
   {
     id: 'recursos',
-    icon: <IconResources />,
-    title: 'Gestión de\nRecursos',
-    subtitle: 'Control de inventario y centros de acopio automatizado',
+    theme: 'blue',
+    icon: <Box size={18} strokeWidth={1.75} />,
+    title: 'Gestión de Recursos',
+    subtitle: 'Control de inventario y centros de acopio automatizado para una distribución eficiente.',
   },
   {
     id: 'ciudadano',
-    icon: <IconCitizen />,
-    title: 'Apoyo\nCiudadano',
-    subtitle: 'Canal directo para donar, reportar necesidades y voluntariado',
+    theme: 'purple',
+    icon: <HeartHandshake size={18} strokeWidth={1.75} />,
+    title: 'Apoyo Ciudadano',
+    subtitle: 'Canal directo para donar, reportar necesidades y ofrecer voluntariado.',
   },
   {
     id: 'chile',
-    icon: <IconChile />,
-    title: 'Chile\nUnido',
-    subtitle: 'Una sola plataforma para todo el territorio nacional',
+    theme: 'green',
+    icon: <Map size={18} strokeWidth={1.75} />,
+    title: 'Chile Unido',
+    subtitle: 'Una sola plataforma para todo el territorio nacional, conectando a todo el país.',
   },
 ];
+
+const tipoEmergenciaLabel: Record<TipoEmergencia, string> = {
+  TERREMOTO: 'Terremoto',
+  TSUNAMI: 'Tsunami',
+  INCENDIO: 'Incendio',
+  INUNDACION: 'Inundación',
+  ERUPCION: 'Erupción volcánica',
+  ALUVION: 'Aluvión',
+};
+
+const estadoEmergenciaLabel: Record<EstadoEmergencia, string> = {
+  ACTIVA: 'Activa',
+  CONTROLADA: 'Controlada',
+  FINALIZADA: 'Finalizada',
+};
+
+const iconoTipoEmergencia: Record<TipoEmergencia, React.ReactNode> = {
+  TERREMOTO: <Zap size={18} />,
+  TSUNAMI: <Waves size={18} />,
+  INCENDIO: <Flame size={18} />,
+  INUNDACION: <CloudRain size={18} />,
+  ERUPCION: <Mountain size={18} />,
+  ALUVION: <Mountain size={18} />,
+};
+
+function severidadEtiquetaPublica(severidad: NivelSeveridad): string {
+  const map: Record<NivelSeveridad, string> = {
+    CRITICA: 'CRÍTICO',
+    ALTA: 'ALTO',
+    MEDIA: 'MEDIO',
+    BAJA: 'BAJO',
+  };
+  return map[severidad];
+}
+
+function formatearFechaEmergencia(em: Emergencia): string {
+  const raw = em.iniciada ?? em.createdAt;
+  if (!raw) return 'Sin fecha';
+  return new Date(raw).toLocaleString('es-CL', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 /* ── Nav links ── */
 const navLinks = [
   { label: 'Inicio', href: '#' },
-  { label: 'Quiénes Somos', href: '#quienes-somos' },
+  { label: 'Emergencias', href: '#emergencias' },
   { label: 'Alertas', href: '#alertas' },
   { label: 'Centros de Acopio', href: '#centros' },
   { label: 'Donaciones', href: '/donaciones' },
@@ -124,6 +148,16 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroBgLoaded, setHeroBgLoaded] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  const { data: emergencias = [], isLoading: emergenciasCargando, isError: emergenciasError } =
+    useEmergenciasActivas({ refetchInterval: 120_000 });
+
+  const { data: anunciosData, isLoading: anunciosCargando } = useAnuncios();
+  const anuncios = (anunciosData?.content || []).slice(0, 6);
+
+  const scrollToEmergencias = () => {
+    document.getElementById('emergencias')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   /* Scroll → header opaco */
   useEffect(() => {
@@ -280,55 +314,205 @@ export default function Home() {
                   <IconArrow />
                 </button>
                 <button
+                  id="btn-hero-emergencias"
+                  className="btn-secondary"
+                  aria-label="Ver emergencias activas en Chile"
+                  onClick={scrollToEmergencias}
+                >
+                  <IconAlert />
+                  Ver emergencias activas
+                </button>
+                <button
                   id="btn-hero-donaciones"
                   className="btn-secondary"
                   aria-label="Ir a donaciones y necesidades"
                   onClick={() => router.push('/donaciones')}
                 >
-                  <IconAlert />
                   Donar recursos
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Scroll indicator */}
-          <div className="scroll-indicator" aria-hidden="true">
-            <div className="scroll-line" />
-            <span className="scroll-label">Scroll</span>
+          {/* Cards de capacidades — sobre el hero */}
+          <div id="beneficios" className="hero-benefits" aria-label="Capacidades del sistema">
+            <div className="hero-benefits__grid" role="list">
+              {benefits.map((benefit, i) => (
+                <article
+                  key={benefit.id}
+                  className={`benefit-card benefit-card--${benefit.theme}`}
+                  role="listitem"
+                  style={{ animationDelay: `${0.75 + i * 0.08}s` }}
+                >
+                  <span className="benefit-card__glow" aria-hidden="true" />
+                  <div className="benefit-card__head">
+                    <div className="benefit-card__icon" aria-hidden="true">
+                      {benefit.icon}
+                    </div>
+                    <h2 className="benefit-card__title">{benefit.title}</h2>
+                  </div>
+                  <p className="benefit-card__desc">{benefit.subtitle}</p>
+                  <span className="benefit-card__arrow" aria-hidden="true">
+                    <IconArrow />
+                  </span>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* ══════ FRANJA DE BENEFICIOS ══════ */}
-        <section
-          id="beneficios"
-          className="benefits-strip"
-          aria-label="Capacidades del sistema"
-        >
-          <div
-            className="benefits-grid"
-            role="list"
-          >
-            {benefits.map((benefit, i) => (
-              <article
-                key={benefit.id}
-                className="benefit-item"
-                role="listitem"
-                style={{
-                  animationDelay: `${i * 80}ms`,
-                }}
-              >
-                <div className="benefit-icon" aria-hidden="true">
-                  {benefit.icon}
-                </div>
-                <h2 className="benefit-title" style={{ whiteSpace: 'pre-line' }}>
-                  {benefit.title}
-                </h2>
-                <p className="benefit-subtitle">
-                  {benefit.subtitle}
-                </p>
-              </article>
-            ))}
+        {/* ══════ EMERGENCIAS ACTIVAS (API pública) ══════ */}
+        <section id="emergencias" className="emergencias-section">
+          <div className="emergencias-section__glow" aria-hidden="true" />
+          <div className="emergencias-section__waves" aria-hidden="true" />
+
+          <div className="container emergencias-section__inner">
+            <header className="emergencias-section__header">
+              <div className="emergencias-badge-live">
+                <span className="emergencias-badge-live__dot" />
+                MONITOREO EN TIEMPO REAL
+              </div>
+              <h2 className="emergencias-section__title">
+                Emergencias <span className="emergencias-section__title-accent">activas</span> en Chile
+              </h2>
+              <p className="emergencias-section__desc">
+                Catástrofes declaradas oficialmente en el sistema. Información actualizada desde el centro de coordinación nacional.
+              </p>
+            </header>
+
+            {emergenciasCargando && emergencias.length === 0 ? (
+              <div className="emergencias-loading">
+                <Loader2 size={28} className="animate-spin" />
+                <p>Cargando emergencias activas...</p>
+              </div>
+            ) : emergenciasError ? (
+              <div className="emergencias-empty">
+                <AlertTriangle size={40} opacity={0.35} />
+                <p>No fue posible cargar las emergencias en este momento.</p>
+                <button type="button" className="btn-secondary" onClick={() => window.location.reload()}>
+                  Reintentar
+                </button>
+              </div>
+            ) : (
+              <div className="emergencias-list-public">
+                {emergencias.length === 0 ? (
+                  <div className="emergencias-empty emergencias-empty--full">
+                    <AlertTriangle size={48} opacity={0.25} />
+                    <p>No hay emergencias activas reportadas en este momento.</p>
+                    <span className="emergencias-empty__hint">El territorio se encuentra sin alertas declaradas.</span>
+                  </div>
+                ) : (
+                  emergencias.map((em, idx) => (
+                    <article
+                      key={em.id}
+                      className={`emergencia-card-v2 severidad-${em.severidad.toLowerCase()}`}
+                      style={{ animationDelay: `${idx * 100}ms` }}
+                    >
+                      <span className={`emergencia-card-v2__badge severidad-${em.severidad.toLowerCase()}`}>
+                        {severidadEtiquetaPublica(em.severidad)}
+                      </span>
+
+                      <div className="emergencia-card-v2__content">
+                        <div className="emergencia-card-v2__main">
+                          <div className="emergencia-card-v2__tipo">
+                            <span className="emergencia-card-v2__icon" aria-hidden="true">
+                              {iconoTipoEmergencia[em.tipo] ?? <AlertTriangle size={18} />}
+                            </span>
+                            <div>
+                              <p className="emergencia-card-v2__label">Tipo</p>
+                              <h3 className="emergencia-card-v2__nombre">
+                                {tipoEmergenciaLabel[em.tipo] ?? em.tipo}
+                              </h3>
+                            </div>
+                          </div>
+
+                          <div className="emergencia-card-v2__details">
+                            <div className="emergencia-card-v2__ubicacion">
+                              <MapPin size={14} className="emergencia-card-v2__pin" />
+                              <p className="emergencia-card-v2__lugar">{em.region}</p>
+                            </div>
+
+                            <div className="emergencia-card-v2__meta">
+                              <span className={`emergencia-card-v2__estado estado-${em.estado.toLowerCase()}`}>
+                                <Activity size={12} />
+                                {estadoEmergenciaLabel[em.estado]}
+                              </span>
+                              <span className="emergencia-card-v2__fecha">
+                                <CalendarDays size={12} />
+                                {formatearFechaEmergencia(em)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="emergencia-card-v2__zona">
+                          {em.zonaImpacto?.coordinates?.[0]?.length
+                            ? 'Zona de impacto registrada en el mapa oficial'
+                            : 'Epicentro registrado en el sistema'}
+                        </p>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ══════ SECCIÓN ALERTAS (RabbitMQ Notifications) ══════ */}
+        <section id="alertas" className="alerts-section">
+          <div className="container">
+            <div className="section-header-center">
+              <div className="alert-badge-live">
+                <span className="live-dot"></span>
+                SISTEMA DE ALERTAS NACIONAL
+              </div>
+              <h2 className="section-title-large">Últimas Notificaciones de Emergencia</h2>
+              <p className="section-desc-center">
+                Información oficial generada automáticamente y en tiempo real sobre catástrofes activas en el territorio.
+              </p>
+            </div>
+
+            {anunciosCargando && anuncios.length === 0 ? (
+              <div className="alerts-loading">
+                <Loader2 className="animate-spin" />
+                <p>Sincronizando con el centro de alertas...</p>
+              </div>
+            ) : (
+              <div className="alerts-masonry">
+                {anuncios.map((anuncio, idx) => (
+                  <div key={anuncio.id} className={`alert-card-public severity-${anuncio.severidad.toLowerCase()}`} style={{ animationDelay: `${idx * 100}ms` }}>
+                    <div className="alert-card-header">
+                      <div className="severity-indicator">
+                        <AlertTriangle size={14} />
+                        <span>{anuncio.severidad}</span>
+                      </div>
+                      <div className="alert-time">
+                        <Clock size={12} />
+                        <span>{new Date(anuncio.creadoEn).toLocaleTimeString("es-CL", { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+                    <h3 className="alert-card-title">{anuncio.titulo}</h3>
+                    <p className="alert-card-text">{anuncio.contenido}</p>
+                    <div className="alert-card-footer">
+                      <div className="alert-location">
+                        <MapPin size={12} />
+                        <span>{anuncio.region || "Cobertura Nacional"}</span>
+                      </div>
+                      <div className="alert-scope">{anuncio.alcance}</div>
+                    </div>
+                  </div>
+                ))}
+
+                {anuncios.length === 0 && (
+                  <div className="no-alerts">
+                    <Bell size={48} opacity={0.2} />
+                    <p>No hay alertas críticas reportadas en los últimos minutos.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         </section>
 

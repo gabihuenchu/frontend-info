@@ -1,11 +1,12 @@
 import apiClient from './apiClient';
+import type { PermisoResponse } from '@/types/identity';
 
+export const getAllPermissions = async (): Promise<PermisoResponse[]> => {
+  const res = await apiClient.get<PermisoResponse[]>('/permisos');
+  return res.data;
+};
+
+/** @deprecated Usar getAllPermissions. */
 export const PermisoService = {
-  // 17. Obtener Todos los Permisos
-  getAllPermissions: async (token: string) => {
-    const response = await apiClient.get('/permisos', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  }
+  getAllPermissions: (_token: string) => getAllPermissions(),
 };

@@ -55,3 +55,8 @@ export function puedeVerSeccionAdmin(profile: PerfilConPermisos | null | undefin
   const roles = normalizarRoles(profile);
   return roles.includes('ADMINISTRADOR') || roles.includes('AUTORIDAD');
 }
+
+/** CRUD usuarios/roles en ms-identity exige rol ADMINISTRADOR en el backend. */
+export function puedeGestionarUsuarios(profile: PerfilConPermisos | null | undefined): boolean {
+  return normalizarRoles(profile).includes('ADMINISTRADOR');
+}

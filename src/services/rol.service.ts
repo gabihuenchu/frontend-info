@@ -1,19 +1,28 @@
 import apiClient from './apiClient';
+import type { RolResponse } from '@/types/identity';
 
+export const getAllRoles = async (): Promise<RolResponse[]> => {
+  const res = await apiClient.get<RolResponse[]>('/roles');
+  return res.data;
+};
+
+export const getRoleById = async (id: string): Promise<RolResponse> => {
+  const res = await apiClient.get<RolResponse>(`/roles/${id}`);
+  return res.data;
+};
+
+export const assignPermissionToRole = async (rolId: string, permisoId: string): Promise<void> => {
+  await apiClient.post(`/roles/${rolId}/permisos/${permisoId}`, {});
+};
+
+export const removePermissionFromRole = async (rolId: string, permisoId: string): Promise<void> => {
+  await apiClient.delete(`/roles/${rolId}/permisos/${permisoId}`);
+};
+
+/** @deprecated Usar funciones nombradas. */
 export const RolService = {
-  // 15. Asignar Permiso a Rol
-  assignPermission: async (id: string, permisoId: string, token: string) => {
-    const response = await apiClient.post(`/roles/${id}/permisos/${permisoId}`, {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 16. Quitar Permiso de Rol
-  removePermission: async (id: string, permisoId: string, token: string) => {
-    const response = await apiClient.delete(`/roles/${id}/permisos/${permisoId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  }
+  assignPermission: (id: string, permisoId: string, _token: string) =>
+    assignPermissionToRole(id, permisoId),
+  removePermission: (id: string, permisoId: string, _token: string) =>
+    removePermissionFromRole(id, permisoId),
 };

@@ -136,7 +136,7 @@ const navLinks = [
   { label: 'Emergencias', href: '#emergencias' },
   { label: 'Alertas', href: '#alertas' },
   { label: 'Centros de Acopio', href: '#centros' },
-  { label: 'Donaciones', href: '#donaciones' },
+  { label: 'Donaciones', href: '/donaciones' },
 ];
 
 /* ════════════════════════════════════════
@@ -314,13 +314,21 @@ export default function Home() {
                   <IconArrow />
                 </button>
                 <button
-                  id="btn-hero-alertas"
+                  id="btn-hero-emergencias"
                   className="btn-secondary"
                   aria-label="Ver emergencias activas en Chile"
                   onClick={scrollToEmergencias}
                 >
                   <IconAlert />
                   Ver emergencias activas
+                </button>
+                <button
+                  id="btn-hero-donaciones"
+                  className="btn-secondary"
+                  aria-label="Ir a donaciones y necesidades"
+                  onClick={() => router.push('/donaciones')}
+                >
+                  Donar recursos
                 </button>
               </div>
             </div>
@@ -505,6 +513,44 @@ export default function Home() {
               </div>
             )}
 
+          </div>
+        </section>
+
+        {/* ══════ DONACIONES / PARTICIPACIÓN CIUDADANA ══════ */}
+        <section
+          id="donaciones"
+          className="benefits-strip"
+          aria-labelledby="donaciones-title"
+        >
+          <div style={{ maxWidth: '1120px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+            <div className="hero-eyebrow" style={{ marginBottom: '1rem' }}>
+              <span className="hero-eyebrow-dot" aria-hidden="true" />
+              Apoyo ciudadano
+            </div>
+            <h2 id="donaciones-title" className="hero-title" style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '0.75rem' }}>
+              Dona recursos donde más se necesitan
+            </h2>
+            <p className="hero-desc" style={{ maxWidth: '560px', marginBottom: '1.5rem' }}>
+              Consulta las necesidades publicadas por los centros de acopio, registra tu donación
+              y recibe un código QR para coordinar la entrega presencial.
+            </p>
+            <div className="hero-actions">
+              <button
+                id="btn-donaciones-ver"
+                className="btn-primary"
+                onClick={() => router.push('/donaciones')}
+              >
+                Ver necesidades
+                <IconArrow />
+              </button>
+              <button
+                id="btn-donaciones-nueva"
+                className="btn-secondary"
+                onClick={() => router.push('/donaciones/nueva')}
+              >
+                Registrar donación
+              </button>
+            </div>
           </div>
         </section>
 

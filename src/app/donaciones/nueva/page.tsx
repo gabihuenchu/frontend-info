@@ -1,7 +1,7 @@
 'use client';
 
 import { CitizenShell } from '@/components/citizen/CitizenShell';
-import { DonationWizard } from '@/components/citizen/DonationWizard';
+import { DonationForm } from '@/components/citizen/DonationForm';
 
 export default function NuevaDonacionPage() {
   return (
@@ -13,11 +13,11 @@ export default function NuevaDonacionPage() {
         </div>
         <h1 className="citizen-title">Registrar una donación</h1>
         <p className="citizen-subtitle">
-          Selecciona un centro, elige los ítems y recibe tu código QR para la entrega presencial.
+          Selecciona un centro, elige ítems por categoría y recibe tu código QR para la entrega presencial.
         </p>
       </section>
 
-      <DonationWizard />
+      <DonationForm layout="steps" />
     </CitizenShell>
   );
 }

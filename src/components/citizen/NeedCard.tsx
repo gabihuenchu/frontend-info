@@ -28,6 +28,14 @@ export function NeedCard({ need }: NeedCardProps) {
 
       <div className="citizen-card-meta">
         <p>Cantidad necesaria: <strong>{need.cantidadNecesaria}</strong></p>
+        {typeof need.cantidadRestante === 'number' && (
+          <p>
+            Aún se aceptan: <strong>{need.cantidadRestante}</strong>
+            {typeof need.cantidadComprometida === 'number' && need.cantidadComprometida > 0 && (
+              <> ({need.cantidadComprometida} ya comprometidas)</>
+            )}
+          </p>
+        )}
         <p>Estado: {estadoNecesidadLabel[need.estado]}</p>
         <p>Centro: {need.centroId.slice(0, 8).toUpperCase()}…</p>
         {fecha && <p>Registrada: {fecha}</p>}

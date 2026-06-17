@@ -11,7 +11,7 @@ interface CitizenShellProps {
 
 const links = [
   { href: '/donaciones', label: 'Necesidades' },
-  { href: '/donaciones/nueva', label: 'Donar' },
+  { href: '/donaciones#formulario-donacion', label: 'Donar' },
   { href: '/donaciones/mis-contribuciones', label: 'Mis contribuciones' },
 ];
 

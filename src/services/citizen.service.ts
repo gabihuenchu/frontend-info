@@ -10,6 +10,8 @@ import type {
   Donacion,
   PageResponse,
   CrearDonacionRequest,
+  CupoDonacion,
+  CrearNecesidadRequest,
 } from '@/types/citizen';
 
 /** GET /necesidades/publicas */
@@ -23,6 +25,14 @@ export const getNecesidadesPublicas = async (
   return res.data;
 };
 
+/** GET /necesidades/centro/{centroId}/cupos-donacion */
+export const getCuposDonacionPorCentro = async (centroId: string): Promise<CupoDonacion[]> => {
+  const res = await apiClient.get<CupoDonacion[]>(
+    `/necesidades/centro/${centroId}/cupos-donacion`
+  );
+  return res.data;
+};
+
 /** GET /necesidades/centro/{centroId} */
 export const getNecesidadesPorCentro = async (centroId: string): Promise<Necesidad[]> => {
   const res = await apiClient.get<Necesidad[]>(`/necesidades/centro/${centroId}`);
@@ -32,6 +42,12 @@ export const getNecesidadesPorCentro = async (centroId: string): Promise<Necesid
 /** POST /donaciones */
 export const crearDonacion = async (data: CrearDonacionRequest): Promise<Donacion> => {
   const res = await apiClient.post<Donacion>('/donaciones', data);
+  return res.data;
+};
+
+/** POST /necesidades — requiere permiso NECESIDAD_GESTIONAR */
+export const crearNecesidad = async (data: CrearNecesidadRequest): Promise<Necesidad> => {
+  const res = await apiClient.post<Necesidad>('/necesidades', data);
   return res.data;
 };
 

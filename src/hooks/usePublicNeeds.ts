@@ -9,6 +9,7 @@ import { getNecesidadesPublicas } from '@/services/citizen.service';
 export const CITIZEN_QUERY_KEYS = {
   publicNeeds: (page: number, size: number) => ['necesidades', 'publicas', page, size] as const,
   centerNeeds: (centroId: string) => ['necesidades', 'centro', centroId] as const,
+  donationQuotas: (centroId: string) => ['necesidades', 'cupos-donacion', centroId] as const,
   myContributions: (page: number, size: number) =>
     ['donaciones', 'mis-contribuciones', page, size] as const,
 };

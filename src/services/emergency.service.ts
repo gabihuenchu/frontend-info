@@ -168,6 +168,53 @@ export interface CentroAcopio {
   longitud?: number;
 }
 
+/** Respuesta cruda de ms-resources GET /centros (Spring Page.content) */
+interface CentroAcopioApiDto {
+  id: string;
+  nombre: string;
+  direccion: string;
+  coordenadas?: { type?: string; coordinates?: [number, number] };
+  region: string;
+  comuna: string;
+  capacidad?: number | null;
+  horario?: string | null;
+  estado: 'ACTIVO' | 'INACTIVO' | 'SATURADO' | 'CERRADO';
+}
+
+function mapEstadoCentroApi(
+  estado: CentroAcopioApiDto['estado']
+): CentroAcopio['estado'] {
+  if (estado === 'ACTIVO') return 'Abierto';
+  if (estado === 'CERRADO') return 'Cerrado';
+  return 'En evaluación';
+}
+
+function mapCentroApiToUi(dto: CentroAcopioApiDto): CentroAcopio {
+  const [lng, lat] = dto.coordenadas?.coordinates ?? [];
+  return {
+    id: dto.id,
+    nombre: dto.nombre,
+    direccion: dto.direccion,
+    ciudad: dto.comuna,
+    region: dto.region,
+    capacidad: dto.capacidad != null ? String(dto.capacidad) : undefined,
+    estado: mapEstadoCentroApi(dto.estado),
+    latitud: lat,
+    longitud: lng,
+  };
+}
+
+async function fetchCentrosPaginados(
+  path: string,
+  params?: Record<string, string | number>
+): Promise<CentroAcopio[]> {
+  const res = await apiClient.get<PageResponse<CentroAcopioApiDto>>(path, {
+    params: { page: 0, size: 100, ...params },
+  });
+  const content = res.data?.content;
+  return Array.isArray(content) ? content.map(mapCentroApiToUi) : [];
+}
+
 export interface CoordenadaDto {
   longitud: number;
   latitud: number;
@@ -375,8 +422,7 @@ export function isCentrosAcopioApiEnabled(): boolean {
 
 export const getCentrosAcopio = async (): Promise<CentroAcopio[]> => {
   if (!isCentrosAcopioApiEnabled()) return [];
-  const res = await apiClient.get<CentroAcopio[]>('/centros-acopio');
-  return res.data;
+  return fetchCentrosPaginados('/centros-acopio');
 };
 
 export const getCentrosCercanos = async (
@@ -385,10 +431,11 @@ export const getCentrosCercanos = async (
   radioKm = 20
 ): Promise<CentroAcopio[]> => {
   if (!isCentrosAcopioApiEnabled()) return [];
-  const res = await apiClient.get<CentroAcopio[]>('/centros-acopio/cercanos', {
-    params: { lat, lng, radio: radioKm },
+  return fetchCentrosPaginados('/centros-acopio/cercanos', {
+    lat,
+    lng,
+    radioMetros: radioKm * 1000,
   });
-  return res.data;
 };
 
 function rejectCentrosDeshabilitados(): never {

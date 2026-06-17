@@ -17,11 +17,21 @@ export interface Necesidad {
   itemId: string;
   emergenciaId: string | null;
   cantidadNecesaria: number;
+  cantidadComprometida: number;
+  cantidadRestante: number;
   prioridad: PrioridadNecesidad;
   origen: OrigenNecesidad;
   estado: EstadoNecesidad;
   creadaEn: string;
   resueltaEn: string | null;
+}
+
+export interface CupoDonacion {
+  itemId: string;
+  necesidadId: string;
+  cantidadNecesaria: number;
+  cantidadComprometida: number;
+  cantidadMaximaDonacion: number;
 }
 
 export interface DonacionItem {
@@ -39,6 +49,7 @@ export interface Donacion {
   donadoEn: string;
   confirmadoEn: string | null;
   confirmadoPorUsuarioId: string | null;
+  cantidadTotal: number;
   items: DonacionItem[];
 }
 
@@ -58,4 +69,12 @@ export interface DonacionItemRequest {
 export interface CrearDonacionRequest {
   centroId: string;
   items: DonacionItemRequest[];
+}
+
+export interface CrearNecesidadRequest {
+  centroId: string;
+  itemId: string;
+  emergenciaId?: string | null;
+  cantidadNecesaria: number;
+  prioridad: PrioridadNecesidad;
 }

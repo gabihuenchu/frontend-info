@@ -4,7 +4,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { crearDonacion, getMisContribuciones } from '@/services/citizen.service';
+import { crearDonacion, getCuposDonacionPorCentro, getMisContribuciones } from '@/services/citizen.service';
 import type { CrearDonacionRequest } from '@/types/citizen';
 import { CITIZEN_QUERY_KEYS } from './usePublicNeeds';
 
@@ -16,14 +16,26 @@ export const useMyContributions = (page = 0, size = 20) =>
     staleTime: 30_000,
   });
 
+/** Cupos de donación por ítem en un centro (cantidad máxima permitida) */
+export const useDonationQuotas = (centroId: string | undefined) =>
+  useQuery({
+    queryKey: CITIZEN_QUERY_KEYS.donationQuotas(centroId ?? ''),
+    queryFn: () => getCuposDonacionPorCentro(centroId!),
+    enabled: Boolean(centroId),
+    staleTime: 30_000,
+  });
+
 /** Crear una nueva donación (DonationForm) */
 export const useCreateDonation = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: CrearDonacionRequest) => crearDonacion(data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['donaciones', 'mis-contribuciones'] });
       qc.invalidateQueries({ queryKey: ['necesidades'] });
+      qc.invalidateQueries({
+        queryKey: CITIZEN_QUERY_KEYS.donationQuotas(variables.centroId),
+      });
     },
   });
 };

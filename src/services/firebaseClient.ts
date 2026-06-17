@@ -13,6 +13,7 @@ const firebaseConfig = {
 
 let firebaseApp: FirebaseApp | null = null;
 let firebaseAppInitialized = false;
+let firebaseDevWarned = false;
 
 function ensureFirebaseConfig() {
   const missingKeys = [];
@@ -35,7 +36,10 @@ function ensureFirebaseConfig() {
 export function getFirebaseAuthClient() {
   // En modo desarrollo, si no hay credenciales, retornar null
   if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'your_api_key_here') {
-    console.warn('Firebase no configurado. Modo desarrollo sin autenticación.');
+    if (!firebaseDevWarned) {
+      firebaseDevWarned = true;
+      console.warn('Firebase no configurado. Modo desarrollo sin autenticación.');
+    }
     return null;
   }
 

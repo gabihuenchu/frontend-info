@@ -5,6 +5,9 @@ import { getFirebaseAuthClient } from './firebaseClient';
 // El frontend debe consumir siempre el API Gateway; este enruta al MS Identity.
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+/** Evita spam en consola cuando un MS opcional no está levantado en local. */
+const loggedUnavailableEndpoints = new Set<string>();
+
 const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -47,6 +50,9 @@ export const getFirebaseToken = async (): Promise<string | null> => {
     }
 
     if (!auth) {
+      if (process.env.NODE_ENV === 'development') {
+        return null;
+      }
       console.warn(
         'Firebase no está configurado (NEXT_PUBLIC_FIREBASE_*). ' +
           'Configure Firebase o inicie sesión para guardar el token en localStorage.'
@@ -173,7 +179,25 @@ apiClient.interceptors.response.use(
               ? resp.data
               : JSON.stringify(resp.data);
 
-      console.error('Error del backend:', safeData);
+      const instance = problem?.instance ?? originalRequest?.url ?? 'unknown';
+      const isServiceDown =
+        problem?.errorCode === 'SERVICIO_NO_DISPONIBLE' ||
+        problem?.title === 'Microservicio no responde' ||
+        problem?.title === 'Error Interno del Gateway' ||
+        (typeof problem?.detail === 'string' &&
+          problem.detail.includes('microservicio de destino'));
+
+      if (process.env.NODE_ENV === 'development' && isServiceDown) {
+        if (!loggedUnavailableEndpoints.has(instance)) {
+          loggedUnavailableEndpoints.add(instance);
+          console.warn(
+            `[dev] Microservicio no disponible (${instance}). ` +
+              'Levanta el MS correspondiente o prueba directamente /donaciones si solo estás validando ms-citizen.'
+          );
+        }
+      } else {
+        console.error('Error del backend:', safeData);
+      }
     } else if (error.request) {
       // El request fue enviado pero no hubo respuesta (Network Error, CORS, timeout...)
       console.error('No response from backend (possible network error or CORS):', {

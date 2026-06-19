@@ -1,0 +1,168 @@
+/* ============================================================
+   tokens.css — CatástrofesCL Design System
+   Centro de Operaciones · WCAG 2.1 AA · Modo claro + oscuro
+   ============================================================ */
+
+:root {
+  /* ── Marca verde corporativa ──────────────────────────────── */
+  --primitive-green-600: #2e7d32;
+  --primitive-green-hover: #256728;
+  --primitive-green-800: #166534;
+  --primitive-green-100: #dcfce7;
+  --primitive-green-200: #bbf7d0;
+
+  /* ── Semánticos sistema ───────────────────────────────────── */
+  --semantic-error: #dc2626;
+  --semantic-warning: #d97706;
+  --semantic-success: #16a34a;
+
+  /* ── Texto modo claro ─────────────────────────────────────── */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --text-placeholder: #9ca3af;
+  --text-table-row: #111827;
+  --text-table-head: #374151;
+  --text-heading: #111827;
+  --text-label: #6b7280;
+  --text-on-brand: #ffffff;
+
+  /* ── Superficies modo claro (jerarquía 3 niveles) ─────────── */
+  --surface-page: #f8fafc;
+  --surface-sidebar: #f4f7f4;
+  --surface-card: #ffffff;
+  --surface-emergencias-list: #f0f4f0;
+  --surface-panel-lateral: #fafdfb;
+  --surface-table-head: #f3f4f6;
+  --surface-hover: #eef2ee;
+  --surface-active-nav: #dcfce7;
+  --surface-subnav: #e8efe8;
+
+  /* ── Bordes y elevación ───────────────────────────────────── */
+  --border-default: #d1d5db;
+  --border-card: #e5e7eb;
+  --border-focus: #2e7d32;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-sidebar: 2px 0 8px rgba(0, 0, 0, 0.04);
+  --focus-ring: 0 0 0 3px rgba(46, 125, 50, 0.15);
+
+  /* ── Form controls (unificado) ────────────────────────────── */
+  --control-height: 40px;
+  --control-radius: 8px;
+  --control-bg: #ffffff;
+  --control-border: #d1d5db;
+  --control-text: #111827;
+  --control-font-size: 0.875rem;
+
+  /* ── Botones ──────────────────────────────────────────────── */
+  --btn-primary-bg: #2e7d32;
+  --btn-primary-bg-hover: #256728;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-text: #2e7d32;
+  --btn-secondary-border: #2e7d32;
+  --btn-secondary-bg-hover: #f4f7f4;
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  --card-radius: 12px;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+
+  /* ── Sidebar nav activo ───────────────────────────────────── */
+  --nav-active-bg: #dcfce7;
+  --nav-active-text: #166534;
+  --nav-active-border: #2e7d32;
+
+  /* ── Estados / badges (sólidos 100%) ──────────────────────── */
+  --state-alta-bg: #fee2e2;
+  --state-alta-text: #b91c1c;
+  --state-media-bg: #fef3c7;
+  --state-media-text: #b45309;
+  --state-baja-bg: #dcfce7;
+  --state-baja-text: #166534;
+  --state-urgente-bg: #fef2f2;
+  --state-urgente-text: #b91c1c;
+
+  /* ── Espaciado (escala 4px) ───────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ── Tipografía ───────────────────────────────────────────── */
+  --font-weight-title: 600;
+  --font-weight-subtitle: 500;
+  --font-weight-body: 400;
+}
+
+/* ── Tema oscuro (sin cambios de identidad) ───────────────── */
+.dashboard-root.dark {
+  --color-bg-base: #1a1a14;
+  --color-bg-card: #1e1e16;
+  --color-bg-sidebar: #10170d;
+  --color-bg-hover: #252519;
+  --color-bg-input: #252519;
+  --color-border: #2a2a1e;
+  --color-border-input: #3a3a2a;
+  --color-text-primary: #e8e6d9;
+  --color-text-secondary: #c8c0af;
+  --color-text-muted: #7a7a6a;
+
+  --alert-alta: #ef4444;
+  --alert-alta-bg: rgba(239, 68, 68, 0.15);
+  --alert-alta-border: rgba(239, 68, 68, 0.35);
+  --alert-media: #f97316;
+  --alert-media-bg: rgba(249, 115, 22, 0.15);
+  --alert-media-border: rgba(249, 115, 22, 0.35);
+  --alert-baja: #22c55e;
+  --alert-baja-bg: rgba(34, 197, 94, 0.15);
+  --alert-baja-border: rgba(34, 197, 94, 0.35);
+
+  --brand-green: #7ab648;
+  --brand-green-hover: #3a5f28;
+  --brand-green-bg: #2d4a1e;
+  --brand-green-border: #4a7a30;
+  --brand-green-text: #a0d060;
+}
+
+/* ── Tema claro — tokens semánticos ───────────────────────── */
+.dashboard-root.light {
+  --color-bg-base: var(--surface-page);
+  --color-bg-card: var(--surface-card);
+  --color-bg-sidebar: var(--surface-sidebar);
+  --color-bg-hover: var(--surface-hover);
+  --color-bg-input: var(--control-bg);
+  --color-border: var(--border-default);
+  --color-border-input: var(--control-border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-tertiary);
+
+  --alert-alta: var(--state-alta-text);
+  --alert-alta-bg: var(--state-alta-bg);
+  --alert-alta-border: #fecaca;
+  --alert-media: var(--state-media-text);
+  --alert-media-bg: var(--state-media-bg);
+  --alert-media-border: #fde68a;
+  --alert-baja: var(--state-baja-text);
+  --alert-baja-bg: var(--state-baja-bg);
+  --alert-baja-border: #bbf7d0;
+
+  --brand-green: var(--primitive-green-600);
+  --brand-green-hover: var(--primitive-green-hover);
+  --brand-green-bg: var(--btn-primary-bg);
+  --brand-green-border: var(--btn-secondary-border);
+  --brand-green-text: var(--btn-primary-text);
+
+  --estado-abierto-text: var(--state-baja-text);
+  --estado-abierto-bg: var(--state-baja-bg);
+  --estado-abierto-border: #bbf7d0;
+  --estado-eval-text: var(--state-media-text);
+  --estado-eval-bg: var(--state-media-bg);
+  --estado-eval-border: #fde68a;
+  --estado-cerrado-text: var(--state-alta-text);
+  --estado-cerrado-bg: var(--state-alta-bg);
+  --estado-cerrado-border: #fecaca;
+}

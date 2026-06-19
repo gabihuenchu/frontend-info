@@ -54,7 +54,12 @@
 }
 
 .dark .logistics-kpi-card__label { color: var(--dark-text-muted); font-size: 0.75rem; }
-.light .logistics-kpi-card__label { color: var(--light-text-muted); font-size: 0.75rem; }
+.light .logistics-kpi-card__label { color: var(--text-tertiary); font-size: 0.75rem; }
+
+.light .logistics-kpi-card__icon--blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
 
 .logistics-kpi-card__trend { font-size: 0.7rem; margin-top: 0.25rem; }
 .logistics-kpi-card__trend--up,
@@ -321,4 +326,11 @@
   border-color: var(--dark-border);
 }
 
-.dark .logistics-empty { padding: 2rem; text-align: center; color: var(--dark-text-muted); font-size: 0.875rem; }
+.dark .logistics-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Modo claro: ver design-system-light.css */

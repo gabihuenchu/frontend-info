@@ -545,20 +545,19 @@ function PanelDerecho({
                 </button>
               </div>
 
-              <div className="flex gap-2" style={{ marginTop: 8 }}>
-                <button className="btn-informe" style={{ flex: 1 }} onClick={onEditarEmergencia}>
-                  <Edit3 size={12} style={{ marginRight: 4 }} /> EDITAR
+              <div className="panel-detalle-actions">
+                <button type="button" className="btn-informe btn-detalle-editar" onClick={onEditarEmergencia}>
+                  <Edit3 size={14} /> EDITAR
                 </button>
                 <button
-                  className="btn-guardar"
-                  style={{ flex: 1, fontSize: 10, background: "#b45309", border: "none" }}
+                  type="button"
+                  className="btn-detalle-finalizar"
                   onClick={onDeleteEmergencia}
                   disabled={isDeleting}
-                  type="button"
                   title="Marca la emergencia como FINALIZADA en el servidor (no hay borrado físico)."
                 >
-                  <Trash2 size={12} style={{ marginRight: 4 }} />
-                  {isDeleting ? "Finalizando..." : "Finalizar emergencia"}
+                  <Trash2 size={14} />
+                  {isDeleting ? 'Finalizando...' : 'Finalizar emergencia'}
                 </button>
               </div>
             </div>
@@ -704,20 +703,18 @@ function PanelDerecho({
               <div className="form-group">
                 <label className="panel-form-label">Epicentro y Zona de Impacto</label>
                 {epicentroPreview ? (
-                  <div style={{ background: "rgba(255,255,255,0.05)", padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <p style={{ fontSize: 13, margin: 0, color: "var(--color-text-secondary)", fontWeight: 600 }}>
+                  <div className="panel-zona-hint panel-zona-hint--ok">
+                    <p className="panel-zona-hint__title">
                       ✓ Zona válida ({cantidadVerticesZona} vértices → mín. {MIN_VERTICES_ZONA_IMPACTO})
                     </p>
-                    <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4 }}>
+                    <p className="panel-zona-hint__sub">
                       Epicentro: Lat {epicentroPreview.latitud.toFixed(5)} | Lng {epicentroPreview.longitud.toFixed(5)}
                     </p>
                   </div>
                 ) : (
-                  <div style={{ background: "rgba(239, 68, 68, 0.05)", padding: "10px", borderRadius: "8px", border: "1px dashed rgba(239, 68, 68, 0.2)" }}>
-                    <p style={{ fontSize: 12, margin: 0, color: "#fca5a5" }}>
-                      ⚠️ Falta zona en el mapa
-                    </p>
-                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>
+                  <div className="panel-zona-hint panel-zona-hint--warn">
+                    <p className="panel-zona-hint__title">⚠️ Falta zona en el mapa</p>
+                    <p className="panel-zona-hint__sub">
                       Usa &quot;Dibujar zona&quot; y marca al menos {MIN_VERTICES_ZONA_IMPACTO} vértices (polígono cerrado con 4+ coordenadas).
                     </p>
                   </div>
@@ -727,21 +724,9 @@ function PanelDerecho({
 
 
             {errorCrear && (
-              <div
-                role="alert"
-                style={{
-                  marginTop: 12,
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  background: "rgba(239, 68, 68, 0.1)",
-                  border: "1px solid rgba(239, 68, 68, 0.35)",
-                  color: "#fca5a5",
-                  fontSize: 12,
-                  lineHeight: 1.45,
-                }}
-              >
-                <AlertCircle size={14} style={{ display: "inline", marginRight: 6, verticalAlign: "text-bottom" }} />
-                {errorCrear}
+              <div role="alert" className="panel-form-alert">
+                <AlertCircle size={14} />
+                <span>{errorCrear}</span>
               </div>
             )}
 
@@ -1309,22 +1294,24 @@ export default function PaginaEmergencias() {
                     )}
                     <div className="emergencia-actions">
                       <button
+                        type="button"
                         className="card-action-btn"
                         onClick={(e) => {
                           e.stopPropagation();
                           seleccionarEmergencia(em, "detalles");
                         }}
                       >
-                        <ClipboardList size={12} className="mr-1" /> Detalles
+                        <ClipboardList size={12} /> Detalles
                       </button>
                       <button
+                        type="button"
                         className="card-action-btn card-action-btn--edit"
                         onClick={(e) => {
                           e.stopPropagation();
                           abrirCrearEmergencia(em);
                         }}
                       >
-                        <Edit3 size={12} className="mr-1" /> Editar
+                        <Edit3 size={12} /> Editar
                       </button>
                     </div>
                   </div>
@@ -1339,7 +1326,7 @@ export default function PaginaEmergencias() {
           <div className="mapa-container">
             <EmergencyMapGoogle
               apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""}
-              dark={dark}
+              defaultMapDark={dark}
               emergencias={emergenciasFiltradas}
               geoJson={geoJson}
               herramientaZona={herramientaMapa}

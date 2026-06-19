@@ -182,7 +182,7 @@ export default function AnuncioCardEditable({ anuncio, regiones, onGuardar, guar
   return (
     <article className={`anuncio-dash-card ${severityClass}`}>
       <div className="anuncio-dash-card__header">
-        <span className="anuncio-dash-card__tag">{severidadLabel[anuncio.severidad]}</span>
+        <span className={`anuncio-dash-card__tag ${severityClass}`}>{severidadLabel[anuncio.severidad]}</span>
         <div className="anuncio-dash-card__meta">
           <time className="anuncio-dash-card__time">
             {new Date(anuncio.creadoEn).toLocaleString("es-CL", {

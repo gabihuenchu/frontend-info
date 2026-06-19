@@ -32,7 +32,7 @@ function progressBar(progreso: number, estado: string) {
       <div className="logistics-progress">
         <div className={`logistics-progress__bar ${barCls}`} style={{ width: `${progreso}%` }} />
       </div>
-      <span style={{ fontSize: '0.7rem', color: 'var(--log-muted)', minWidth: 32 }}>{progreso}%</span>
+      <span className="logistics-progress-pct">{progreso}%</span>
     </div>
   );
 }

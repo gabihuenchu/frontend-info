@@ -6,10 +6,12 @@
  * El dibujo de zonas usa clics en el mapa (DrawingManager fue retirado en Maps JS API 3.65).
  */
 
-import { useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 
+import MapThemeToggle from "@/components/maps/MapThemeToggle";
 import { useCatastrofesGoogleMaps } from "@/hooks/useGoogleMaps";
+import { googleMapDarkStyles } from "@/lib/mapStyles";
 import type { Emergencia, EmergenciasGeoJsonCollection } from "@/services/emergency.service";
 import { latLngRingFromGeoJson } from "@/services/emergency.service";
 
@@ -20,15 +22,6 @@ const mapContainerStyle: CSSProperties = {
 
 const defaultCenter = { lat: -33.45, lng: -70.67 };
 
-const darkMapStyles: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#1a1a14" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#7a7a6a" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a14" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0a0f1a" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#2a2a1e" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#3a3a2a" }] },
-];
-
 function ringToLatLngPath(ring: [number, number][]): google.maps.LatLngLiteral[] {
   return ring.map(([lng, lat]) => ({ lat, lng }));
 }
@@ -37,7 +30,10 @@ export type HerramientaZonaMapa = "Dibujar zona" | "Editar zona" | "Borrar zona"
 
 interface EmergencyMapGoogleProps {
   apiKey: string;
-  dark: boolean;
+  /** Tema inicial del mapa (independiente del tema global tras el primer render) */
+  defaultMapDark?: boolean;
+  /** @deprecated Usar defaultMapDark */
+  dark?: boolean;
   emergencias: Emergencia[];
   geoJson?: EmergenciasGeoJsonCollection;
   herramientaZona: HerramientaZonaMapa;
@@ -62,6 +58,7 @@ function fitMapToPaths(
 
 export default function EmergencyMapGoogle({
   apiKey,
+  defaultMapDark,
   dark,
   emergencias,
   geoJson,
@@ -74,6 +71,7 @@ export default function EmergencyMapGoogle({
 }: EmergencyMapGoogleProps) {
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const [mapDark, setMapDark] = useState(defaultMapDark ?? dark ?? false);
 
   const dibujarActivo = herramientaZona === "Dibujar zona";
   const mapaSeleccionable = seleccionEnMapaHabilitada && !dibujarActivo;
@@ -170,7 +168,8 @@ export default function EmergencyMapGoogle({
   }
 
   return (
-    <GoogleMap
+    <div className="mapa-google-root">
+      <GoogleMap
       mapContainerStyle={mapContainerStyle}
       center={defaultCenter}
       zoom={6}
@@ -185,7 +184,7 @@ export default function EmergencyMapGoogle({
         disableDefaultUI: true,
         zoomControl: false,
         draggableCursor: dibujarActivo ? "crosshair" : undefined,
-        styles: dark ? darkMapStyles : [],
+        styles: mapDark ? googleMapDarkStyles : [],
       }}
     >
       {geoFeatures.map((f) => {
@@ -278,5 +277,7 @@ export default function EmergencyMapGoogle({
         />
       ))}
     </GoogleMap>
+      <MapThemeToggle mapDark={mapDark} onChange={setMapDark} />
+    </div>
   );
 }

@@ -114,7 +114,7 @@ export interface MatchingVoluntarioResponse {
   candidatos: CandidatoMatchingResponse[];
 }
 
-/** Vista enriquecida para tablas del dashboard (mock + API) */
+/** Vista enriquecida para tablas del dashboard (datos API) */
 export interface TransferenciaVista extends TransferenciaResponse {
   codigo: string;
   origenNombre: string;

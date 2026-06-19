@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useCrearMision, useMisionesVista } from '@/hooks/useLogistics';
+import { formatApiError } from '@/lib/api-errors';
 
 export default function MisionesPage() {
-  const { data: misiones = [], isLoading } = useMisionesVista();
+  const { data: misiones = [], isLoading, isError, error } = useMisionesVista();
   const crear = useCrearMision();
 
   const [centroOrigenId, setCentroOrigenId] = useState('');
@@ -24,8 +25,7 @@ export default function MisionesPage() {
       });
       toast.success(`Misión creada: ${res.id.slice(0, 8)}…`);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(msg ?? 'Error al crear misión');
+      toast.error(formatApiError(err));
     }
   };
 
@@ -66,6 +66,10 @@ export default function MisionesPage() {
         <div className="logistics-panel__head">Misiones registradas</div>
         {isLoading ? (
           <div className="logistics-empty">Cargando…</div>
+        ) : isError ? (
+          <div className="logistics-empty" style={{ color: '#fca5a5' }}>{formatApiError(error)}</div>
+        ) : misiones.length === 0 ? (
+          <div className="logistics-empty">No hay misiones en la base de datos.</div>
         ) : (
           <div className="logistics-matching-list" style={{ padding: '1rem' }}>
             {misiones.map((m) => (

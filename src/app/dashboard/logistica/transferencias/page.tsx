@@ -8,10 +8,11 @@ import {
   useCrearTransferencia,
   useTransferenciasVista,
 } from '@/hooks/useLogistics';
+import { formatApiError } from '@/lib/api-errors';
 import type { EstadoTransferencia } from '@/types/logistics';
 
 export default function TransferenciasPage() {
-  const { data: rows = [], isLoading } = useTransferenciasVista();
+  const { data: rows = [], isLoading, isError, error } = useTransferenciasVista();
   const crear = useCrearTransferencia();
   const actualizar = useActualizarEstadoTransferencia();
 
@@ -37,8 +38,7 @@ export default function TransferenciasPage() {
       setCentroDestinoId('');
       setNotas('');
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(msg ?? 'Error al crear transferencia');
+      toast.error(formatApiError(err));
     }
   };
 
@@ -51,8 +51,7 @@ export default function TransferenciasPage() {
       await actualizar.mutateAsync({ id: selectedId, data: { nuevoEstado } });
       toast.success(`Estado actualizado a ${nuevoEstado}`);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(msg ?? 'Error al actualizar estado');
+      toast.error(formatApiError(err));
     }
   };
 
@@ -115,7 +114,11 @@ export default function TransferenciasPage() {
 
       <div className="logistics-panel">
         <div className="logistics-panel__head">Listado</div>
-        <TransferenciasTable rows={rows} loading={isLoading} />
+        {isError ? (
+          <div className="logistics-empty" style={{ color: '#fca5a5' }}>{formatApiError(error)}</div>
+        ) : (
+          <TransferenciasTable rows={rows} loading={isLoading} />
+        )}
       </div>
     </div>
   );

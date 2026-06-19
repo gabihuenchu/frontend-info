@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import { useCatastrofesGoogleMaps, getGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
-import { MOCK_MAPA_PUNTOS } from '@/lib/mocks/logistics-mock';
+import { puntosMapaDesdeRutas } from '@/services/logistics.service';
+import type { RutaVoluntarioResponse } from '@/types/logistics';
 
 const center = { lat: -35.5, lng: -71.5 };
 
@@ -19,11 +20,15 @@ const markerColor: Record<string, string> = {
   voluntario: '#a855f7',
 };
 
-export default function LogisticsMap() {
+interface LogisticsMapProps {
+  rutas?: RutaVoluntarioResponse[];
+}
+
+export default function LogisticsMap({ rutas = [] }: LogisticsMapProps) {
   const apiKey = getGoogleMapsApiKey();
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
 
-  const puntos = useMemo(() => MOCK_MAPA_PUNTOS, []);
+  const puntos = useMemo(() => puntosMapaDesdeRutas(rutas), [rutas]);
 
   if (!apiKey) {
     return (
@@ -45,8 +50,8 @@ export default function LogisticsMap() {
     <div className="logistics-map-wrap">
       <GoogleMap
         mapContainerStyle={{ width: '100%', height: '100%' }}
-        center={center}
-        zoom={5}
+        center={puntos[0] ? { lat: puntos[0].lat, lng: puntos[0].lng } : center}
+        zoom={puntos.length > 0 ? 6 : 5}
         options={{ disableDefaultUI: true, styles: darkStyles }}
       >
         {puntos.map((p) => (
@@ -65,13 +70,20 @@ export default function LogisticsMap() {
           />
         ))}
       </GoogleMap>
-      <div className="logistics-map-legend">
-        <div style={{ fontWeight: 600, marginBottom: 6 }}>Leyenda</div>
-        <div>🟢 Centro de Acopio</div>
-        <div>🔵 Transferencia</div>
-        <div>🟠 Misión Activa</div>
-        <div>🟣 Voluntario</div>
-      </div>
+      {puntos.length === 0 ? (
+        <div
+          className="logistics-map-legend"
+          style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}
+        >
+          Sin rutas de voluntarios en la BD. Registra una en Rutas de Voluntarios.
+        </div>
+      ) : (
+        <div className="logistics-map-legend">
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Leyenda</div>
+          <div>🟢 Destino ruta</div>
+          <div>🟣 Origen voluntario</div>
+        </div>
+      )}
     </div>
   );
 }

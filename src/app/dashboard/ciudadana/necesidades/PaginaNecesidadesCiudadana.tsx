@@ -42,8 +42,8 @@ export default function PaginaNecesidadesCiudadana() {
           Gestión de necesidades
         </h1>
         <p style={{ color: 'var(--color-text-secondary, #c8c0af)', maxWidth: 640, lineHeight: 1.6 }}>
-          Registra las necesidades de cada centro de acopio para que los donantes sepan qué recursos
-          se requieren y en qué cantidad.
+          Registra las necesidades de cada centro de acopio para que aparezcan en el portal público
+          de donaciones e indiques qué recursos se requieren y en qué cantidad.
         </p>
       </header>
 

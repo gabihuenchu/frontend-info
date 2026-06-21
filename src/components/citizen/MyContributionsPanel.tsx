@@ -82,7 +82,7 @@ export function MyContributionsPanel() {
               <div className="citizen-card-header">
                 <div>
                   <h3 className="citizen-card-title">
-                    Código {donation.codigoQr.slice(0, 12)}…
+                    Donación {donation.id.slice(0, 8).toUpperCase()}
                   </h3>
                   {fecha && <p className="citizen-card-meta">Donado: {fecha}</p>}
                 </div>

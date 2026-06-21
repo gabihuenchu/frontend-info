@@ -3,6 +3,8 @@
 import {
   Apple,
   BedDouble,
+  Dog,
+  Home,
   Shirt,
   SprayCan,
   Wrench,
@@ -16,11 +18,13 @@ import {
 import type { ItemCatalogo } from '@/types/catalog';
 
 const CATEGORY_ICONS: Record<DonationCategoryId, LucideIcon> = {
-  alimentos: Apple,
-  vestuario: Shirt,
-  herramientas: Wrench,
-  'utiles-aseo': SprayCan,
-  'alojamiento-enseres': BedDouble,
+  'alimentos-no-perecederos': Apple,
+  'aseo-personal': SprayCan,
+  'ropa-calzado': Shirt,
+  'ropa-cama': BedDouble,
+  'articulos-hogar': Home,
+  'herramientas-insumos': Wrench,
+  'alimentos-mascotas': Dog,
 };
 
 export type SelectedDonationLine = {

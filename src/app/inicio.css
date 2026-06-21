@@ -2106,3 +2106,17 @@ button {
   letter-spacing: 0.05em;
   font-size: 0.65rem;
 }
+
+/* Instructivo de donación en sección Apoyo ciudadano (home) */
+.home-donation-steps {
+  margin-bottom: 1.5rem;
+  max-width: 960px;
+}
+
+.home-donation-steps .citizen-steps-guide__title {
+  color: var(--color-text-primary);
+}
+
+.home-donation-steps .citizen-steps-guide__step-title {
+  color: var(--color-text-primary);
+}

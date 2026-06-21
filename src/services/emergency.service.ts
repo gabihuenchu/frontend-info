@@ -163,6 +163,7 @@ export interface CentroAcopio {
   region: string;
   distanciaKm?: number;
   capacidad?: string;
+  horario?: string;
   estado: 'Abierto' | 'En evaluación' | 'Cerrado';
   latitud?: number;
   longitud?: number;
@@ -198,6 +199,7 @@ function mapCentroApiToUi(dto: CentroAcopioApiDto): CentroAcopio {
     ciudad: dto.comuna,
     region: dto.region,
     capacidad: dto.capacidad != null ? String(dto.capacidad) : undefined,
+    horario: dto.horario ?? undefined,
     estado: mapEstadoCentroApi(dto.estado),
     latitud: lat,
     longitud: lng,

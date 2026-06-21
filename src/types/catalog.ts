@@ -6,7 +6,8 @@ export type CategoriaInventario =
   | 'HERRAMIENTAS'
   | 'ARTICULOS_HIGIENE'
   | 'MATERIALES'
-  | 'ARTICULOS_VARIOS';
+  | 'ARTICULOS_VARIOS'
+  | 'MASCOTAS';
 
 export interface ItemCatalogo {
   id: string;

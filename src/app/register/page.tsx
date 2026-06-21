@@ -153,7 +153,7 @@ export default function RegisterPage() {
           <div className="login-copy">
             <h1>Crear cuenta</h1>
             <p>
-              Únete al sistema de gestión de emergencias para poder colaborar y mantenerte informado.
+              Registro reservado para operadores y personal autorizado del sistema de emergencias.
             </p>
           </div>
 

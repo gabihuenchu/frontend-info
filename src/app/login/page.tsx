@@ -112,8 +112,8 @@ function LoginContent() {
           <div className="login-copy">
             <h1>Sistema de Gestión y Monitoreo de Catástrofes en Chile</h1>
             <p>
-              Monitoreamos en tiempo real las emergencias para proteger vidas, informar y unir a Chile
-              cuando más se necesita.
+              Acceso reservado para operadores, autoridades y personal autorizado. Los donantes no
+              necesitan cuenta: pueden acercarse directamente a las sucursales de acopio.
             </p>
           </div>
 

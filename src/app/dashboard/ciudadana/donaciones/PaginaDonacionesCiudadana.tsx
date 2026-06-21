@@ -39,11 +39,11 @@ export default function PaginaDonacionesCiudadana() {
             marginBottom: '0.5rem',
           }}
         >
-          Formulario de donaciones
+          Gestión de donaciones (operadores)
         </h1>
         <p style={{ color: 'var(--color-text-secondary, #c8c0af)', maxWidth: 640, lineHeight: 1.6 }}>
-          Registra donaciones por categoría: alimentos, vestuario, herramientas, útiles de aseo
-          y alojamiento y enseres. El donante recibe un código QR para confirmar la entrega en el centro.
+          Registra en el sistema las donaciones recibidas presencialmente en los centros de acopio.
+          El portal público no requiere que los donantes tengan cuenta.
         </p>
       </header>
 

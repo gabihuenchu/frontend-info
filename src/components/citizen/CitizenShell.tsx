@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import '@/app/inicio.css';
 import '@/styles/citizen.css';
 
@@ -10,14 +9,12 @@ interface CitizenShellProps {
 }
 
 const links = [
-  { href: '/donaciones', label: 'Necesidades' },
-  { href: '/donaciones#formulario-donacion', label: 'Donar' },
-  { href: '/donaciones/mis-contribuciones', label: 'Mis contribuciones' },
+  { href: '/donaciones#como-donar', label: 'Cómo donar' },
+  { href: '/donaciones#sucursales', label: 'Sucursales' },
+  { href: '/donaciones#necesidades', label: 'Necesidades' },
 ];
 
 export function CitizenShell({ children }: CitizenShellProps) {
-  const pathname = usePathname();
-
   return (
     <div className="citizen-page">
       <header className="citizen-header" role="banner">
@@ -31,12 +28,12 @@ export function CitizenShell({ children }: CitizenShellProps) {
             </span>
           </Link>
 
-          <nav className="citizen-nav" aria-label="Participación ciudadana">
+          <nav className="citizen-nav" aria-label="Apoyo ciudadano">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`citizen-nav-link${pathname === link.href ? ' active' : ''}`}
+                className="citizen-nav-link"
               >
                 {link.label}
               </Link>

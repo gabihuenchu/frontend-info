@@ -20,13 +20,13 @@ interface DonationFormProps {
   onSuccess?: (donation: Donacion) => void;
 }
 
-const STEPS = ['Centro', 'Categorías', 'Confirmar', 'Código QR'];
+const STEPS = ['Centro', 'Categorías', 'Confirmar'];
 
 export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [step, setStep] = useState(1);
   const [centroId, setCentroId] = useState<string | undefined>();
-  const [activeCategory, setActiveCategory] = useState<DonationCategoryId>('alimentos');
+  const [activeCategory, setActiveCategory] = useState<DonationCategoryId>('alimentos-no-perecederos');
   const [selected, setSelected] = useState<Record<string, SelectedDonationLine>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [donation, setDonation] = useState<Donacion | null>(null);
@@ -103,17 +103,18 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
     return (
       <div className="citizen-panel">
         <h2 className="citizen-title" style={{ fontSize: '1.25rem' }}>
-          Inicia sesión para donar
+          Acceso restringido
         </h2>
         <p className="citizen-subtitle">
-          Necesitas una cuenta para registrar tu donación y recibir el código QR de entrega.
+          El registro de donaciones en plataforma es solo para operadores autenticados. Los donantes
+          pueden acercarse directamente a las sucursales sin cuenta.
         </p>
         <div className="citizen-actions">
-          <Link href="/login?next=/donaciones" className="citizen-btn citizen-btn--primary">
-            Iniciar sesión
+          <Link href="/donaciones" className="citizen-btn citizen-btn--primary">
+            Ver cómo donar (público)
           </Link>
-          <Link href="/register" className="citizen-btn citizen-btn--secondary">
-            Crear cuenta
+          <Link href="/login?next=/dashboard/ciudadana/donaciones" className="citizen-btn citizen-btn--secondary">
+            Acceso operadores
           </Link>
         </div>
       </div>
@@ -127,18 +128,17 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
           ¡Donación registrada!
         </h2>
         <p className="citizen-subtitle">
-          Presenta este código en {selectedCentro?.nombre ?? 'el centro de acopio'} para confirmar la entrega.
+          Acércate a {selectedCentro?.nombre ?? 'el centro de acopio'} en su horario de atención para
+          entregar los recursos donados.
         </p>
-        <div className="citizen-qr-box">
-          <p className="citizen-card-meta">Código QR / referencia</p>
-          <p className="citizen-qr-code">{donation.codigoQr}</p>
+        <div className="citizen-success-box">
           <p className="citizen-card-meta">
-            Estado: {donation.estado} · {selectedItems.length} ítem(s)
+            Estado: {donation.estado} · {selectedItems.length} ítem(s) registrados
           </p>
         </div>
         <div className="citizen-actions">
-          <Link href="/donaciones/mis-contribuciones" className="citizen-btn citizen-btn--primary">
-            Ver mis contribuciones
+          <Link href="/dashboard/ciudadana/donaciones" className="citizen-btn citizen-btn--primary">
+            Volver al panel
           </Link>
           <button
             type="button"
@@ -160,25 +160,25 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
   if (donation && isSteps && step === 4) {
     return (
       <div className="citizen-wizard">
-        {renderSteps(step)}
+        {renderSteps(3)}
         <div className="citizen-panel">
           <h2 className="citizen-title" style={{ fontSize: '1.25rem' }}>
             ¡Donación registrada!
           </h2>
           <p className="citizen-subtitle">
-            Presenta este código en el centro de acopio para confirmar la entrega.
+            Tu aporte quedó registrado. Coordina la entrega presencial con el centro de acopio
+            seleccionado.
           </p>
-          <div className="citizen-qr-box">
-            <p className="citizen-card-meta">Código QR / referencia</p>
-            <p className="citizen-qr-code">{donation.codigoQr}</p>
+          <div className="citizen-success-box">
+            <p className="citizen-card-meta">Estado: {donation.estado}</p>
           </div>
           <div className="citizen-actions">
-            <Link href="/donaciones/mis-contribuciones" className="citizen-btn citizen-btn--primary">
-              Ver mis contribuciones
+            <Link href="/dashboard/ciudadana/donaciones" className="citizen-btn citizen-btn--primary">
+              Volver al panel
             </Link>
-            <Link href="/donaciones" className="citizen-btn citizen-btn--secondary">
-              Volver al listado
-            </Link>
+          <Link href="/donaciones" className="citizen-btn citizen-btn--secondary">
+            Ver portal público
+          </Link>
           </div>
         </div>
       </div>

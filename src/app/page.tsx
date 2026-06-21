@@ -8,7 +8,9 @@ import {
   MapPin, Clock, AlertTriangle, Bell, Loader2, Flame, Waves, CloudRain,
   Mountain, Zap, Activity, CalendarDays, Users, Box, HeartHandshake, Map,
 } from 'lucide-react';
+import { DonationStepsGuide } from '@/components/citizen/DonationStepsGuide';
 import './inicio.css';
+import '@/styles/citizen.css';
 
 /* ── Iconos SVG inline ── */
 const IconArrow = () => (
@@ -531,24 +533,25 @@ export default function Home() {
               Dona recursos donde más se necesitan
             </h2>
             <p className="hero-desc" style={{ maxWidth: '560px', marginBottom: '1.5rem' }}>
-              Consulta las necesidades publicadas por los centros de acopio, registra tu donación
-              y recibe un código QR para coordinar la entrega presencial.
+              Acércate a una sucursal con los insumos que desees donar. No necesitas registrarte ni
+              agendar cita: revisa qué se necesita y entrega presencialmente en el centro de acopio.
             </p>
+            <DonationStepsGuide variant="compact" className="home-donation-steps" />
             <div className="hero-actions">
               <button
                 id="btn-donaciones-ver"
                 className="btn-primary"
                 onClick={() => router.push('/donaciones')}
               >
-                Ver necesidades
+                Cómo donar
                 <IconArrow />
               </button>
               <button
-                id="btn-donaciones-nueva"
+                id="btn-donaciones-sucursales"
                 className="btn-secondary"
-                onClick={() => router.push('/donaciones/nueva')}
+                onClick={() => router.push('/donaciones#sucursales')}
               >
-                Registrar donación
+                Ver sucursales
               </button>
             </div>
           </div>

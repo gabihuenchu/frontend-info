@@ -16,7 +16,9 @@ export function PublicNeedsList() {
   if (isError) {
     return (
       <div className="citizen-error" role="alert">
-        No pudimos cargar las necesidades. Verifica que el gateway y ms-citizen estén activos.
+        No pudimos cargar las necesidades. Verifica que el gateway (8080), ms-citizen y tu
+        PostgreSQL local estén activos (`docker compose up -d redis rabbitmq` y backends con perfil
+        `backends`).
         {error instanceof Error && `: ${error.message}`}
       </div>
     );

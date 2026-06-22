@@ -206,63 +206,7 @@ ${contexto || "No hay emergencias activas en este momento."}`,
     "Sugiere prioridades de respuesta",
   ];
 
-  return (
-    <div className="panel-ia-overlay">
-      <div className="panel-ia">
-        <div className="panel-ia-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Brain size={18} />
-            <span>Análisis IA — Claude</span>
-          </div>
-          <button onClick={onClose} className="panel-ia-close">
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="panel-ia-mensajes">
-          {mensajes.map((m, i) => (
-            <div key={i} className={`ia-mensaje ia-mensaje--${m.role}`}>
-              <div className="ia-avatar">
-                {m.role === "assistant" ? <Brain size={12} /> : <Users size={12} />}
-              </div>
-              <div className="ia-burbuja">{m.content}</div>
-            </div>
-          ))}
-          {cargando && (
-            <div className="ia-mensaje ia-mensaje--assistant">
-              <div className="ia-avatar"><Brain size={12} /></div>
-              <div className="ia-burbuja ia-typing">
-                <span /><span /><span />
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        <div className="panel-ia-accesos">
-          {accesosRapidos.map((q) => (
-            <button key={q} className="ia-acceso-btn" onClick={() => enviar(q)}>
-              {q}
-            </button>
-          ))}
-        </div>
-
-        <div className="panel-ia-input">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && enviar(input)}
-            placeholder="Pregunta sobre las emergencias..."
-            disabled={cargando}
-          />
-          <button onClick={() => enviar(input)} disabled={cargando || !input.trim()}>
-            <Send size={14} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  
 }
 
 // ─── Panel Derecho con Tabs ───────────────────────────────────────────────────
@@ -301,7 +245,7 @@ function PanelDerecho({
   vista: VistaPanel;
   setVista: (v: VistaPanel) => void;
   emergencia: Emergencia | null;
-  /** Desactivado mientras el MS de centros no esté en el gateway (`NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO`). */
+  /** Centros vía gateway /centros-acopio; desactivar con NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false */
   centrosApiHabilitada: boolean;
   centros: CentroAcopio[];
   centrosCargando: boolean;
@@ -1209,22 +1153,7 @@ export default function PaginaEmergencias() {
               <option>Todos los tipos</option>
               {tipos.map((t) => <option key={t}>{t}</option>)}
             </select>
-            <button
-              className="header-bell"
-              onClick={() => setMostrarIA((v) => !v)}
-              title="Análisis IA"
-              style={{ position: "relative" }}
-            >
-              <Brain size={18} />
-              <span className="bell-badge" style={{ background: "#3b82f6" }}>IA</span>
-            </button>
-            <button className="header-bell" title="Actualizar" onClick={() => { void refetch(); void refetchGeoJson(); }}>
-              <RefreshCw size={18} />
-            </button>
-            <button className="header-bell">
-              <Bell size={18} />
-              <span className="bell-badge">{emergenciasFiltradas.length}</span>
-            </button>
+            
             <button className="btn-nueva-emergencia" onClick={iniciarCreacionNuevaEmergencia}>
               <span>+</span><span>Nueva emergencia</span>
             </button>
@@ -1433,13 +1362,7 @@ export default function PaginaEmergencias() {
         </div>
         </div>
 
-      {/* PANEL IA — overlay */}
-      {mostrarIA && (
-        <PanelIA
-          emergencias={emergencias}
-          onClose={() => setMostrarIA(false)}
-        />
-      )}
+      
     </>
   );
 }

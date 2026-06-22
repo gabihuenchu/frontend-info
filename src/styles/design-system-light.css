@@ -591,8 +591,15 @@
   gap: var(--space-2);
 }
 
-.dashboard-root.light .usuarios-form-row .usuarios-select {
+.dashboard-root.light .usuarios-form-row .usuarios-select:not(.usuarios-select--rol-picker) {
   flex: 1;
+}
+
+.dashboard-root.light .usuarios-select--rol-picker {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .dashboard-root.light .usuarios-form-row .usuarios-btn-primary,

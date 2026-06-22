@@ -458,13 +458,13 @@ export default function GestionUsuarios() {
               </div>
             )}
 
-            <div className="usuarios-form-row usuarios-form-row--stack">
+            <div className="usuarios-form-row usuarios-form-row--stack usuarios-rol-select-wrap">
               <label className="usuarios-label" htmlFor="rol-permisos-select">
                 Rol
               </label>
               <select
                 id="rol-permisos-select"
-                className="usuarios-select"
+                className="usuarios-select usuarios-select--rol-picker"
                 value={rolPermisosId}
                 onChange={(e) => setRolPermisosId(e.target.value)}
                 disabled={rolesCargando || roles.length === 0}
@@ -477,8 +477,6 @@ export default function GestionUsuarios() {
                   roles.map((r) => (
                     <option key={r.id} value={r.id}>
                       {r.nombre}
-                      {r.descripcion ? ` — ${r.descripcion}` : ''}
-                      {` (${r.permisos.length} permisos)`}
                     </option>
                   ))
                 )}

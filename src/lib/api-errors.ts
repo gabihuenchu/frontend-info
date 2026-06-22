@@ -8,9 +8,15 @@ export function formatApiError(error: unknown): string {
 
   if (isAxiosError(error)) {
     if (!error.response) {
+      const originHint =
+        typeof window !== 'undefined' &&
+        !/^https?:\/\/localhost(:\d+)?$/i.test(window.location.origin)
+          ? ` Estás en ${window.location.origin}; si el gateway no permite ese origen (CORS), abre http://localhost:3000.`
+          : '';
       return (
         'No se pudo conectar con el servidor. Verifica que el API Gateway esté activo ' +
-        `(NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}).`
+        `(NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}).` +
+        originHint
       );
     }
 

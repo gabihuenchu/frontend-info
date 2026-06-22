@@ -413,15 +413,14 @@ export const deleteEmergencia = async (id: string): Promise<void> => {
 };
 
 // ─── Centros de acopio ────────────────────────────────────────────────────────
-// El MS de recursos no está integrado en el gateway aún; no llamar a /centros-acopio por defecto.
-// Para reactivar el cliente cuando exista el servicio: NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true
+// Gateway: GET /centros-acopio → ms-resources /centros (ruta pública en el gateway).
+// Desactivar solo si el MS no está levantado: NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false
 
 export function isCentrosAcopioApiEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO === 'true';
+  return process.env.NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO !== 'false';
 }
 
 export const getCentrosAcopio = async (): Promise<CentroAcopio[]> => {
-  if (!isCentrosAcopioApiEnabled()) return [];
   return fetchCentrosPaginados('/centros-acopio');
 };
 
@@ -430,7 +429,6 @@ export const getCentrosCercanos = async (
   lng: number,
   radioKm = 20
 ): Promise<CentroAcopio[]> => {
-  if (!isCentrosAcopioApiEnabled()) return [];
   return fetchCentrosPaginados('/centros-acopio/cercanos', {
     lat,
     lng,
@@ -440,7 +438,7 @@ export const getCentrosCercanos = async (
 
 function rejectCentrosDeshabilitados(): never {
   throw new Error(
-    'El módulo de centros de acopio no está disponible. Cuando el microservicio esté listo, define NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true.'
+    'El módulo de centros de acopio está desactivado en el frontend (NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false).'
   );
 }
 

@@ -7,13 +7,16 @@ import {
   crearTransferencia,
   listarMisionesVista,
   listarRutasVoluntario,
+  listarTransferencias,
   listarTransferenciasVista,
   matchingVoluntarios,
   obtenerMision,
   obtenerMisionDestacada,
   obtenerTransferencia,
   ofrecerRuta,
+  toTransferenciaVista,
 } from '@/services/logistics.service';
+import { listarCentrosLogistica, listarInventarioCentro } from '@/services/resources.service';
 import type {
   ActualizarEstadoTransferenciaRequest,
   CrearMisionRequest,
@@ -23,6 +26,8 @@ import type {
 
 export const LOGISTICS_KEYS = {
   transferencias: ['logistica', 'transferencias'] as const,
+  centros: ['logistica', 'centros'] as const,
+  inventario: (centroId: string) => ['logistica', 'inventario', centroId] as const,
   misiones: ['logistica', 'misiones'] as const,
   rutas: ['logistica', 'rutas'] as const,
   resumen: ['logistica', 'resumen'] as const,
@@ -62,8 +67,30 @@ export const useResumenLogistica = () =>
 export const useTransferenciasVista = () =>
   useQuery({
     queryKey: LOGISTICS_KEYS.transferencias,
-    queryFn: listarTransferenciasVista,
+    queryFn: async () => {
+      const [items, centros] = await Promise.all([
+        listarTransferencias(),
+        listarCentrosLogistica().catch(() => []),
+      ]);
+      const nombres = new Map(centros.map((c) => [c.id, c.nombre]));
+      return items.map((t) => toTransferenciaVista(t, nombres));
+    },
     staleTime: 30_000,
+  });
+
+export const useCentrosLogistica = () =>
+  useQuery({
+    queryKey: LOGISTICS_KEYS.centros,
+    queryFn: listarCentrosLogistica,
+    staleTime: 60_000,
+  });
+
+export const useInventarioCentro = (centroId: string | null) =>
+  useQuery({
+    queryKey: LOGISTICS_KEYS.inventario(centroId ?? ''),
+    queryFn: () => listarInventarioCentro(centroId!),
+    enabled: Boolean(centroId),
+    staleTime: 15_000,
   });
 
 export const useMisionesVista = () =>

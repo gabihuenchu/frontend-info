@@ -1,4 +1,5 @@
 import apiClient from './apiClient';
+import { listarCentrosLogistica } from './resources.service';
 import type {
   ActualizarEstadoTransferenciaRequest,
   AlertaLogistica,
@@ -93,12 +94,20 @@ const PRIORIDAD_TRANSFERENCIA: Record<EstadoTransferencia, TransferenciaVista['p
   RECHAZADA: 'BAJA',
 };
 
-export function toTransferenciaVista(t: TransferenciaResponse): TransferenciaVista {
+export function toTransferenciaVista(
+  t: TransferenciaResponse,
+  nombresCentro?: Map<string, string>
+): TransferenciaVista {
+  const nombreOrigen =
+    nombresCentro?.get(t.centroOrigenId) ?? `Centro ${t.centroOrigenId.slice(0, 8)}…`;
+  const nombreDestino = t.centroDestinoId
+    ? nombresCentro?.get(t.centroDestinoId) ?? `Centro ${t.centroDestinoId.slice(0, 8)}…`
+    : '—';
   return {
     ...t,
     codigo: `TRF-${t.id.slice(0, 8).toUpperCase()}`,
-    origenNombre: `Centro ${t.centroOrigenId.slice(0, 8)}…`,
-    destinoNombre: `Centro ${t.centroDestinoId.slice(0, 8)}…`,
+    origenNombre: nombreOrigen,
+    destinoNombre: nombreDestino,
     prioridad: PRIORIDAD_TRANSFERENCIA[t.estado],
     progreso: PROGRESO_TRANSFERENCIA[t.estado],
     fechaSalida: t.aprobadaEn ?? t.solicitadaEn,
@@ -127,8 +136,12 @@ export function toMisionVista(m: MisionResponse): MisionVista {
 }
 
 export async function listarTransferenciasVista(): Promise<TransferenciaVista[]> {
-  const items = await listarTransferencias();
-  return items.map(toTransferenciaVista);
+  const [items, centros] = await Promise.all([
+    listarTransferencias(),
+    listarCentrosLogistica().catch(() => []),
+  ]);
+  const nombres = new Map(centros.map((c) => [c.id, c.nombre]));
+  return items.map((t) => toTransferenciaVista(t, nombres));
 }
 
 export async function listarMisionesVista(): Promise<MisionVista[]> {

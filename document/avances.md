@@ -4,6 +4,35 @@
 
 ---
 
+### [2026-06-22] Suite de tests unitarios para frontend-info (Vitest + RTL)
+**Integrante(s):** Alfonso González / Cursor  
+**Fase trabajada:** Fase 8 — Frontend Completo (testing)
+
+#### Completado
+- **Infraestructura de testing:** se configuró Vitest + React Testing Library + jsdom + `vite-tsconfig-paths`. Archivos nuevos: `vitest.config.ts`, `vitest.setup.ts` (mocks globales de Firebase y `next/navigation`). Scripts `test`, `test:watch` y `test:coverage` en `package.json`.
+- **Tipo A — Tests de lógica pura (sin render):**
+  - Schemas Zod: `donation`, `centro`, `need`, `inventario`, `emergency` (casos válidos/ inválidos y mensajes en español; incluye los `.refine` de umbrales mín ≤ óptimo ≤ máximo y rangos geográficos de Chile).
+  - Permisos/RBAC: `logistics-permissions` y `resources-permissions` (alias de roles inglés→español, regla de umbrales solo ADMINISTRADOR).
+  - Utilidades: `api-errors` (RFC 7807, 401/403/400, network), `centros-agrupados`, `citizenLabels`, `donationCategories`.
+  - Funciones puras de `emergency.service`: mapeos, etiquetas, geometría de zona de impacto (`cerrarAnilloZona`, `centroidEpicentro`, `prepararZonaImpactoParaApi`), `calculateKpis`.
+- **Tipo B — Tests de componentes y hooks (con render/interacción):**
+  - Componentes RTL: `CatastrofesButton`, `CatastrofesCard`, `Logo`, `NeedCard`.
+  - Hook `useCreateNeed` con `QueryClientProvider` y servicio mockeado (invocación + invalidación de query keys + estado de error).
+- **Resultado:** 17 archivos de test, 161 tests, todos en verde (`npm run test`).
+- **Bug detectado:** ver `errores.md` [ERR-FRONT-001] — los `.refine` de `emergency.ts` rechazan enums válidos (operador `in` mal usado). Documentado, no corregido (pendiente visto bueno del equipo).
+
+#### En progreso
+- Ninguno.
+
+#### Bloqueadores
+- Ninguno.
+
+#### Próximos pasos
+- Corregir [ERR-FRONT-001] e invertir las aserciones de los tests de enums de emergencias.
+- Extender la cobertura a componentes con dependencias externas (Google Maps) mediante mocks dedicados.
+
+---
+
 ### [2026-06-04] Módulo logística dashboard + sidebar unificado
 **Integrante(s):** Camilo / Claude (Cursor)  
 **Fase trabajada:** Fase 8 — Frontend Completo (integración Fase 4 logística)

@@ -291,6 +291,54 @@ export function mapTipoUiABackend(tipoUi: string): TipoEmergenciaApi {
   return m[tipoUi] ?? 'INCENDIO';
 }
 
+/** Etiqueta legible del tipo de emergencia (clave = valor API). */
+export const ETIQUETA_TIPO_EMERGENCIA: Record<TipoEmergenciaUi, string> = {
+  TERREMOTO: 'Terremoto',
+  TSUNAMI: 'Tsunami',
+  INCENDIO: 'Incendio',
+  INUNDACION: 'Inundación',
+  ERUPCION: 'Erupción',
+  ALUVION: 'Aluvión',
+};
+
+/** Primeros 8 caracteres del UUID, usados como "código" corto legible. */
+export function idCorto(id: string | null | undefined): string {
+  return id ? id.slice(0, 8) : '';
+}
+
+/** Etiqueta legible de una emergencia: "Incendio · Biobío (#a1b2c3d4)". */
+export function etiquetaEmergencia(
+  e: Pick<Emergencia, 'id' | 'tipo' | 'region'> | null | undefined
+): string {
+  if (!e) return '';
+  const tipo = ETIQUETA_TIPO_EMERGENCIA[e.tipo as TipoEmergenciaUi] ?? e.tipo ?? 'Emergencia';
+  const region = e.region ? ` · ${e.region}` : '';
+  return `${tipo}${region} (#${idCorto(e.id)})`;
+}
+
+/** Busca una emergencia por id dentro de una lista. */
+export function resolverEmergencia(
+  emergenciaId: string | null | undefined,
+  lista: Emergencia[] | undefined
+): Emergencia | null {
+  if (!emergenciaId || !lista) return null;
+  return lista.find((e) => e.id === emergenciaId) ?? null;
+}
+
+/**
+ * Etiqueta de la emergencia asociada a un id. Si no está en la lista (p. ej. no activa)
+ * devuelve un código corto; si no hay id devuelve null.
+ */
+export function etiquetaEmergenciaPorId(
+  emergenciaId: string | null | undefined,
+  lista: Emergencia[] | undefined
+): string | null {
+  const emergencia = resolverEmergencia(emergenciaId, lista);
+  if (emergencia) return etiquetaEmergencia(emergencia);
+  if (emergenciaId) return `Emergencia #${idCorto(emergenciaId)}`;
+  return null;
+}
+
 function severidadApiAUi(s: SeveridadEmergenciaApi): NivelSeveridad {
   if (s === 'CATASTROFICA') return 'CRITICA';
   return s as NivelSeveridad;

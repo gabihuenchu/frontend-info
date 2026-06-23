@@ -1503,6 +1503,14 @@ body {
 }
 .light .centro-row:hover { background-color: #f9fafb; }
 
+/* Centro enfocado en el mapa (clic en la lista) */
+.centro-row--activo {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 1px #0d9488 inset;
+}
+.dark .centro-row--activo { background-color: rgba(13, 148, 136, 0.12); }
+.light .centro-row--activo { background-color: rgba(13, 148, 136, 0.08); }
+
 .centro-nombre {
   font-size: 11px;
   font-weight: 500;
@@ -1516,6 +1524,13 @@ body {
 
 .dark .centro-ciudad  { color: var(--dark-text-muted); }
 .light .centro-ciudad { color: var(--light-text-muted); }
+
+.centro-emergencia {
+  font-size: 10px;
+  margin: 2px 0 0;
+  font-weight: 500;
+  color: #0d9488;
+}
 
 .centro-distancia {
   font-size: 10px;

@@ -45,6 +45,14 @@ export const crearDonacion = async (data: CrearDonacionRequest): Promise<Donacio
   return res.data;
 };
 
+/** POST /donaciones/{codigoQr}/confirmar — operador confirma recepción (DONACION_CONFIRMAR). */
+export const confirmarDonacion = async (codigoQr: string): Promise<Donacion> => {
+  const res = await apiClient.post<Donacion>(
+    `/donaciones/${encodeURIComponent(codigoQr)}/confirmar`
+  );
+  return res.data;
+};
+
 /** POST /necesidades — requiere permiso NECESIDAD_GESTIONAR */
 export const crearNecesidad = async (data: CrearNecesidadRequest): Promise<Necesidad> => {
   const res = await apiClient.post<Necesidad>('/necesidades', data);

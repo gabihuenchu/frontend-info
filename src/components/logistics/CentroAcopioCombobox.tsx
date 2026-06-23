@@ -14,6 +14,17 @@ interface CentroAcopioComboboxProps {
   excludeId?: string;
   placeholder?: string;
   disabled?: boolean;
+  /** Devuelve la etiqueta legible de la emergencia del centro (o null si no tiene). */
+  resolverEtiquetaEmergencia?: (emergenciaId?: string | null) => string | null;
+}
+
+/** Prioriza ACTIVO/SATURADO sobre INACTIVO/CERRADO para que aparezcan primero. */
+function rankEstado(estado: string): number {
+  const e = estado?.toUpperCase();
+  if (e === 'ACTIVO') return 0;
+  if (e === 'SATURADO') return 1;
+  if (e === 'INACTIVO') return 2;
+  return 3;
 }
 
 export default function CentroAcopioCombobox({
@@ -26,6 +37,7 @@ export default function CentroAcopioCombobox({
   excludeId,
   placeholder = 'Buscar por nombre, comuna o región…',
   disabled = false,
+  resolverEtiquetaEmergencia,
 }: CentroAcopioComboboxProps) {
   const [abierto, setAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState('');
@@ -45,8 +57,30 @@ export default function CentroAcopioCombobox({
         const texto = [c.nombre, c.ciudad, c.region, c.direccion, c.id].join(' ').toLowerCase();
         return texto.includes(q);
       })
-      .slice(0, 12);
+      .slice()
+      .sort((a, b) => rankEstado(a.estado) - rankEstado(b.estado) || a.nombre.localeCompare(b.nombre));
   }, [busqueda, centros, excludeId]);
+
+  const SIN_EMERGENCIA = '__sin_emergencia__';
+
+  // Agrupa los centros por emergencia (mismo formato que donaciones); grupo final sin emergencia.
+  const grupos = useMemo(() => {
+    const map = new Map<string, { etiqueta: string; centros: CentroAcopioLogistica[] }>();
+    for (const c of filtrados) {
+      const etiqueta = resolverEtiquetaEmergencia?.(c.emergenciaId) ?? null;
+      const key = etiqueta ?? SIN_EMERGENCIA;
+      if (!map.has(key)) {
+        map.set(key, { etiqueta: etiqueta ?? 'Centros sin emergencia activa', centros: [] });
+      }
+      map.get(key)!.centros.push(c);
+    }
+    const conEmergencia = [...map.entries()]
+      .filter(([k]) => k !== SIN_EMERGENCIA)
+      .sort((a, b) => a[1].etiqueta.localeCompare(b[1].etiqueta))
+      .map(([, v]) => v);
+    const sinEmergencia = map.get(SIN_EMERGENCIA);
+    return sinEmergencia ? [...conEmergencia, sinEmergencia] : conEmergencia;
+  }, [filtrados, resolverEtiquetaEmergencia]);
 
   useEffect(() => {
     if (!abierto) return;
@@ -105,10 +139,18 @@ export default function CentroAcopioCombobox({
       {seleccionado && (
         <p className="logistics-combobox__hint">
           {seleccionado.ciudad}, {seleccionado.region} · {seleccionado.estado}
+          {(() => {
+            const etiqueta = resolverEtiquetaEmergencia?.(seleccionado.emergenciaId);
+            return etiqueta ? ` · ${etiqueta}` : '';
+          })()}
         </p>
       )}
       {abierto && !loading && (
-        <ul className="logistics-combobox__list" role="listbox">
+        <ul
+          className="logistics-combobox__list"
+          role="listbox"
+          style={{ maxHeight: 280, overflowY: 'auto' }}
+        >
           {filtrados.length === 0 ? (
             <li className="logistics-combobox__empty">
               {centros.length === 0
@@ -118,20 +160,27 @@ export default function CentroAcopioCombobox({
                 : 'Sin coincidencias'}
             </li>
           ) : (
-            filtrados.map((c) => (
-              <li key={c.id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={c.id === value}
-                  className={`logistics-combobox__option${c.id === value ? ' logistics-combobox__option--active' : ''}`}
-                  onClick={() => elegir(c)}
-                >
-                  <span className="logistics-combobox__option-name">{c.nombre}</span>
-                  <span className="logistics-combobox__option-meta">
-                    {c.ciudad} · {c.estado}
-                  </span>
-                </button>
+            grupos.map((grupo) => (
+              <li key={grupo.etiqueta} className="logistics-combobox__group-wrap">
+                <div className="logistics-combobox__group">{grupo.etiqueta}</div>
+                <ul role="group" aria-label={grupo.etiqueta} style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {grupo.centros.map((c) => (
+                    <li key={c.id}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={c.id === value}
+                        className={`logistics-combobox__option${c.id === value ? ' logistics-combobox__option--active' : ''}`}
+                        onClick={() => elegir(c)}
+                      >
+                        <span className="logistics-combobox__option-name">{c.nombre}</span>
+                        <span className="logistics-combobox__option-meta">
+                          {c.ciudad} · {c.estado}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))
           )}

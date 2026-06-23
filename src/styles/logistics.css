@@ -519,4 +519,86 @@
   font-size: 0.78rem;
 }
 
+/* ── Desplegable del combobox: fondo blanco clásico (legible sobre tema oscuro) ── */
+.logistics-combobox__list {
+  background: #ffffff;
+  border-color: #d7d7cf;
+  color: #1f2937;
+}
+.logistics-combobox__option {
+  color: #1f2937;
+}
+.logistics-combobox__option-meta {
+  color: #4b5563;
+  opacity: 1;
+}
+.logistics-combobox__option:hover,
+.logistics-combobox__option--active {
+  background: rgba(139, 154, 70, 0.18);
+}
+.logistics-combobox__group-wrap {
+  list-style: none;
+}
+.logistics-combobox__group {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #0d9488;
+  padding: 0.45rem 0.6rem 0.2rem;
+}
+.logistics-combobox__empty {
+  color: #4b5563;
+  opacity: 1;
+}
+
+/* Popups de <select> nativos del dashboard de logística con fondo blanco */
+.logistics-form select option,
+.logistics-form select optgroup,
+.logistics-panel select option,
+.logistics-panel select optgroup {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* ── Botón de borrado (eliminar centro) ── */
+.logistics-btn--danger {
+  background: #b91c1c;
+  border: 1px solid #b91c1c;
+  color: #ffffff;
+}
+.logistics-btn--danger:hover {
+  background: #991b1b;
+}
+
+/* ── Grupos colapsables de centros por emergencia (dashboard de centros) ── */
+.centros-grupo__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--dark-border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.centros-grupo__head:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+/* Tarjetas dentro de los grupos con fondo blanco clásico */
+.centros-grupo .centro-grid-card {
+  background-color: #ffffff;
+  border-color: #d7d7cf;
+  color: #1f2937;
+}
+.centros-grupo .centro-grid-card p {
+  color: #4b5563;
+  opacity: 1;
+}
+
 /* Modo claro: ver design-system-light.css */

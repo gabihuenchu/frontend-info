@@ -23,12 +23,15 @@ const nextConfig = {
   // Soluciona problemas de cross-origin en desarrollo
   allowedDevOrigins: ['192.168.1.18', 'localhost:3000'],
   async rewrites() {
+    // En contenedor el proxy server-side debe apuntar al gateway por su nombre
+    // de servicio (API_GATEWAY_INTERNAL_URL); en local cae a localhost:8080.
+    const gateway = process.env.API_GATEWAY_INTERNAL_URL || 'http://localhost:8080';
     return [
       {
         // Intercepta todas las llamadas a /api/*
         source: '/api/:path*',
         // Las redirige al MS-Api-Gateway que es el orquestador
-        destination: 'http://localhost:8080/:path*',
+        destination: `${gateway}/:path*`,
       }
     ];
   },

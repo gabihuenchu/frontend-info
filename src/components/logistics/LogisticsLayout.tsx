@@ -6,6 +6,7 @@ import { Bell } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { UsuarioService } from '@/services/usuario.service';
 import { puedeVerLogistica } from '@/lib/logistics-permissions';
+import { puedeGestionarCentros } from '@/lib/resources-permissions';
 import DashboardPageHeader from '@/components/DashboardPageHeader';
 import '@/styles/logistics.css';
 
@@ -33,7 +34,8 @@ export default function LogisticsLayout({
       try {
         const token = await user.getIdToken();
         const p = await UsuarioService.getMyProfile(token);
-        if (!puedeVerLogistica(p)) {
+        // Permite el módulo a quien ve logística o a quien gestiona centros (operadores de centro).
+        if (!puedeVerLogistica(p) && !puedeGestionarCentros(p)) {
           router.replace('/dashboard/emergency');
           return;
         }

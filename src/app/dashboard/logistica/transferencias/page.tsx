@@ -12,8 +12,18 @@ import {
   useTransferenciasVista,
 } from '@/hooks/useLogistics';
 import { formatApiError } from '@/lib/api-errors';
-import { ETIQUETA_CATEGORIA } from '@/types/resources';
-import type { EstadoTransferencia } from '@/types/logistics';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useEmergenciasActivas } from '@/hooks/useEmergencies';
+import { etiquetaEmergenciaPorId } from '@/services/emergency.service';
+import { tienePermiso } from '@/lib/logistics-permissions';
+import { PERMISOS_LOGISTICA } from '@/types/logistics';
+import type { EstadoTransferencia, TipoDestinoTransferencia } from '@/types/logistics';
+
+const ETIQUETA_TIPO_DESTINO: Record<TipoDestinoTransferencia, string> = {
+  CENTRO: 'Otro centro de acopio',
+  PUNTO_DISTRIBUCION: 'Punto de distribución',
+  COMUNIDAD: 'Entrega a la comunidad',
+};
 
 const TRANSICIONES: Record<EstadoTransferencia, EstadoTransferencia[]> = {
   SOLICITADA: ['APROBADA', 'RECHAZADA'],
@@ -34,10 +44,27 @@ export default function TransferenciasPage() {
   } = useCentrosLogistica();
   const crear = useCrearTransferencia();
   const actualizar = useActualizarEstadoTransferencia();
+  const { data: profile } = useUserProfile();
+  const { data: emergencias = [] } = useEmergenciasActivas();
+  const resolverEtiquetaEmergencia = useMemo(
+    () => (emergenciaId?: string | null) => etiquetaEmergenciaPorId(emergenciaId, emergencias),
+    [emergencias]
+  );
+  // Los centros CERRADOS (borrado lógico) no deben aparecer en los selectores de transferencia.
+  const centrosActivos = useMemo(() => centros.filter((c) => c.estado !== 'CERRADO'), [centros]);
+  const puedeAprobar = tienePermiso(profile, PERMISOS_LOGISTICA.APROBAR);
 
   const [centroOrigenId, setCentroOrigenId] = useState('');
   const [centroDestinoId, setCentroDestinoId] = useState('');
+  const [tipoDestino, setTipoDestino] = useState<TipoDestinoTransferencia>('CENTRO');
   const [notas, setNotas] = useState('');
+
+  // Preselección de centro origen al venir desde el detalle de un centro (?origen=...)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const origen = new URLSearchParams(window.location.search).get('origen');
+    if (origen) setCentroOrigenId(origen);
+  }, []);
   const [itemId, setItemId] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [selectedId, setSelectedId] = useState('');
@@ -49,7 +76,7 @@ export default function TransferenciasPage() {
   );
 
   const lineaInventario = useMemo(
-    () => inventario.find((i) => i.id === itemId) ?? null,
+    () => inventario.find((i) => i.itemCatalogoId === itemId) ?? null,
     [inventario, itemId]
   );
 
@@ -89,13 +116,19 @@ export default function TransferenciasPage() {
     );
   }, [rows, centroRecepcionId]);
 
+  const destinoEsCentro = tipoDestino === 'CENTRO';
+
   const handleCrear = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!centroOrigenId || !centroDestinoId || !itemId) {
-      toast.error('Completa centro origen, destino e insumo');
+    if (!centroOrigenId || !itemId) {
+      toast.error('Completa centro origen e insumo');
       return;
     }
-    if (centroOrigenId === centroDestinoId) {
+    if (destinoEsCentro && !centroDestinoId) {
+      toast.error('Selecciona el centro de destino');
+      return;
+    }
+    if (destinoEsCentro && centroOrigenId === centroDestinoId) {
       toast.error('El centro origen y destino deben ser distintos');
       return;
     }
@@ -106,12 +139,12 @@ export default function TransferenciasPage() {
     try {
       const res = await crear.mutateAsync({
         centroOrigenId,
-        centroDestinoId,
+        centroDestinoId: destinoEsCentro ? centroDestinoId : null,
+        tipoDestino,
         notas: notas || undefined,
         items: [{ itemId, cantidad }],
       });
       toast.success(`Transferencia ${res.id.slice(0, 8)}… creada. El destino será notificado vía eventos.`);
-      setCentroOrigenId('');
       setCentroDestinoId('');
       setNotas('');
       setItemId('');
@@ -180,22 +213,44 @@ export default function TransferenciasPage() {
           <form className="logistics-form logistics-form--wide" onSubmit={handleCrear}>
             <CentroAcopioCombobox
               label="Centro de acopio origen"
-              centros={centros}
+              centros={centrosActivos}
               value={centroOrigenId}
               onChange={setCentroOrigenId}
               loading={centrosCargando}
               error={centrosError}
               excludeId={centroDestinoId}
+              resolverEtiquetaEmergencia={resolverEtiquetaEmergencia}
             />
-            <CentroAcopioCombobox
-              label="Centro de acopio destino"
-              centros={centros}
-              value={centroDestinoId}
-              onChange={setCentroDestinoId}
-              loading={centrosCargando}
-              error={centrosError}
-              excludeId={centroOrigenId}
-            />
+            <label>
+              Tipo de destino
+              <select
+                value={tipoDestino}
+                onChange={(e) => setTipoDestino(e.target.value as TipoDestinoTransferencia)}
+              >
+                {(Object.keys(ETIQUETA_TIPO_DESTINO) as TipoDestinoTransferencia[]).map((t) => (
+                  <option key={t} value={t}>
+                    {ETIQUETA_TIPO_DESTINO[t]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {destinoEsCentro ? (
+              <CentroAcopioCombobox
+                label="Centro de acopio destino"
+                centros={centrosActivos}
+                value={centroDestinoId}
+                onChange={setCentroDestinoId}
+                loading={centrosCargando}
+                error={centrosError}
+                excludeId={centroOrigenId}
+                resolverEtiquetaEmergencia={resolverEtiquetaEmergencia}
+              />
+            ) : (
+              <p className="logistics-hint">
+                Entrega definitiva ({ETIQUETA_TIPO_DESTINO[tipoDestino]}): el stock egresa del centro origen y no
+                ingresa a otro centro.
+              </p>
+            )}
 
             <label>
               Insumo en inventario del origen
@@ -212,11 +267,15 @@ export default function TransferenciasPage() {
                       ? 'Cargando inventario…'
                       : inventario.length === 0
                         ? 'Sin líneas de inventario'
-                        : 'Elegir categoría / insumo…'}
+                        : 'Elegir insumo…'}
                 </option>
                 {inventario.map((linea) => (
-                  <option key={linea.id} value={linea.id} disabled={linea.stockActual <= 0}>
-                    {ETIQUETA_CATEGORIA[linea.categoria]} — stock {linea.stockActual} (
+                  <option
+                    key={linea.itemCatalogoId}
+                    value={linea.itemCatalogoId}
+                    disabled={linea.stockActual <= 0}
+                  >
+                    {linea.itemNombre} ({linea.nombreCategoria}) — stock {linea.stockActual} (
                     {linea.estadoCriticidad})
                   </option>
                 ))}
@@ -287,10 +346,17 @@ export default function TransferenciasPage() {
               type="button"
               className="logistics-btn logistics-btn--secondary"
               onClick={handleEstado}
-              disabled={actualizar.isPending || !selectedId || estadosDisponibles.length === 0}
+              disabled={
+                actualizar.isPending || !selectedId || estadosDisponibles.length === 0 || !puedeAprobar
+              }
             >
               {actualizar.isPending ? 'Actualizando…' : 'Aplicar cambio'}
             </button>
+            {!puedeAprobar && (
+              <p className="logistics-hint">
+                Necesitas el permiso <code>TRANSFERENCIA_APROBAR</code> para cambiar el estado de una transferencia.
+              </p>
+            )}
           </div>
 
           <hr className="logistics-divider" />
@@ -298,11 +364,12 @@ export default function TransferenciasPage() {
           <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.9rem' }}>Recepción en centro destino</h3>
           <CentroAcopioCombobox
             label="Centro de acopio receptor"
-            centros={centros}
+            centros={centrosActivos}
             value={centroRecepcionId}
             onChange={setCentroRecepcionId}
             loading={centrosCargando}
             placeholder="Filtrar transferencias entrantes…"
+            resolverEtiquetaEmergencia={resolverEtiquetaEmergencia}
           />
           {centroRecepcionId && pendientesRecepcion.length === 0 && (
             <p className="logistics-hint">No hay transferencias pendientes hacia este centro.</p>
@@ -322,7 +389,7 @@ export default function TransferenciasPage() {
                     type="button"
                     className="logistics-btn logistics-btn--primary logistics-btn--sm"
                     onClick={() => void confirmarRecepcion(t.id)}
-                    disabled={actualizar.isPending}
+                    disabled={actualizar.isPending || !puedeAprobar}
                   >
                     Confirmar llegada
                   </button>

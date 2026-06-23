@@ -11,7 +11,11 @@ export type CategoriaInventario =
 export interface ItemCatalogo {
   id: string;
   nombre: string;
-  categoria: CategoriaInventario;
+  categoriaId: string;
+  /** Codigo enum de la categoria (ALIMENTOS, MATERIALES, ...). */
+  codigoCategoria: CategoriaInventario;
+  /** Nombre legible de la categoria. */
+  nombreCategoria: string;
   descripcion: string | null;
   unidadMedida: string;
   activo: boolean;

@@ -16,7 +16,7 @@ import {
   ofrecerRuta,
   toTransferenciaVista,
 } from '@/services/logistics.service';
-import { listarCentrosLogistica, listarInventarioCentro } from '@/services/resources.service';
+import { listarCentrosLogistica, listarInventarioItems } from '@/services/resources.service';
 import type {
   ActualizarEstadoTransferenciaRequest,
   CrearMisionRequest,
@@ -88,7 +88,7 @@ export const useCentrosLogistica = () =>
 export const useInventarioCentro = (centroId: string | null) =>
   useQuery({
     queryKey: LOGISTICS_KEYS.inventario(centroId ?? ''),
-    queryFn: () => listarInventarioCentro(centroId!),
+    queryFn: () => listarInventarioItems(centroId!),
     enabled: Boolean(centroId),
     staleTime: 15_000,
   });
@@ -142,7 +142,13 @@ export const useActualizarEstadoTransferencia = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ActualizarEstadoTransferenciaRequest }) =>
       actualizarEstadoTransferencia(id, data),
-    onSuccess: () => invalidateLogistica(qc),
+    onSuccess: () => {
+      invalidateLogistica(qc);
+      // Al recibir una transferencia, ms-resources mueve el stock vía evento;
+      // invalidamos el inventario y KPIs de recursos para reflejarlo al refrescar.
+      qc.invalidateQueries({ queryKey: ['recursos', 'inventario'] });
+      qc.invalidateQueries({ queryKey: ['recursos', 'kpis'] });
+    },
   });
 };
 

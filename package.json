@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@gabihuenchu/ui-library": "file:../ui-library-standalone",
     "@hookform/resolvers": "^5.2.2",
     "@react-google-maps/api": "^2.20.8",
     "@tailwindcss/postcss": "^4.2.4",

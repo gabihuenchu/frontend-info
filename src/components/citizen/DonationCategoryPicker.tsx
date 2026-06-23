@@ -8,12 +8,18 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
+import { useMemo } from 'react';
 import { useCatalogItems } from '@/hooks/useCatalogItems';
 import {
   DONATION_CATEGORIES,
   type DonationCategoryId,
 } from '@/lib/donationCategories';
-import type { ItemCatalogo } from '@/types/catalog';
+import type { CategoriaInventario, ItemCatalogo } from '@/types/catalog';
+
+/** Etiqueta legible de una categoría a partir de su código enum. */
+function etiquetaPorCodigo(codigo: CategoriaInventario, fallback: string): string {
+  return DONATION_CATEGORIES.find((c) => c.apiCategoria === codigo)?.label ?? fallback;
+}
 
 const CATEGORY_ICONS: Record<DonationCategoryId, LucideIcon> = {
   alimentos: Apple,
@@ -52,7 +58,14 @@ export function DonationCategoryPicker({
   centroSelected = true,
 }: DonationCategoryPickerProps) {
   const categoryConfig = DONATION_CATEGORIES.find((c) => c.id === activeCategory)!;
-  const { data: items, isLoading, isError } = useCatalogItems(categoryConfig.apiCategoria);
+  const { data: todosLosItems, isLoading, isError } = useCatalogItems();
+
+  // Filtrado en cliente por la categoría real del ítem (codigoCategoria), ya que el backend
+  // filtra por categoriaId (UUID) y no por el enum que maneja la UI.
+  const items = useMemo(
+    () => (todosLosItems ?? []).filter((it) => it.codigoCategoria === categoryConfig.apiCategoria),
+    [todosLosItems, categoryConfig.apiCategoria]
+  );
 
   const toggleItem = (item: ItemCatalogo) => {
     const maxQty = quotas?.[item.id];
@@ -67,7 +80,8 @@ export function DonationCategoryPicker({
         cantidad: 1,
         nombre: item.nombre,
         unidadMedida: item.unidadMedida,
-        categoriaLabel: categoryConfig.label,
+        // Etiqueta tomada de la categoría real del ítem, no de la pestaña activa.
+        categoriaLabel: etiquetaPorCodigo(item.codigoCategoria, item.nombreCategoria),
       };
     }
     onSelectedChange(next);

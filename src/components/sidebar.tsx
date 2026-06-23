@@ -15,6 +15,7 @@ import {
   type PerfilConPermisos,
 } from "@/lib/logistics-permissions";
 import { PERMISOS_LOGISTICA } from "@/types/logistics";
+import { puedeGestionarCentros } from "@/lib/resources-permissions";
 import {
   TriangleAlert,
   Warehouse,
@@ -196,24 +197,25 @@ export default function Sidebar({ dark, setDark }: SidebarProps) {
 
   const menuItems: NavItem[] = [
     {
-      type: "link",
+      type: "link" as const,
       icon: <UserCog size={18} />,
       label: "Gestión Usuarios",
       href: "/dashboard/usuarios",
       visible: showAdmin,
     },
     {
-      type: "link",
+      type: "link" as const,
       icon: <TriangleAlert size={18} />,
       label: "Emergencias",
       href: "/dashboard/emergency",
       activeIconClass: "alert",
     },
     {
-      type: "link",
+      type: "link" as const,
       icon: <Warehouse size={18} />,
       label: "Centros de acopio",
       href: "/dashboard/logistica/centros-acopio",
+      visible: puedeGestionarCentros(profile),
     },
     ...(showLogistica && logisticaChildren.length > 0
       ? [

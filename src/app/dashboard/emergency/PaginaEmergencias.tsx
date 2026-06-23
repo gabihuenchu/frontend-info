@@ -10,7 +10,9 @@ import { useState, useCallback, useRef, useEffect, useMemo, type ReactNode } fro
 import { useDashboardTheme } from "@/providers/DashboardThemeProvider";
 import EmergencyMapGoogle, {
   type HerramientaZonaMapa,
+  type CentroPersistidoMapa,
 } from "@/components/emergency/EmergencyMapGoogle";
+import type { SolicitudCentroAcopioRequest } from "@/services/emergency.service";
 import AnuncioCardEditable from "@/components/emergency/AnuncioCardEditable";
 import {
   useEmergenciasActivas,
@@ -20,13 +22,13 @@ import {
   useDeleteEmergencia,
   useEmergenciasKpis,
   useCentrosAcopio,
-  useCreateCentroAcopio,
   useAnuncios,
   useUpdateAnuncio,
 } from "@/hooks/useEmergencies";
+import { useCentrosDetalle, useCrearCentro } from "@/hooks/useResources";
+import type { CentroDetalle, EstadoCentro } from "@/types/resources";
 import type {
   Emergencia,
-  CentroAcopio,
   NivelAlerta,
   EstadoEmergencia,
   TipoEmergencia,
@@ -42,6 +44,7 @@ import {
   severidadUiAApi,
   isCentrosAcopioApiEnabled,
   prepararZonaImpactoParaApi,
+  etiquetaEmergenciaPorId,
   MIN_VERTICES_ZONA_IMPACTO,
 } from "@/services/emergency.service";
 import { formatApiError } from "@/lib/api-errors";
@@ -91,10 +94,12 @@ const estadoLabel: Record<EstadoEmergencia, string> = {
   FINALIZADA: "Finalizada",
 };
 
-const estadoPillClass: Record<string, string> = {
-  Abierto:        "estado-pill estado-abierto",
-  "En evaluación":"estado-pill estado-evaluacion",
-  Cerrado:        "estado-pill estado-cerrado",
+/** Etiqueta y clase de pill para el estado real del centro (EstadoCentro). */
+const estadoCentroPill: Record<EstadoCentro, { label: string; clase: string }> = {
+  ACTIVO:   { label: "Activo",    clase: "estado-pill estado-abierto" },
+  SATURADO: { label: "Saturado",  clase: "estado-pill estado-evaluacion" },
+  INACTIVO: { label: "Inactivo",  clase: "estado-pill estado-cerrado" },
+  CERRADO:  { label: "Cerrado",   clase: "estado-pill estado-cerrado" },
 };
 
 // ─── (Marcadores legacy eliminados: el mapa usa @react-google-maps/api) ───────
@@ -213,13 +218,26 @@ ${contexto || "No hay emergencias activas en este momento."}`,
 
 type VistaPanel = "detalles" | "crear-emergencia" | "centros" | "crear-centro" | "anuncios";
 
+/** Centro de acopio en borrador colocado durante la creación de una emergencia. */
+export type CentroAcopioBorrador = {
+  id: string;
+  nombre: string;
+  capacidad: string;
+  lat: number;
+  lng: number;
+};
+
 function PanelDerecho({
   theme,
   vista,
   setVista,
   emergencia,
   centrosApiHabilitada,
-  centros,
+  centrosDetalle,
+  centrosDeEmergencia,
+  resolverEtiquetaEmergencia,
+  onSeleccionarCentro,
+  centroSeleccionadoId,
   centrosCargando,
   anuncios,
   anunciosCargando,
@@ -240,6 +258,11 @@ function PanelDerecho({
   setHerramientaMapa,
   epicentroPreview,
   cantidadVerticesZona,
+  colocandoCentro,
+  onToggleColocarCentro,
+  centrosBorrador,
+  onActualizarCentroBorrador,
+  onEliminarCentroBorrador,
 }: {
   theme: string;
   vista: VistaPanel;
@@ -247,7 +270,15 @@ function PanelDerecho({
   emergencia: Emergencia | null;
   /** Centros vía gateway /centros-acopio; desactivar con NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false */
   centrosApiHabilitada: boolean;
-  centros: CentroAcopio[];
+  /** Todos los centros con detalle (incluye emergenciaId) para la pestaña "Centros". */
+  centrosDetalle: CentroDetalle[];
+  /** Centros (con detalle) asociados a la emergencia seleccionada. */
+  centrosDeEmergencia: CentroDetalle[];
+  /** Devuelve la etiqueta legible de la emergencia del centro (o null si no tiene). */
+  resolverEtiquetaEmergencia: (emergenciaId?: string | null) => string | null;
+  /** Enfoca un centro en el mapa (pin + popup). */
+  onSeleccionarCentro: (id: string) => void;
+  centroSeleccionadoId: string | null;
   centrosCargando: boolean;
   anuncios: AnuncioResponseDto[];
   anunciosCargando: boolean;
@@ -267,7 +298,7 @@ function PanelDerecho({
   onCrearCentro: (data: {
     nombre: string; direccion: string; ciudad: string;
     region: string; latitud?: number; longitud?: number; capacidad?: string;
-  }) => void;
+  }) => Promise<void>;
   editData?: { tipo: string; nivel: string; nombre: string };
   isCreating: boolean;
   isUpdating: boolean;
@@ -276,6 +307,11 @@ function PanelDerecho({
   setHerramientaMapa: (h: HerramientaZonaMapa) => void;
   epicentroPreview: { latitud: number; longitud: number } | null;
   cantidadVerticesZona: number;
+  colocandoCentro: boolean;
+  onToggleColocarCentro: () => void;
+  centrosBorrador: CentroAcopioBorrador[];
+  onActualizarCentroBorrador: (id: string, patch: Partial<Pick<CentroAcopioBorrador, "nombre" | "capacidad">>) => void;
+  onEliminarCentroBorrador: (id: string) => void;
 }) {
   const [formEmergencia, setFormEmergencia] = useState({
     tipo: (editData?.tipo ?? "TERREMOTO") as TipoEmergencia,
@@ -299,6 +335,8 @@ function PanelDerecho({
     nombre: "", direccion: "", ciudad: "", region: "",
     latitud: "", longitud: "", capacidad: "",
   });
+  const [errorCentro, setErrorCentro] = useState<string | null>(null);
+  const [creandoCentro, setCreandoCentro] = useState(false);
 
   const herramientasZona: { id: HerramientaZonaMapa; icono: ReactNode; label: string }[] = [
     { id: "Dibujar zona", icono: <Square size={18} />, label: "Dibujar zona" },
@@ -319,17 +357,32 @@ function PanelDerecho({
     }
   };
 
-  const handleCrearCentro = () => {
-    if (!formCentro.nombre.trim()) return;
-    onCrearCentro({
-      nombre: formCentro.nombre,
-      direccion: formCentro.direccion,
-      ciudad: formCentro.ciudad,
-      region: formCentro.region,
-      latitud: formCentro.latitud ? Number(formCentro.latitud) : undefined,
-      longitud: formCentro.longitud ? Number(formCentro.longitud) : undefined,
-      capacidad: formCentro.capacidad || undefined,
-    });
+  const handleCrearCentro = async () => {
+    if (!formCentro.nombre.trim()) {
+      setErrorCentro("Ingresa el nombre del centro.");
+      return;
+    }
+    setErrorCentro(null);
+    setCreandoCentro(true);
+    try {
+      await onCrearCentro({
+        nombre: formCentro.nombre,
+        direccion: formCentro.direccion,
+        ciudad: formCentro.ciudad,
+        region: formCentro.region,
+        latitud: formCentro.latitud ? Number(formCentro.latitud) : undefined,
+        longitud: formCentro.longitud ? Number(formCentro.longitud) : undefined,
+        capacidad: formCentro.capacidad || undefined,
+      });
+      setFormCentro({
+        nombre: "", direccion: "", ciudad: "", region: "",
+        latitud: "", longitud: "", capacidad: "",
+      });
+    } catch (err) {
+      setErrorCentro(formatApiError(err));
+    } finally {
+      setCreandoCentro(false);
+    }
   };
 
   return (
@@ -506,11 +559,11 @@ function PanelDerecho({
               </div>
             </div>
 
-            {/* Centros cercanos — solo si el MS de recursos está habilitado en build */}
+            {/* Centros de acopio de esta emergencia — solo si el MS de recursos está habilitado en build */}
             {centrosApiHabilitada && (
             <div style={{ marginTop: 20 }}>
               <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
-                <h3 className="panel-section-title" style={{ margin: 0 }}>Centros de Acopio Cercanos</h3>
+                <h3 className="panel-section-title" style={{ margin: 0 }}>Centros de Acopio de la Emergencia</h3>
                 <button className="btn-nueva-emergencia" style={{ fontSize: 10, padding: "4px 10px" }} onClick={() => setVista("crear-centro")}>
                   + Nuevo
                 </button>
@@ -519,23 +572,35 @@ function PanelDerecho({
                 <p style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>Cargando centros...</p>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {centros.slice(0, 3).map((c) => (
-                    <button key={c.id} className="centro-row">
-                      <div className="flex items-center gap-2">
-                        <MapPin size={14} />
-                        <div>
-                          <p className="centro-nombre">{c.nombre}</p>
-                          <p className="centro-ciudad">{c.ciudad}, {c.region}</p>
+                  {centrosDeEmergencia.map((c) => {
+                    const pill = estadoCentroPill[c.estado];
+                    return (
+                      <button
+                        key={c.id}
+                        className={`centro-row${c.id === centroSeleccionadoId ? " centro-row--activo" : ""}`}
+                        onClick={() => onSeleccionarCentro(c.id)}
+                        title="Ver en el mapa"
+                      >
+                        <div className="flex items-center gap-2">
+                          <MapPin size={14} />
+                          <div>
+                            <p className="centro-nombre">{c.nombre}</p>
+                            <p className="centro-ciudad">
+                              {[c.comuna, c.region].filter(Boolean).join(", ") || "Sin ubicación"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {c.distanciaKm && <span className="centro-distancia">{c.distanciaKm} km</span>}
-                        <span className={estadoPillClass[c.estado] ?? "estado-pill"}>{c.estado}</span>
-                      </div>
-                    </button>
-                  ))}
-                  {centros.length === 0 && (
-                    <p style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>No hay centros registrados.</p>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {c.capacidad != null && (
+                            <span className="centro-distancia">{c.capacidad.toLocaleString("es-CL")}</span>
+                          )}
+                          <span className={pill?.clase ?? "estado-pill"}>{pill?.label ?? c.estado}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {centrosDeEmergencia.length === 0 && (
+                    <p style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>Esta emergencia no tiene centros de acopio asociados.</p>
                   )}
                 </div>
               )}
@@ -664,6 +729,77 @@ function PanelDerecho({
                   </div>
                 )}
               </div>
+
+              <div className="form-group">
+                <label className="panel-form-label">Centros de acopio (opcional)</label>
+                <button
+                  type="button"
+                  className={`zona-tool-btn${colocandoCentro ? " zona-tool-btn--active" : ""}`}
+                  style={{ width: "100%", justifyContent: "center", marginBottom: 8 }}
+                  onClick={onToggleColocarCentro}
+                >
+                  <span className="zona-tool-icon"><Warehouse size={16} /></span>
+                  <span className="zona-tool-label">
+                    {colocandoCentro ? "Colocando centro… (clic en el mapa)" : "Colocar centro en el mapa"}
+                  </span>
+                </button>
+                <p className="panel-zona-hint__sub" style={{ marginBottom: 8 }}>
+                  Haz clic en el mapa para ubicar un centro y arrastra el pin para ajustarlo. Sus
+                  inventarios se inicializan en 0 al crear la emergencia.
+                </p>
+
+                {centrosBorrador.length === 0 ? (
+                  <p style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+                    Aún no has colocado centros. (Opcional)
+                  </p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {centrosBorrador.map((c, i) => (
+                      <div
+                        key={c.id}
+                        style={{
+                          border: "1px solid var(--border-default, rgba(255,255,255,0.12))",
+                          borderRadius: 10,
+                          padding: 10,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 6,
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.8 }}>
+                            <MapPin size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />
+                            Centro {i + 1} · {c.lat.toFixed(4)}, {c.lng.toFixed(4)}
+                          </span>
+                          <button
+                            type="button"
+                            className="card-action-btn"
+                            onClick={() => onEliminarCentroBorrador(c.id)}
+                            title="Quitar centro"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          className="panel-form-input"
+                          placeholder="Nombre del centro *"
+                          value={c.nombre}
+                          onChange={(e) => onActualizarCentroBorrador(c.id, { nombre: e.target.value })}
+                        />
+                        <input
+                          type="number"
+                          min={1}
+                          className="panel-form-input"
+                          placeholder="Capacidad estimada (opcional)"
+                          value={c.capacidad}
+                          onChange={(e) => onActualizarCentroBorrador(c.id, { capacidad: e.target.value })}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
 
@@ -703,22 +839,38 @@ function PanelDerecho({
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {centros.map((c) => (
-                  <button key={c.id} className="centro-row">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={14} />
-                      <div>
-                        <p className="centro-nombre">{c.nombre}</p>
-                        <p className="centro-ciudad">{c.ciudad}, {c.region}</p>
+                {centrosDetalle.map((c) => {
+                  const pill = estadoCentroPill[c.estado];
+                  const etiqueta = resolverEtiquetaEmergencia(c.emergenciaId);
+                  return (
+                    <button
+                      key={c.id}
+                      className={`centro-row${c.id === centroSeleccionadoId ? " centro-row--activo" : ""}`}
+                      onClick={() => onSeleccionarCentro(c.id)}
+                      title="Ver en el mapa"
+                    >
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} />
+                        <div>
+                          <p className="centro-nombre">{c.nombre}</p>
+                          <p className="centro-ciudad">
+                            {[c.comuna, c.region].filter(Boolean).join(", ") || "Sin ubicación"}
+                          </p>
+                          <p className="centro-emergencia">
+                            {etiqueta ?? "Sin emergencia activa"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {c.distanciaKm && <span className="centro-distancia">{c.distanciaKm} km</span>}
-                      <span className={estadoPillClass[c.estado] ?? "estado-pill"}>{c.estado}</span>
-                    </div>
-                  </button>
-                ))}
-                {centros.length === 0 && (
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {c.capacidad != null && (
+                          <span className="centro-distancia">{c.capacidad.toLocaleString("es-CL")}</span>
+                        )}
+                        <span className={pill?.clase ?? "estado-pill"}>{pill?.label ?? c.estado}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+                {centrosDetalle.length === 0 && (
                   <p style={{ fontSize: 12, color: "var(--color-text-secondary)", textAlign: "center", padding: 24 }}>
                     No hay centros de acopio registrados.
                   </p>
@@ -756,28 +908,38 @@ function PanelDerecho({
                 </div>
               </div>
               <div className="form-group">
-                <label className="panel-form-label">Coordenadas</label>
+                <label className="panel-form-label">Coordenadas (latitud : longitud) *</label>
                 <div className="coords-wrap">
                   <input type="text" className="form-input" placeholder="-33.0389" value={formCentro.latitud} onChange={(e) => setFormCentro({ ...formCentro, latitud: e.target.value })} />
                   <span className="coords-sep">:</span>
                   <input type="text" className="form-input" placeholder="-71.4378" value={formCentro.longitud} onChange={(e) => setFormCentro({ ...formCentro, longitud: e.target.value })} />
-                  <button className="coords-pin-btn"><MapPin size={16} /></button>
                 </div>
+                <p className="panel-zona-hint__sub" style={{ marginTop: 6 }}>
+                  Obligatorias. Puedes copiarlas desde Google Maps (clic derecho → coordenadas).
+                </p>
               </div>
               <div className="form-group">
                 <label className="panel-form-label">Capacidad estimada</label>
-                <select className="form-select" value={formCentro.capacidad} onChange={(e) => setFormCentro({ ...formCentro, capacidad: e.target.value })}>
-                  <option value="">Seleccionar</option>
-                  <option>Pequeño (1-50)</option>
-                  <option>Mediano (51-200)</option>
-                  <option>Grande (200+)</option>
-                </select>
+                <input
+                  type="number"
+                  min={1}
+                  className="panel-form-input"
+                  placeholder="Ej: 200 (opcional)"
+                  value={formCentro.capacidad}
+                  onChange={(e) => setFormCentro({ ...formCentro, capacidad: e.target.value })}
+                />
               </div>
+
+              {errorCentro && (
+                <p style={{ fontSize: 12, color: "#ef4444", marginTop: 4 }}>{errorCentro}</p>
+              )}
             </div>
 
             <div className="panel-lateral-actions" style={{ marginTop: "auto", paddingTop: 16 }}>
               <button className="btn-panel-cancelar" onClick={() => setVista("centros")}>Cancelar</button>
-              <button className="btn-panel-guardar" onClick={handleCrearCentro}>Crear centro</button>
+              <button className="btn-panel-guardar" onClick={handleCrearCentro} disabled={creandoCentro}>
+                {creandoCentro ? "Creando..." : "Crear centro"}
+              </button>
             </div>
           </div>
         )}
@@ -865,6 +1027,10 @@ export default function PaginaEmergencias() {
   const [filtroTipo, setFiltroTipo] = useState("Todos los tipos");
   const [herramientaMapa, setHerramientaMapa] = useState<HerramientaZonaMapa>("Dibujar zona");
   const [poligonoBorrador, setPoligonoBorrador] = useState<BorradorLatLng[] | null>(null);
+  const [centrosBorrador, setCentrosBorrador] = useState<CentroAcopioBorrador[]>([]);
+  const [colocandoCentro, setColocandoCentro] = useState(false);
+  /** Centro de acopio enfocado en el mapa (pin + popup) al hacer clic en la lista. */
+  const [centroSeleccionadoId, setCentroSeleccionadoId] = useState<string | null>(null);
   const [mostrarIA, setMostrarIA] = useState(false);
   /** Oculta el banner sin arreglar el 500; se resetea cuando el error desaparece. */
   const [ocultarBannerEmergencias, setOcultarBannerEmergencias] = useState(false);
@@ -902,7 +1068,9 @@ export default function PaginaEmergencias() {
     refetchInterval: intervaloEmergencias,
   });
 
-  const { data: centros = [], isLoading: centrosCargando } = useCentrosAcopio();
+  const { data: centros = [], isLoading: centrosCargando, refetch: refetchCentros } = useCentrosAcopio();
+  // Centros con detalle (incluye emergenciaId, estado y coordenadas) para dibujarlos en el mapa.
+  const { data: centrosDetalle = [], refetch: refetchCentrosDetalle } = useCentrosDetalle();
 
   const { data: anunciosData, isLoading: anunciosCargando } = useAnuncios();
   const anuncios = anunciosData?.content || [];
@@ -931,11 +1099,49 @@ export default function PaginaEmergencias() {
     if (!error) setOcultarBannerEmergencias(false);
   }, [error]);
 
+  // Al salir del modo crear emergencia, desactiva la colocación de pines de centro.
+  useEffect(() => {
+    if (panelVista !== "crear-emergencia") setColocandoCentro(false);
+  }, [panelVista]);
+
+  const agregarCentroBorrador = useCallback((punto: { lat: number; lng: number }) => {
+    setCentrosBorrador((prev) => [
+      ...prev,
+      {
+        id:
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `centro-${Date.now()}-${prev.length}`,
+        nombre: "",
+        capacidad: "",
+        lat: punto.lat,
+        lng: punto.lng,
+      },
+    ]);
+  }, []);
+
+  const moverCentroBorrador = useCallback((id: string, punto: { lat: number; lng: number }) => {
+    setCentrosBorrador((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, lat: punto.lat, lng: punto.lng } : c))
+    );
+  }, []);
+
+  const actualizarCentroBorrador = useCallback(
+    (id: string, patch: Partial<Pick<CentroAcopioBorrador, "nombre" | "capacidad">>) => {
+      setCentrosBorrador((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    },
+    []
+  );
+
+  const eliminarCentroBorrador = useCallback((id: string) => {
+    setCentrosBorrador((prev) => prev.filter((c) => c.id !== id));
+  }, []);
+
   // ── Mutations ──
   const createMutation    = useCreateEmergencia();
   const updateMutation    = useUpdateEstadoEmergencia();
   const deleteMutation    = useDeleteEmergencia();
-  const createCentroMut   = useCreateCentroAcopio();
+  const crearCentroMut    = useCrearCentro();
   const updateAnuncioMut  = useUpdateAnuncio();
 
   const kpis = useEmergenciasKpis(emergencias);
@@ -955,6 +1161,8 @@ export default function PaginaEmergencias() {
     setEditData(undefined);
     setEmergenciaSeleccionada(null);
     setPoligonoBorrador(null);
+    setCentrosBorrador([]);
+    setColocandoCentro(false);
     setHerramientaMapa("Dibujar zona");
     setPanelVista("crear-emergencia");
   }, []);
@@ -992,6 +1200,47 @@ export default function PaginaEmergencias() {
 
   const enModoCrearEmergencia = panelVista === "crear-emergencia";
   const mapSelectedId = enModoCrearEmergencia ? null : emergenciaSeleccionada?.id ?? null;
+
+  // Centros de la emergencia seleccionada (para el detalle y el mapa en vista "detalles").
+  const centrosDeEmergencia = useMemo<CentroDetalle[]>(
+    () =>
+      emergenciaSeleccionada
+        ? centrosDetalle.filter((c) => c.emergenciaId === emergenciaSeleccionada.id)
+        : [],
+    [centrosDetalle, emergenciaSeleccionada?.id]
+  );
+
+  // Centros a dibujar en el mapa según la vista activa:
+  //  - crear emergencia: ninguno (solo se ven los pines de borrador)
+  //  - centros / crear-centro: todos los centros activos
+  //  - detalles: solo los de la emergencia seleccionada
+  const centrosParaMapa = useMemo<CentroPersistidoMapa[]>(() => {
+    if (enModoCrearEmergencia) return [];
+    const mostrarTodos = panelVista === "centros" || panelVista === "crear-centro";
+    const base = mostrarTodos ? centrosDetalle : centrosDeEmergencia;
+    return base
+      .filter((c) => typeof c.latitud === "number" && typeof c.longitud === "number")
+      .map((c) => ({
+        id: c.id,
+        nombre: c.nombre,
+        lat: c.latitud as number,
+        lng: c.longitud as number,
+        estado: c.estado,
+        capacidad: c.capacidad,
+        emergenciaId: c.emergenciaId,
+      }));
+  }, [enModoCrearEmergencia, panelVista, centrosDetalle, centrosDeEmergencia]);
+
+  // Etiqueta legible de la emergencia asociada a un centro (o null si no tiene).
+  const resolverEtiquetaEmergencia = useCallback(
+    (emergenciaId?: string | null) => etiquetaEmergenciaPorId(emergenciaId, emergencias),
+    [emergencias]
+  );
+
+  // Al cambiar de emergencia o de vista, cierra el popup del centro enfocado.
+  useEffect(() => {
+    setCentroSeleccionadoId(null);
+  }, [emergenciaSeleccionada?.id, panelVista]);
 
   useEffect(() => {
     if (!emergenciaSeleccionada) return;
@@ -1031,12 +1280,22 @@ export default function PaginaEmergencias() {
         );
       }
 
+      const centrosValidos = centrosBorrador.filter((c) => c.nombre.trim());
+      const centrosAcopio: SolicitudCentroAcopioRequest[] | undefined = centrosValidos.length
+        ? centrosValidos.map((c) => ({
+            nombre: c.nombre.trim(),
+            ubicacion: { longitud: c.lng, latitud: c.lat },
+            capacidadEstimada: c.capacidad ? Number(c.capacidad) : undefined,
+          }))
+        : undefined;
+
       const payload: CrearEmergenciaRequest = {
         tipo: mapTipoUiABackend(data.tipo),
         severidad: severidadUiAApi(data.severidad),
         region: data.region.trim(),
         epicentro: preparada.epicentro,
         zonaImpacto: preparada.ring,
+        ...(centrosAcopio ? { centrosAcopio } : {}),
       };
 
       const creada = await createMutation.mutateAsync(payload);
@@ -1048,13 +1307,27 @@ export default function PaginaEmergencias() {
         });
       }
 
+      const habiaCentros = Boolean(centrosAcopio?.length);
       setPoligonoBorrador(null);
+      setCentrosBorrador([]);
+      setColocandoCentro(false);
       setHerramientaMapa("Dibujar zona");
       setEmergenciaSeleccionada(creada);
       setPanelVista("detalles");
       void refetchGeoJson();
+
+      // Los centros llegan de forma asíncrona vía RabbitMQ (emergency.created → ms-resources).
+      // Refrescamos varias veces para reflejarlos cuando aparezcan.
+      if (habiaCentros) {
+        [1500, 4000, 8000].forEach((ms) =>
+          setTimeout(() => {
+            void refetchCentros();
+            void refetchCentrosDetalle();
+          }, ms)
+        );
+      }
     },
-    [poligonoBorrador, createMutation, updateMutation, refetchGeoJson]
+    [poligonoBorrador, centrosBorrador, createMutation, updateMutation, refetchGeoJson, refetchCentros, refetchCentrosDetalle]
   );
 
 
@@ -1084,11 +1357,39 @@ export default function PaginaEmergencias() {
   }, [emergenciaSeleccionada, deleteMutation]);
 
   const handleCrearCentro = useCallback(
-    async (data: Parameters<typeof createCentroMut.mutateAsync>[0]) => {
-      await createCentroMut.mutateAsync(data);
+    async (data: {
+      nombre: string;
+      direccion: string;
+      ciudad: string;
+      region: string;
+      latitud?: number;
+      longitud?: number;
+      capacidad?: string;
+    }) => {
+      if (
+        data.latitud == null ||
+        data.longitud == null ||
+        Number.isNaN(data.latitud) ||
+        Number.isNaN(data.longitud)
+      ) {
+        throw new Error(
+          "Ingresa coordenadas válidas (latitud y longitud) para ubicar el centro."
+        );
+      }
+      const capacidad = data.capacidad ? Number(data.capacidad) : undefined;
+      await crearCentroMut.mutateAsync({
+        nombre: data.nombre.trim(),
+        direccion: data.direccion.trim() || undefined,
+        coordenadas: { longitud: data.longitud, latitud: data.latitud },
+        region: data.region.trim() || undefined,
+        comuna: data.ciudad.trim() || undefined,
+        capacidad: capacidad && capacidad > 0 ? capacidad : undefined,
+      });
+      void refetchCentros();
+      void refetchCentrosDetalle();
       setPanelVista("centros");
     },
-    [createCentroMut]
+    [crearCentroMut, refetchCentros, refetchCentrosDetalle]
   );
 
   // ── Render states ──
@@ -1264,6 +1565,19 @@ export default function PaginaEmergencias() {
               selectedId={mapSelectedId}
               onSelectEmergenciaId={onSelectEmergenciaId}
               seleccionEnMapaHabilitada={!enModoCrearEmergencia}
+              modoColocarCentro={enModoCrearEmergencia && colocandoCentro}
+              centrosBorrador={centrosBorrador.map((c) => ({
+                id: c.id,
+                nombre: c.nombre,
+                lat: c.lat,
+                lng: c.lng,
+              }))}
+              onAgregarCentroBorrador={agregarCentroBorrador}
+              onMoverCentroBorrador={moverCentroBorrador}
+              centrosPersistidos={centrosParaMapa}
+              centroSeleccionadoId={centroSeleccionadoId}
+              onSelectCentro={setCentroSeleccionadoId}
+              onCerrarCentro={() => setCentroSeleccionadoId(null)}
             />
 
             <div className="mapa-zoom-controls">
@@ -1303,6 +1617,12 @@ export default function PaginaEmergencias() {
                   <span>{n.charAt(0) + n.slice(1).toLowerCase()}</span>
                 </div>
               ))}
+              {centrosApiHabilitada && (
+                <div className="leyenda-item">
+                  <div className="leyenda-dot" style={{ background: "#0d9488" }} />
+                  <span>Centro de acopio</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1313,7 +1633,11 @@ export default function PaginaEmergencias() {
             setVista={setPanelVista}
             emergencia={emergenciaSeleccionada}
             centrosApiHabilitada={centrosApiHabilitada}
-            centros={centros}
+            centrosDetalle={centrosDetalle}
+            centrosDeEmergencia={centrosDeEmergencia}
+            resolverEtiquetaEmergencia={resolverEtiquetaEmergencia}
+            onSeleccionarCentro={setCentroSeleccionadoId}
+            centroSeleccionadoId={centroSeleccionadoId}
             centrosCargando={centrosCargando}
             anuncios={anuncios}
             anunciosCargando={anunciosCargando}
@@ -1338,6 +1662,11 @@ export default function PaginaEmergencias() {
             setHerramientaMapa={setHerramientaMapa}
             epicentroPreview={epicentroPreview}
             cantidadVerticesZona={poligonoBorrador?.length ?? 0}
+            colocandoCentro={colocandoCentro}
+            onToggleColocarCentro={() => setColocandoCentro((v) => !v)}
+            centrosBorrador={centrosBorrador}
+            onActualizarCentroBorrador={actualizarCentroBorrador}
+            onEliminarCentroBorrador={eliminarCentroBorrador}
           />
         </div>
 

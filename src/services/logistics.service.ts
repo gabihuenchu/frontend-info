@@ -157,7 +157,7 @@ export function calcularKpisLogistica(
   const centros = new Set<string>();
   transferencias.forEach((t) => {
     centros.add(t.centroOrigenId);
-    centros.add(t.centroDestinoId);
+    if (t.centroDestinoId) centros.add(t.centroDestinoId);
   });
   misiones.forEach((m) => centros.add(m.centroOrigenId));
 

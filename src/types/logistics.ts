@@ -18,6 +18,9 @@ export type TipoVehiculo = 'AUTO' | 'CAMIONETA' | 'CAMION' | 'FURGON';
 
 export type PrioridadLogistica = 'ALTA' | 'MEDIA' | 'BAJA';
 
+/** Destino de una transferencia: entre centros, a un punto de distribución o entrega a la comunidad. */
+export type TipoDestinoTransferencia = 'CENTRO' | 'PUNTO_DISTRIBUCION' | 'COMUNIDAD';
+
 export interface CoordenadaDto {
   longitud: number;
   latitud: number;
@@ -30,7 +33,9 @@ export interface ItemTransferenciaRequest {
 
 export interface CrearTransferenciaRequest {
   centroOrigenId: string;
-  centroDestinoId: string;
+  /** Obligatorio solo cuando tipoDestino === 'CENTRO'. */
+  centroDestinoId?: string | null;
+  tipoDestino: TipoDestinoTransferencia;
   notas?: string;
   items: ItemTransferenciaRequest[];
 }
@@ -64,7 +69,8 @@ export interface ItemTransferenciaResponse {
 export interface TransferenciaResponse {
   id: string;
   centroOrigenId: string;
-  centroDestinoId: string;
+  centroDestinoId: string | null;
+  tipoDestino: TipoDestinoTransferencia;
   solicitadoPorUsuarioId: string;
   aprobadoPorUsuarioId: string | null;
   estado: EstadoTransferencia;

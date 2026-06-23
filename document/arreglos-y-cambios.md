@@ -20,6 +20,15 @@
 
 ## Cambios Aplicados
 
+### [DEC-018] Adopción de Vitest + React Testing Library para tests unitarios de frontend-info
+- **Fecha:** 2026-06-22
+- **Autor:** Alfonso González / Cursor
+- **Tipo:** Decisión técnica | Feature
+- **Error relacionado:** ERR-FRONT-001 (detectado durante el testing)
+- **Descripción del cambio:** Se incorporó la infraestructura de testing del portal ciudadano usando **Vitest** (en vez de Jest) por su mejor compatibilidad con Next.js 16 / React 19 / ESM y su menor configuración. Se añadió React Testing Library para los tests de componentes y hooks. Se implementaron dos tipos de tests: (A) lógica pura (schemas Zod, permisos RBAC, utilidades y mapeos de servicios) y (B) componentes/hooks con renderizado e interacción. Total: 17 archivos, 161 tests en verde. Mocks globales de Firebase y `next/navigation` en `vitest.setup.ts`.
+- **Archivos afectados:** `vitest.config.ts`, `vitest.setup.ts`, `package.json`, `src/lib/schemas/*.test.ts`, `src/lib/*.test.ts`, `src/services/emergency.service.test.ts`, `src/components/**/*.test.tsx`, `src/hooks/useNeeds.test.tsx`.
+- **Tests actualizados:** Sí (suite creada desde cero).
+
 ### [ARR-017] Menú lateral definitivo del dashboard (estructura por módulos)
 - **Fecha:** 2026-06-04
 - **Autor:** Camilo / Claude

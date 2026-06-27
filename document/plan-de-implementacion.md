@@ -574,7 +574,7 @@ Punto de entrada único para todas las peticiones del frontend. Valida el token 
 - [ ] Hidratación TanStack Query (SSR → Client) para mapa y datos públicos
 - [ ] Fallback: polling automático si WebSocket cae (refetchInterval: 30s)
 - [ ] Validación internacional completa (Zod schema para documentos y teléfonos)
-- [ ] Tests con React Testing Library (flujos de usuario críticos)
+- [x] Tests con React Testing Library (flujos de usuario críticos) — Vitest + RTL: 161 tests (schemas, permisos, utilidades, servicios, componentes y hooks). Ver `avances.md` [2026-06-22].
 
 ### Entregables
 

@@ -1,11 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCentrosAcopio } from '@/hooks/useEmergencies';
+import { useEmergenciasActivas } from '@/hooks/useEmergencies';
+import { useCentrosDetalle } from '@/hooks/useResources';
 import { useCatalogItems } from '@/hooks/useCatalogItems';
 import { useCreateNeed } from '@/hooks/useNeeds';
 import { createNeedSchema } from '@/lib/schemas/need';
 import { formatApiError } from '@/lib/api-errors';
+import { agruparCentrosPorEmergencia } from '@/lib/centros-agrupados';
+import { etiquetaEmergenciaPorId } from '@/services/emergency.service';
 import { prioridadLabel } from '@/lib/citizenLabels';
 import type { PrioridadNecesidad } from '@/types/citizen';
 import { PublicNeedsList } from './PublicNeedsList';
@@ -20,11 +23,23 @@ export function NeedManagementPanel() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const { data: centros = [], isLoading: loadingCentros } = useCentrosAcopio();
+  const { data: centros = [], isLoading: loadingCentros } = useCentrosDetalle();
+  const { data: emergencias = [] } = useEmergenciasActivas();
   const { data: catalogItems = [], isLoading: loadingCatalog } = useCatalogItems();
   const createNeed = useCreateNeed();
 
-  const centrosList = Array.isArray(centros) ? centros : [];
+  const centrosList = (Array.isArray(centros) ? centros : []).filter((c) => c.estado !== 'CERRADO');
+  const gruposCentros = useMemo(
+    () => agruparCentrosPorEmergencia(centrosList, emergencias),
+    [centrosList, emergencias]
+  );
+  const centroSeleccionado = useMemo(
+    () => centrosList.find((c) => c.id === centroId) ?? null,
+    [centrosList, centroId]
+  );
+  const etiquetaEmergenciaCentro = centroSeleccionado
+    ? etiquetaEmergenciaPorId(centroSeleccionado.emergenciaId, emergencias)
+    : null;
   const sortedItems = useMemo(
     () => [...catalogItems].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')),
     [catalogItems]
@@ -38,6 +53,8 @@ export function NeedManagementPanel() {
     const payload = {
       centroId,
       itemId,
+      // Si el centro está asociado a una emergencia, la propagamos a la necesidad.
+      emergenciaId: centroSeleccionado?.emergenciaId ?? undefined,
       cantidadNecesaria,
       prioridad,
     };
@@ -68,6 +85,18 @@ export function NeedManagementPanel() {
           con necesidad activa y cupo disponible.
         </p>
 
+        {!loadingCentros && centrosList.length === 0 && (
+          <div className="citizen-empty" style={{ marginTop: '1rem' }}>
+            No hay centros de acopio registrados. Crea uno desde el dashboard de emergencias o de centros de acopio antes
+            de publicar necesidades.
+          </div>
+        )}
+        {!loadingCatalog && sortedItems.length === 0 && (
+          <div className="citizen-empty" style={{ marginTop: '1rem' }}>
+            El catálogo de ítems está vacío. Agrega ítems al catálogo para poder registrar necesidades.
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="need-form" style={{ marginTop: '1.25rem' }}>
           <label className="need-form-field">
             <span>Centro de acopio</span>
@@ -78,12 +107,22 @@ export function NeedManagementPanel() {
               disabled={loadingCentros}
             >
               <option value="">Selecciona un centro</option>
-              {centrosList.map((centro) => (
-                <option key={centro.id} value={centro.id}>
-                  {centro.nombre} — {centro.ciudad}
-                </option>
+              {gruposCentros.map((grupo) => (
+                <optgroup key={grupo.key} label={grupo.etiqueta}>
+                  {grupo.centros.map((centro) => (
+                    <option key={centro.id} value={centro.id}>
+                      {centro.nombre}
+                      {centro.comuna ? ` — ${centro.comuna}` : ''}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
+            {centroSeleccionado && (
+              <span className="citizen-card-meta" style={{ marginTop: 4 }}>
+                Emergencia: {etiquetaEmergenciaCentro ?? 'Sin emergencia activa'}
+              </span>
+            )}
           </label>
 
           <label className="need-form-field">
@@ -97,7 +136,7 @@ export function NeedManagementPanel() {
               <option value="">Selecciona un ítem</option>
               {sortedItems.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.nombre} ({item.categoria})
+                  {item.nombre} ({item.nombreCategoria})
                 </option>
               ))}
             </select>

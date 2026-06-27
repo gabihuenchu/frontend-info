@@ -1,16 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
+import MapThemeToggle from '@/components/maps/MapThemeToggle';
+import { useDashboardTheme } from '@/providers/DashboardThemeProvider';
 import { useCatastrofesGoogleMaps, getGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
-import { MOCK_MAPA_PUNTOS } from '@/lib/mocks/logistics-mock';
+import { googleMapDarkStyles } from '@/lib/mapStyles';
+import { puntosMapaDesdeRutas } from '@/services/logistics.service';
+import type { RutaVoluntarioResponse } from '@/types/logistics';
 
 const center = { lat: -35.5, lng: -71.5 };
-
-const darkStyles: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#1a2218' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0a1210' }] },
-];
 
 const markerColor: Record<string, string> = {
   centro: '#22c55e',
@@ -19,16 +18,22 @@ const markerColor: Record<string, string> = {
   voluntario: '#a855f7',
 };
 
-export default function LogisticsMap() {
+interface LogisticsMapProps {
+  rutas?: RutaVoluntarioResponse[];
+}
+
+export default function LogisticsMap({ rutas = [] }: LogisticsMapProps) {
+  const { dark: appDark } = useDashboardTheme();
+  const [mapDark, setMapDark] = useState(appDark);
   const apiKey = getGoogleMapsApiKey();
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
 
-  const puntos = useMemo(() => MOCK_MAPA_PUNTOS, []);
+  const puntos = useMemo(() => puntosMapaDesdeRutas(rutas), [rutas]);
 
   if (!apiKey) {
     return (
       <div className="logistics-map-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--log-muted)', fontSize: 13 }}>Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span>
+        <span style={{ color: 'var(--text-tertiary, #6b7280)', fontSize: 13 }}>Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span>
       </div>
     );
   }
@@ -36,18 +41,18 @@ export default function LogisticsMap() {
   if (loadError || !isLoaded) {
     return (
       <div className="logistics-map-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--log-muted)', fontSize: 13 }}>Cargando mapa logístico…</span>
+        <span style={{ color: 'var(--text-tertiary, #6b7280)', fontSize: 13 }}>Cargando mapa logístico…</span>
       </div>
     );
   }
 
   return (
-    <div className="logistics-map-wrap">
+    <div className="logistics-map-wrap mapa-google-root">
       <GoogleMap
         mapContainerStyle={{ width: '100%', height: '100%' }}
-        center={center}
-        zoom={5}
-        options={{ disableDefaultUI: true, styles: darkStyles }}
+        center={puntos[0] ? { lat: puntos[0].lat, lng: puntos[0].lng } : center}
+        zoom={puntos.length > 0 ? 6 : 5}
+        options={{ disableDefaultUI: true, styles: mapDark ? googleMapDarkStyles : [] }}
       >
         {puntos.map((p) => (
           <Marker
@@ -65,13 +70,21 @@ export default function LogisticsMap() {
           />
         ))}
       </GoogleMap>
-      <div className="logistics-map-legend">
-        <div style={{ fontWeight: 600, marginBottom: 6 }}>Leyenda</div>
-        <div>🟢 Centro de Acopio</div>
-        <div>🔵 Transferencia</div>
-        <div>🟠 Misión Activa</div>
-        <div>🟣 Voluntario</div>
-      </div>
+      <MapThemeToggle mapDark={mapDark} onChange={setMapDark} />
+      {puntos.length === 0 ? (
+        <div
+          className="logistics-map-legend"
+          style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}
+        >
+          Sin rutas de voluntarios en la BD. Registra una en Rutas de Voluntarios.
+        </div>
+      ) : (
+        <div className="logistics-map-legend">
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Leyenda</div>
+          <div>🟢 Destino ruta</div>
+          <div>🟣 Origen voluntario</div>
+        </div>
+      )}
     </div>
   );
 }

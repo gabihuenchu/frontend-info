@@ -2,12 +2,16 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useCentrosAcopio } from '@/hooks/useEmergencies';
+import { useEmergenciasActivas } from '@/hooks/useEmergencies';
+import { useCentrosDetalle } from '@/hooks/useResources';
 import { useCreateDonation, useDonationQuotas } from '@/hooks/useDonations';
 import { useAuth } from '@/providers/AuthProvider';
 import type { Donacion } from '@/types/citizen';
 import { createDonationSchema } from '@/lib/schemas/donation';
 import { formatApiError } from '@/lib/api-errors';
+import { etiquetaEmergenciaPorId } from '@/services/emergency.service';
+import { agruparCentrosPorEmergencia } from '@/lib/centros-agrupados';
+import { ETIQUETA_ESTADO_CENTRO } from '@/types/resources';
 import type { DonationCategoryId } from '@/lib/donationCategories';
 import {
   DonationCategoryPicker,
@@ -30,10 +34,24 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
   const [selected, setSelected] = useState<Record<string, SelectedDonationLine>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [donation, setDonation] = useState<Donacion | null>(null);
+  const [gruposColapsados, setGruposColapsados] = useState<Set<string>>(new Set());
 
-  const { data: centros = [], isLoading: loadingCentros } = useCentrosAcopio();
+  const toggleGrupo = (key: string) =>
+    setGruposColapsados((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
+  const { data: centros = [], isLoading: loadingCentros } = useCentrosDetalle();
+  const { data: emergencias = [] } = useEmergenciasActivas();
   const { data: cupos = [], isLoading: loadingCupos } = useDonationQuotas(centroId);
-  const centrosList = Array.isArray(centros) ? centros : [];
+  const centrosList = (Array.isArray(centros) ? centros : []).filter((c) => c.estado !== 'CERRADO');
+  const gruposCentros = useMemo(
+    () => agruparCentrosPorEmergencia(centrosList, emergencias),
+    [centrosList, emergencias]
+  );
   const createDonation = useCreateDonation();
 
   const quotasByItem = useMemo(
@@ -65,6 +83,9 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
 
   const selectedItems = useMemo(() => getSelectedDonationItems(selected), [selected]);
   const selectedCentro = centrosList.find((c) => c.id === centroId);
+  const etiquetaEmergenciaCentro = selectedCentro
+    ? etiquetaEmergenciaPorId(selectedCentro.emergenciaId, emergencias)
+    : null;
   const isSteps = layout === 'steps';
 
   const canNext =
@@ -206,25 +227,62 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
               No hay centros disponibles. Activa el módulo de centros o crea uno desde el dashboard de emergencias.
             </div>
           ) : (
-            <div className="citizen-list" style={{ marginTop: '1.25rem' }}>
-              {centrosList.map((centro) => (
-                <button
-                  key={centro.id}
-                  type="button"
-                  className={`citizen-list-item${centroId === centro.id ? ' selected' : ''}`}
-                  onClick={() => {
-                    setCentroId(centro.id);
-                    setSelected({});
-                  }}
-                >
-                  <div>
-                    <strong>{centro.nombre}</strong>
-                    <p className="citizen-card-meta">
-                      {centro.direccion}, {centro.ciudad} — {centro.estado}
-                    </p>
+            <div
+              className="donation-centros-grupos"
+              style={{ marginTop: '1.25rem', maxHeight: 360, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}
+            >
+              {gruposCentros.map((grupo) => {
+                const colapsado = gruposColapsados.has(grupo.key);
+                return (
+                  <div key={grupo.key} className="donation-centro-grupo">
+                    <button
+                      type="button"
+                      className="donation-centro-grupo__head"
+                      onClick={() => toggleGrupo(grupo.key)}
+                      aria-expanded={!colapsado}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        gap: 8,
+                        padding: '8px 10px',
+                        fontWeight: 600,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span>{grupo.etiqueta}</span>
+                      <span className="citizen-card-meta">
+                        {grupo.centros.length} centro(s) {colapsado ? '▸' : '▾'}
+                      </span>
+                    </button>
+                    {!colapsado && (
+                      <div className="citizen-list" style={{ marginTop: 6 }}>
+                        {grupo.centros.map((centro) => (
+                          <button
+                            key={centro.id}
+                            type="button"
+                            className={`citizen-list-item${centroId === centro.id ? ' selected' : ''}`}
+                            onClick={() => {
+                              setCentroId(centro.id);
+                              setSelected({});
+                            }}
+                          >
+                            <div>
+                              <strong>{centro.nombre}</strong>
+                              <p className="citizen-card-meta">
+                                {[centro.comuna, centro.region].filter(Boolean).join(', ') || 'Sin ubicación'} —{' '}
+                                {ETIQUETA_ESTADO_CENTRO[centro.estado]}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
@@ -259,6 +317,9 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
               </h2>
               <p className="citizen-subtitle">
                 Centro: <strong>{selectedCentro?.nombre ?? '— selecciona un centro —'}</strong>
+                {etiquetaEmergenciaCentro && (
+                  <span style={{ display: 'block' }}>Emergencia: {etiquetaEmergenciaCentro}</span>
+                )}
               </p>
             </>
           )}
@@ -269,6 +330,9 @@ export function DonationForm({ layout = 'single', onSuccess }: DonationFormProps
               </h2>
               <p className="citizen-subtitle">
                 Centro: <strong>{selectedCentro?.nombre}</strong>
+                {etiquetaEmergenciaCentro && (
+                  <span style={{ display: 'block' }}>Emergencia: {etiquetaEmergenciaCentro}</span>
+                )}
               </p>
             </>
           )}

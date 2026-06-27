@@ -673,3 +673,29 @@
 .citizen-operator-note a:hover {
   color: var(--color-text-primary, #f5f0e8);
 }
+
+/* ── Desplegables con fondo blanco clásico (legibles sobre tema oscuro) ── */
+/* Popups de <select> nativos (necesidades, donaciones de operador) */
+.need-form-field select option,
+.need-form-field select optgroup {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Lista de centros agrupada en el formulario de donación */
+.donation-centros-grupos .citizen-list-item {
+  background: #ffffff;
+  border-color: #d7d7cf;
+  color: #1f2937;
+}
+.donation-centros-grupos .citizen-list-item:hover,
+.donation-centros-grupos .citizen-list-item.selected {
+  background: rgba(33, 167, 62, 0.1);
+  border-color: rgba(33, 167, 62, 0.5);
+}
+.donation-centros-grupos .citizen-card-meta {
+  color: #4b5563;
+}
+.donation-centro-grupo__head {
+  color: inherit;
+}

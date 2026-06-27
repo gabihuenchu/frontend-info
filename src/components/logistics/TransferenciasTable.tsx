@@ -32,7 +32,7 @@ function progressBar(progreso: number, estado: string) {
       <div className="logistics-progress">
         <div className={`logistics-progress__bar ${barCls}`} style={{ width: `${progreso}%` }} />
       </div>
-      <span style={{ fontSize: '0.7rem', color: 'var(--log-muted)', minWidth: 32 }}>{progreso}%</span>
+      <span className="logistics-progress-pct">{progreso}%</span>
     </div>
   );
 }
@@ -49,9 +49,16 @@ function formatFecha(iso?: string | null) {
 interface TransferenciasTableProps {
   rows: TransferenciaVista[];
   loading?: boolean;
+  selectedId?: string;
+  onSelect?: (id: string) => void;
 }
 
-export default function TransferenciasTable({ rows, loading }: TransferenciasTableProps) {
+export default function TransferenciasTable({
+  rows,
+  loading,
+  selectedId,
+  onSelect,
+}: TransferenciasTableProps) {
   if (loading) {
     return <div className="logistics-empty">Cargando transferencias…</div>;
   }
@@ -77,7 +84,17 @@ export default function TransferenciasTable({ rows, loading }: TransferenciasTab
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id}>
+            <tr
+              key={r.id}
+              className={
+                selectedId === r.id
+                  ? 'logistics-table__row--selected'
+                  : onSelect
+                    ? 'logistics-table__row--clickable'
+                    : undefined
+              }
+              onClick={onSelect ? () => onSelect(r.id) : undefined}
+            >
               <td style={{ fontWeight: 600, color: 'var(--log-accent)' }}>{r.codigo}</td>
               <td>{r.origenNombre}</td>
               <td>{r.destinoNombre}</td>

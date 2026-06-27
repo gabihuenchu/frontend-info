@@ -20,7 +20,14 @@
 
 ## Errores Activos
 
-*(Sin errores registrados — proyecto en inicio)*
+### [ERR-FRONT-001] `crearEmergenciaSchema`/`actualizarEstadoSchema` rechazan valores de enum válidos
+- **Fecha:** 2026-06-22
+- **Microservicio/Módulo:** frontend-info (`src/lib/schemas/emergency.ts`)
+- **Severidad:** 🟡 Medio
+- **Estado:** Abierto
+- **Descripción:** Al validar una emergencia con `tipo`, `severidad` o `estado` válidos (p. ej. `tipo: 'INCENDIO'`, `severidad: 'ALTA'`, `estado: 'ACTIVA'`), el `safeParse` falla con los mensajes "Tipo de emergencia inválido", "Nivel de severidad inválido" y "Estado de emergencia inválido". Esto impide construir un formulario de emergencias que valide correctamente con estos schemas.
+- **Causa raíz:** Los `.refine((val) => val in ['TERREMOTO', ...])` usan el operador `in`, que en JavaScript comprueba si `val` es una **clave** del array (índices `"0"`, `"1"`, ... o `length`), no si pertenece al array. Como un string como `'INCENDIO'` nunca es clave de un array, el predicado siempre devuelve `false` y el refine rechaza incluso los valores ya validados por `z.enum`.
+- **Solución aplicada:** Pendiente (no se modifica el código sin visto bueno del equipo). Los tests en `src/lib/schemas/emergency.test.ts` documentan el comportamiento real actual como guardia de regresión. Corrección sugerida: eliminar los `.refine` redundantes (el `z.enum` ya valida la pertenencia) o reemplazarlos por `.refine((val) => [...].includes(val))`.
 
 ---
 

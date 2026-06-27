@@ -1,0 +1,735 @@
+/* ============================================================
+   design-system-light.css — CatástrofesCL
+   Componentes unificados · solo .dashboard-root.light
+   ============================================================ */
+
+/* ── Layout: jerarquía Sidebar → Contenido → Cards ─────────── */
+.dashboard-root.light {
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .dashboard-content-pane {
+  padding: var(--space-5) var(--space-5);
+  background: var(--surface-page);
+}
+
+/* ── Card base (todas las superficies elevadas) ────────────── */
+.dashboard-root.light .ds-card,
+.dashboard-root.light .logistics-panel,
+.dashboard-root.light .logistics-kpi-card,
+.dashboard-root.light .usuarios-panel,
+.dashboard-root.light .detalle-card,
+.dashboard-root.light .emergencia-card,
+.dashboard-root.light .anuncio-dash-card,
+.dashboard-root.light .sidebar--app-widget {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-card);
+}
+
+/* ── Sidebar institucional ─────────────────────────────────── */
+.dashboard-root.light .sidebar--app {
+  background: var(--surface-sidebar);
+  border-right: 1px solid var(--border-default);
+  box-shadow: var(--shadow-sidebar);
+  color: var(--text-secondary);
+}
+
+.dashboard-root.light .sidebar--app-logo-text {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-title);
+}
+
+.dashboard-root.light .nav-item--app {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-subtitle);
+  border-left: 4px solid transparent;
+  padding-left: calc(1rem - 4px);
+}
+
+.dashboard-root.light .nav-item--app .nav-icon {
+  color: var(--text-tertiary);
+}
+
+.dashboard-root.light .nav-item--app:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .nav-item--app:hover .nav-icon {
+  color: var(--text-secondary);
+}
+
+.dashboard-root.light .nav-item--app.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  font-weight: var(--font-weight-title);
+  border-left-color: var(--nav-active-border);
+  box-shadow: none;
+}
+
+.dashboard-root.light .nav-item--app.active .nav-icon,
+.dashboard-root.light .nav-item--app.active .nav-icon--brand {
+  color: var(--nav-active-text);
+}
+
+.dashboard-root.light .nav-sub-item {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-subtitle);
+  border-left: 3px solid transparent;
+  margin-left: var(--space-2);
+}
+
+.dashboard-root.light .nav-sub-item:hover {
+  background: var(--surface-subnav);
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .nav-sub-item.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  font-weight: var(--font-weight-title);
+  border-left-color: var(--nav-active-border);
+}
+
+/* ── Controles de formulario unificados ────────────────────── */
+.dashboard-root.light .ds-control,
+.dashboard-root.light .form-input,
+.dashboard-root.light .form-select,
+.dashboard-root.light .form-textarea,
+.dashboard-root.light .panel-form-input,
+.dashboard-root.light .panel-form-select,
+.dashboard-root.light .usuarios-select,
+.dashboard-root.light .usuarios-search,
+.dashboard-root.light .logistics-form input:not([type="checkbox"]):not([type="radio"]),
+.dashboard-root.light .logistics-form select,
+.dashboard-root.light .logistics-form textarea {
+  min-height: var(--control-height);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  font-size: var(--control-font-size);
+  font-weight: var(--font-weight-body);
+  line-height: 1.25;
+  color: var(--control-text);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-sans);
+}
+
+.dashboard-root.light .form-textarea,
+.dashboard-root.light .logistics-form textarea {
+  height: auto;
+  min-height: 96px;
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.dashboard-root.light .form-select,
+.dashboard-root.light .panel-form-select,
+.dashboard-root.light .usuarios-select,
+.dashboard-root.light .logistics-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.dashboard-root.light .ds-control:hover,
+.dashboard-root.light .form-input:hover,
+.dashboard-root.light .form-select:hover,
+.dashboard-root.light .panel-form-input:hover,
+.dashboard-root.light .panel-form-select:hover,
+.dashboard-root.light .usuarios-select:hover,
+.dashboard-root.light .logistics-form input:hover,
+.dashboard-root.light .logistics-form select:hover {
+  border-color: #9ca3af;
+}
+
+.dashboard-root.light .ds-control:focus,
+.dashboard-root.light .form-input:focus,
+.dashboard-root.light .form-select:focus,
+.dashboard-root.light .panel-form-input:focus,
+.dashboard-root.light .panel-form-select:focus,
+.dashboard-root.light .usuarios-select:focus,
+.dashboard-root.light .logistics-form input:focus,
+.dashboard-root.light .logistics-form select:focus,
+.dashboard-root.light .logistics-form textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--focus-ring);
+}
+
+.dashboard-root.light .form-input::placeholder,
+.dashboard-root.light .panel-form-input::placeholder,
+.dashboard-root.light .logistics-form input::placeholder,
+.dashboard-root.light .logistics-form textarea::placeholder {
+  color: var(--text-placeholder);
+}
+
+.dashboard-root.light .panel-form-select-wrap {
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
+}
+
+.dashboard-root.light .panel-form-select-wrap:hover {
+  border-color: #9ca3af;
+}
+
+.dashboard-root.light .panel-form-select-wrap:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--focus-ring);
+}
+
+.dashboard-root.light .panel-form-select-wrap .panel-form-select {
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+  color: var(--control-text);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+}
+
+/* ── Labels y valores (paneles laterales) ──────────────────── */
+.dashboard-root.light .form-label,
+.dashboard-root.light .panel-form-label,
+.dashboard-root.light .usuarios-label,
+.dashboard-root.light .logistics-form label,
+.dashboard-root.light .usuarios-dl dt {
+  color: var(--text-label);
+  font-weight: var(--font-weight-subtitle);
+  font-size: 0.75rem;
+}
+
+.dashboard-root.light .usuarios-dl dd,
+.dashboard-root.light .detalle-desc,
+.dashboard-root.light .kpi-value {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-body);
+}
+
+/* ── Botones unificados ────────────────────────────────────── */
+.dashboard-root.light .ds-btn-primary,
+.dashboard-root.light .btn-nueva-emergencia,
+.dashboard-root.light .logistics-btn--primary,
+.dashboard-root.light .usuarios-btn-primary,
+.dashboard-root.light .btn-guardar-estado {
+  background: var(--btn-primary-bg);
+  border: 1px solid var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-weight: var(--font-weight-title);
+  border-radius: var(--control-radius);
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard-root.light .ds-btn-primary:hover,
+.dashboard-root.light .btn-nueva-emergencia:hover,
+.dashboard-root.light .logistics-btn--primary:hover,
+.dashboard-root.light .usuarios-btn-primary:hover {
+  background: var(--btn-primary-bg-hover);
+  border-color: var(--btn-primary-bg-hover);
+}
+
+.dashboard-root.light .ds-btn-secondary,
+.dashboard-root.light .logistics-btn--secondary,
+.dashboard-root.light .usuarios-btn-secondary,
+.dashboard-root.light .btn-informe,
+.dashboard-root.light .btn-cancelar {
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--btn-secondary-border);
+  color: var(--btn-secondary-text);
+  font-weight: var(--font-weight-title);
+  border-radius: var(--control-radius);
+}
+
+.dashboard-root.light .ds-btn-secondary:hover,
+.dashboard-root.light .logistics-btn--secondary:hover,
+.dashboard-root.light .usuarios-btn-secondary:hover,
+.dashboard-root.light .btn-informe:hover,
+.dashboard-root.light .btn-cancelar:hover {
+  background: var(--btn-secondary-bg-hover);
+}
+
+/* ── Tablas ────────────────────────────────────────────────── */
+.dashboard-root.light .logistics-table th,
+.dashboard-root.light .usuarios-table th {
+  background: var(--surface-table-head);
+  color: var(--text-table-head);
+  font-weight: var(--font-weight-title);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.dashboard-root.light .logistics-table td,
+.dashboard-root.light .usuarios-table td {
+  color: var(--text-table-row);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-card);
+}
+
+.dashboard-root.light .logistics-table tr:hover td,
+.dashboard-root.light .usuarios-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.dashboard-root.light .usuarios-table__row--selected {
+  background: var(--nav-active-bg) !important;
+}
+
+.dashboard-root.light .usuarios-table__sub {
+  color: var(--text-tertiary);
+}
+
+/* ── Badges unificados ─────────────────────────────────────── */
+.dashboard-root.light .ds-badge,
+.dashboard-root.light .logistics-badge,
+.dashboard-root.light .usuarios-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-title);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: none;
+}
+
+.dashboard-root.light .ds-badge--alta,
+.dashboard-root.light .logistics-badge--alta,
+.dashboard-root.light .usuarios-badge--suspendido {
+  background: var(--state-alta-bg);
+  color: var(--state-alta-text);
+}
+
+.dashboard-root.light .ds-badge--media,
+.dashboard-root.light .logistics-badge--transito,
+.dashboard-root.light .logistics-badge--curso,
+.dashboard-root.light .logistics-badge--solicitada {
+  background: var(--state-media-bg);
+  color: var(--state-media-text);
+}
+
+.dashboard-root.light .logistics-badge--aprobada,
+.dashboard-root.light .logistics-badge--recibida,
+.dashboard-root.light .usuarios-badge--activo {
+  background: var(--state-baja-bg);
+  color: var(--state-baja-text);
+}
+
+.dashboard-root.light .logistics-progress-pct {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  min-width: 32px;
+}
+
+.dashboard-root.light .logistics-progress {
+  background: #e5e7eb;
+}
+
+.dashboard-root.light .logistics-quick-btn {
+  background: var(--nav-active-bg);
+  border-color: var(--border-card);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-subtitle);
+}
+
+.dashboard-root.light .logistics-quick-btn:hover {
+  background: var(--primitive-green-200);
+  border-color: var(--primitive-green-600);
+}
+
+.dashboard-root.light .logistics-empty {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.dashboard-root.light .logistics-mision-card__progress {
+  background: #e5e7eb;
+}
+
+.dashboard-root.light .logistics-alert__desc {
+  color: var(--text-secondary);
+}
+
+.dashboard-root.light .logistics-alert__time {
+  color: var(--text-tertiary);
+}
+
+.dashboard-root.light .logistics-matching-item {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-root.light .usuarios-badge--inactivo {
+  background: var(--surface-table-head);
+  color: var(--text-table-head);
+}
+
+.dashboard-root.light .usuarios-role-pill {
+  background: var(--state-media-bg);
+  color: var(--state-media-text);
+  border: none;
+}
+
+/* ── Paneles laterales / detalle ───────────────────────────── */
+.dashboard-root.light .usuarios-detail {
+  padding: var(--space-4);
+}
+
+.dashboard-root.light .usuarios-section {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-card);
+}
+
+.dashboard-root.light .usuarios-section h3 {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-title);
+  font-size: 0.8125rem;
+  margin-bottom: var(--space-3);
+}
+
+.dashboard-root.light .panel-derecho {
+  background: var(--surface-page);
+  border-left: 1px solid var(--border-default);
+}
+
+.dashboard-root.light .panel-section-title {
+  color: var(--text-label);
+  font-weight: var(--font-weight-title);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dashboard-root.light .panel-divider {
+  background: var(--border-card);
+  margin: var(--space-3) 0;
+}
+
+/* ── Tipografía jerárquica ─────────────────────────────────── */
+.dashboard-root.light .header-title,
+.dashboard-root.light .logistics-page-title,
+.dashboard-root.light .usuarios-panel__title {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-title);
+}
+
+.dashboard-root.light .header-subtitle,
+.dashboard-root.light .section-label,
+.dashboard-root.light .kpi-label,
+.dashboard-root.light .logistics-kpi-card__label,
+.dashboard-root.light .usuarios-hint {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-subtitle);
+}
+
+.dashboard-root.light .emergencia-region,
+.dashboard-root.light .emergencia-fecha,
+.dashboard-root.light .detalle-region {
+  color: var(--text-tertiary);
+}
+
+/* ── KPI / métricas ────────────────────────────────────────── */
+.dashboard-root.light .logistics-kpi-card__value,
+.dashboard-root.light .kpi-value {
+  color: var(--text-heading);
+  font-weight: 700;
+}
+
+.dashboard-root.light .logistics-kpi-card__icon--orange {
+  background: var(--state-media-bg);
+  color: var(--state-media-text);
+}
+
+.dashboard-root.light .logistics-kpi-card__icon--green {
+  background: var(--state-baja-bg);
+  color: var(--state-baja-text);
+}
+
+.dashboard-root.light .logistics-kpi-card__icon--blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ── Tabs usuarios (segmented control) ─────────────────────── */
+.dashboard-root.light .usuarios-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  margin-bottom: var(--space-5);
+  background: var(--surface-sidebar);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-root.light .usuarios-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-subtitle);
+  background: transparent;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.dashboard-root.light .usuarios-tab:hover {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .usuarios-tab--active {
+  background: var(--surface-card);
+  border-color: var(--primitive-green-200);
+  color: var(--nav-active-text);
+  font-weight: var(--font-weight-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-root.light .usuarios-refresh {
+  flex: 0 0 auto;
+  margin-left: var(--space-2);
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+}
+
+.dashboard-root.light .usuarios-refresh:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .usuarios-header-pill {
+  background: var(--nav-active-bg);
+  border: 1px solid var(--primitive-green-200);
+  color: var(--nav-active-text);
+}
+
+/* ── Gestión usuarios: detalle lateral ─────────────────────── */
+.dashboard-root.light .usuarios-detail.usuarios-panel {
+  padding: var(--space-4);
+  background: linear-gradient(180deg, #f4f8f4 0%, var(--surface-card) 96px);
+  border-left: 3px solid var(--primitive-green-600);
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-root.light .usuarios-grid .usuarios-panel:not(.usuarios-detail) {
+  background: var(--surface-card);
+}
+
+.dashboard-root.light .usuarios-dl > div {
+  padding: var(--space-3);
+  background: var(--surface-sidebar);
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+}
+
+.dashboard-root.light .usuarios-dl dt {
+  color: var(--text-label);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dashboard-root.light .usuarios-dl dd {
+  color: var(--text-heading);
+  font-weight: var(--font-weight-subtitle);
+  font-size: 0.875rem;
+}
+
+.dashboard-root.light .usuarios-section {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  padding-top: var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  border-top: 1px solid var(--border-card);
+}
+
+.dashboard-root.light .usuarios-section h3 {
+  color: var(--text-heading);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-title);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-card);
+}
+
+.dashboard-root.light .usuarios-form-row {
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.dashboard-root.light .usuarios-form-row .usuarios-select:not(.usuarios-select--rol-picker) {
+  flex: 1;
+}
+
+.dashboard-root.light .usuarios-select--rol-picker {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dashboard-root.light .usuarios-form-row .usuarios-btn-primary,
+.dashboard-root.light .usuarios-form-row .usuarios-btn-secondary {
+  flex-shrink: 0;
+  min-height: var(--control-height);
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dashboard-root.light .usuarios-perm-pill {
+  background: var(--nav-active-bg);
+  border: 1px solid var(--primitive-green-200);
+  color: var(--nav-active-text);
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.dashboard-root.light .usuarios-role-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-root.light .usuarios-role-card:hover {
+  border-color: var(--primitive-green-200);
+  background: #f8fcf8;
+}
+
+.dashboard-root.light .usuarios-role-card--active {
+  border-color: var(--primitive-green-600);
+  background: var(--nav-active-bg);
+  box-shadow: 0 0 0 1px rgba(46, 125, 50, 0.15);
+}
+
+.dashboard-root.light .usuarios-role-card__name {
+  color: var(--text-heading);
+}
+
+.dashboard-root.light .usuarios-role-card__desc {
+  color: var(--text-secondary);
+}
+
+.dashboard-root.light .usuarios-role-card__count {
+  color: var(--primitive-green-600);
+}
+
+.dashboard-root.light .usuarios-modulo__title {
+  color: var(--primitive-green-800);
+}
+
+.dashboard-root.light .usuarios-perm-label {
+  color: var(--text-primary);
+}
+
+.dashboard-root.light .usuarios-perm-label small {
+  color: var(--text-tertiary);
+}
+
+.dashboard-root.light .usuarios-btn-ghost {
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+}
+
+.dashboard-root.light .usuarios-btn-ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* ── Emergencias: columnas y contexto de color ─────────────── */
+.dashboard-root.light .dashboard-header {
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-root.light .emergencias-list {
+  background: var(--surface-emergencias-list);
+  border-right-color: var(--border-default);
+}
+
+.dashboard-root.light .emergencias-scroll {
+  padding: var(--space-3);
+}
+
+.dashboard-root.light .section-label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-title);
+}
+
+.dashboard-root.light .header-select {
+  min-height: var(--control-height);
+  height: var(--control-height);
+}
+
+.dashboard-root.light .panel-form-select-wrap,
+.dashboard-root.light .panel-derecho-nuevo .form-group > .panel-form-select {
+  min-height: var(--control-height);
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  box-shadow: var(--shadow-card);
+}
+
+.dashboard-root.light .panel-form-label {
+  color: var(--text-label);
+  font-weight: var(--font-weight-subtitle);
+  margin-bottom: var(--space-1);
+}
+
+.dashboard-root.light .form-zone-btn--active,
+.dashboard-root.light .form-zone-btn.active {
+  background: var(--nav-active-bg);
+  border-color: var(--primitive-green-600);
+  color: var(--nav-active-text);
+}
+
+.dashboard-root.light .form-zone-btn:not(.form-zone-btn--active):not(.active) {
+  border-color: var(--border-default);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+}
+
+/* ── Alertas de error accesibles ───────────────────────────── */
+.dashboard-root.light .usuarios-alert--error {
+  background: var(--state-alta-bg);
+  border: 1px solid #fecaca;
+  color: var(--state-alta-text);
+}

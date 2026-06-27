@@ -1,92 +1,51 @@
 import apiClient from './apiClient';
+import type {
+  AssignRoleRequest,
+  ChangeStatusRequest,
+  UsuarioResponse,
+} from '@/types/identity';
 
-export interface AssignRoleRequest {
-  rolId: string;
-}
+export type { AssignRoleRequest, ChangeStatusRequest, UsuarioResponse };
 
-export interface ChangeStatusRequest {
-  estado: 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO';
-}
+export const getUsuarioById = async (id: string): Promise<UsuarioResponse> => {
+  const res = await apiClient.get<UsuarioResponse>(`/usuarios/${id}`);
+  return res.data;
+};
 
-export interface RequestRoleRequest {
-  rolId: string;
-  justificacion: string;
-}
+export const getMyProfile = async (): Promise<UsuarioResponse> => {
+  const res = await apiClient.get<UsuarioResponse>('/usuarios/yo');
+  return res.data;
+};
 
-export interface ResolveRoleRequest {
-  estado: 'APROBADA' | 'RECHAZADA';
-}
+export const getUsuarioByFirebaseUid = async (firebaseUid: string): Promise<UsuarioResponse> => {
+  const res = await apiClient.get<UsuarioResponse>(`/usuarios/firebase/${firebaseUid}`);
+  return res.data;
+};
 
+export const getAllUsers = async (): Promise<UsuarioResponse[]> => {
+  const res = await apiClient.get<UsuarioResponse[]>('/usuarios');
+  return res.data;
+};
+
+export const assignRoleToUser = async (userId: string, data: AssignRoleRequest): Promise<void> => {
+  await apiClient.post(`/usuarios/${userId}/roles`, data);
+};
+
+export const removeRoleFromUser = async (userId: string, rolId: string): Promise<void> => {
+  await apiClient.delete(`/usuarios/${userId}/roles/${rolId}`);
+};
+
+export const changeUserStatus = async (userId: string, data: ChangeStatusRequest): Promise<void> => {
+  await apiClient.patch(`/usuarios/${userId}/estado`, data);
+};
+
+/** @deprecated Usar funciones nombradas; mantiene compatibilidad con sidebar/login. */
 export const UsuarioService = {
-  // 6. Obtener Perfil Usuario (por ID)
-  getProfileById: async (id: string, token: string) => {
-    const response = await apiClient.get(`/usuarios/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 7. Obtener Mi Perfil
-  getMyProfile: async (token: string) => {
-    const response = await apiClient.get('/usuarios/yo', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 8. Obtener Perfil por Firebase UID
-  getProfileByFirebaseUid: async (firebaseUid: string, token: string) => {
-    const response = await apiClient.get(`/usuarios/firebase/${firebaseUid}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 9. Obtener Todos los Usuarios
-  getAllUsers: async (token: string) => {
-    const response = await apiClient.get('/usuarios', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 10. Asignar Rol a Usuario
-  assignRole: async (id: string, data: AssignRoleRequest, token: string) => {
-    const response = await apiClient.post(`/usuarios/${id}/roles`, data, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 11. Quitar Rol de Usuario
-  removeRole: async (id: string, rolId: string, token: string) => {
-    const response = await apiClient.delete(`/usuarios/${id}/roles/${rolId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 12. Cambiar Estado de Usuario
-  changeStatus: async (id: string, data: ChangeStatusRequest, token: string) => {
-    const response = await apiClient.patch(`/usuarios/${id}/estado`, data, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 13. Solicitar Rol
-  requestRole: async (data: RequestRoleRequest, token: string) => {
-    const response = await apiClient.post('/usuarios/solicitudes-rol', data, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  },
-
-  // 14. Resolver Solicitud de Rol
-  resolveRoleRequest: async (id: string, data: ResolveRoleRequest, token: string) => {
-    const response = await apiClient.patch(`/usuarios/solicitudes-rol/${id}`, data, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data;
-  }
+  getProfileById: (id: string, _token: string) => getUsuarioById(id),
+  getMyProfile: (_token: string) => getMyProfile(),
+  getProfileByFirebaseUid: (firebaseUid: string, _token: string) => getUsuarioByFirebaseUid(firebaseUid),
+  getAllUsers: (_token: string) => getAllUsers(),
+  assignRole: (id: string, data: AssignRoleRequest, _token: string) => assignRoleToUser(id, data),
+  removeRole: (id: string, rolId: string, _token: string) => removeRoleFromUser(id, rolId),
+  changeStatus: (id: string, data: ChangeStatusRequest, _token: string) => changeUserStatus(id, data),
 };

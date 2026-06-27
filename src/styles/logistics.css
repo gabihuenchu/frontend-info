@@ -54,7 +54,12 @@
 }
 
 .dark .logistics-kpi-card__label { color: var(--dark-text-muted); font-size: 0.75rem; }
-.light .logistics-kpi-card__label { color: var(--light-text-muted); font-size: 0.75rem; }
+.light .logistics-kpi-card__label { color: var(--text-tertiary); font-size: 0.75rem; }
+
+.light .logistics-kpi-card__icon--blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
 
 .logistics-kpi-card__trend { font-size: 0.7rem; margin-top: 0.25rem; }
 .logistics-kpi-card__trend--up,
@@ -321,4 +326,279 @@
   border-color: var(--dark-border);
 }
 
-.dark .logistics-empty { padding: 2rem; text-align: center; color: var(--dark-text-muted); font-size: 0.875rem; }
+.dark .logistics-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+}
+
+.logistics-form--wide {
+  max-width: none;
+}
+
+.logistics-hint {
+  font-size: 0.75rem;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.dark .logistics-hint { color: var(--dark-text-muted); }
+.light .logistics-hint { color: var(--light-text-muted); }
+
+.logistics-hint--page {
+  margin-bottom: 1.25rem;
+  max-width: 720px;
+}
+
+.logistics-hint code {
+  font-size: 0.7rem;
+}
+
+.logistics-hint--error {
+  color: #f87171;
+}
+
+.logistics-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: #60a5fa;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.logistics-divider {
+  border: none;
+  border-top: 1px solid var(--dark-border, rgba(255, 255, 255, 0.08));
+  margin: 1.25rem 0;
+}
+
+.logistics-btn--sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+}
+
+.logistics-table__row--clickable {
+  cursor: pointer;
+}
+
+.logistics-table__row--selected td {
+  background: rgba(139, 154, 70, 0.12);
+}
+
+.logistics-combobox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.logistics-combobox__label {
+  font-size: 0.8rem;
+}
+
+.dark .logistics-combobox__label { color: var(--dark-text-muted); }
+
+.logistics-combobox__control {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--dark-border-input, rgba(255, 255, 255, 0.12));
+  background: var(--dark-bg-input, rgba(0, 0, 0, 0.2));
+  padding: 0 0.5rem;
+}
+
+.logistics-combobox__control--open {
+  border-color: var(--green-brand-border, rgba(139, 154, 70, 0.45));
+}
+
+.logistics-combobox__icon {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.logistics-combobox__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.55rem 0.25rem;
+  font-size: 0.85rem;
+  color: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.logistics-combobox__toggle {
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  display: flex;
+  padding: 0.25rem;
+}
+
+.logistics-combobox__hint {
+  font-size: 0.7rem;
+  margin: 0;
+  opacity: 0.75;
+}
+
+.logistics-combobox__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--dark-border);
+  background: var(--dark-bg-card, #1a1a14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.logistics-combobox__option {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.logistics-combobox__option:hover,
+.logistics-combobox__option--active {
+  background: rgba(139, 154, 70, 0.14);
+}
+
+.logistics-combobox__option-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.logistics-combobox__option-meta {
+  font-size: 0.68rem;
+  opacity: 0.7;
+}
+
+.logistics-combobox__empty {
+  padding: 0.65rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.logistics-recepcion-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logistics-recepcion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--dark-border, rgba(255, 255, 255, 0.08));
+  font-size: 0.78rem;
+}
+
+/* ── Desplegable del combobox: fondo blanco clásico (legible sobre tema oscuro) ── */
+.logistics-combobox__list {
+  background: #ffffff;
+  border-color: #d7d7cf;
+  color: #1f2937;
+}
+.logistics-combobox__option {
+  color: #1f2937;
+}
+.logistics-combobox__option-meta {
+  color: #4b5563;
+  opacity: 1;
+}
+.logistics-combobox__option:hover,
+.logistics-combobox__option--active {
+  background: rgba(139, 154, 70, 0.18);
+}
+.logistics-combobox__group-wrap {
+  list-style: none;
+}
+.logistics-combobox__group {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #0d9488;
+  padding: 0.45rem 0.6rem 0.2rem;
+}
+.logistics-combobox__empty {
+  color: #4b5563;
+  opacity: 1;
+}
+
+/* Popups de <select> nativos del dashboard de logística con fondo blanco */
+.logistics-form select option,
+.logistics-form select optgroup,
+.logistics-panel select option,
+.logistics-panel select optgroup {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* ── Botón de borrado (eliminar centro) ── */
+.logistics-btn--danger {
+  background: #b91c1c;
+  border: 1px solid #b91c1c;
+  color: #ffffff;
+}
+.logistics-btn--danger:hover {
+  background: #991b1b;
+}
+
+/* ── Grupos colapsables de centros por emergencia (dashboard de centros) ── */
+.centros-grupo__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--dark-border, rgba(255, 255, 255, 0.1));
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.centros-grupo__head:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+/* Tarjetas dentro de los grupos con fondo blanco clásico */
+.centros-grupo .centro-grid-card {
+  background-color: #ffffff;
+  border-color: #d7d7cf;
+  color: #1f2937;
+}
+.centros-grupo .centro-grid-card p {
+  color: #4b5563;
+  opacity: 1;
+}
+
+/* Modo claro: ver design-system-light.css */

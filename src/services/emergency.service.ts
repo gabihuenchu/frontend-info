@@ -293,6 +293,54 @@ export function mapTipoUiABackend(tipoUi: string): TipoEmergenciaApi {
   return m[tipoUi] ?? 'INCENDIO';
 }
 
+/** Etiqueta legible del tipo de emergencia (clave = valor API). */
+export const ETIQUETA_TIPO_EMERGENCIA: Record<TipoEmergenciaUi, string> = {
+  TERREMOTO: 'Terremoto',
+  TSUNAMI: 'Tsunami',
+  INCENDIO: 'Incendio',
+  INUNDACION: 'Inundación',
+  ERUPCION: 'Erupción',
+  ALUVION: 'Aluvión',
+};
+
+/** Primeros 8 caracteres del UUID, usados como "código" corto legible. */
+export function idCorto(id: string | null | undefined): string {
+  return id ? id.slice(0, 8) : '';
+}
+
+/** Etiqueta legible de una emergencia: "Incendio · Biobío (#a1b2c3d4)". */
+export function etiquetaEmergencia(
+  e: Pick<Emergencia, 'id' | 'tipo' | 'region'> | null | undefined
+): string {
+  if (!e) return '';
+  const tipo = ETIQUETA_TIPO_EMERGENCIA[e.tipo as TipoEmergenciaUi] ?? e.tipo ?? 'Emergencia';
+  const region = e.region ? ` · ${e.region}` : '';
+  return `${tipo}${region} (#${idCorto(e.id)})`;
+}
+
+/** Busca una emergencia por id dentro de una lista. */
+export function resolverEmergencia(
+  emergenciaId: string | null | undefined,
+  lista: Emergencia[] | undefined
+): Emergencia | null {
+  if (!emergenciaId || !lista) return null;
+  return lista.find((e) => e.id === emergenciaId) ?? null;
+}
+
+/**
+ * Etiqueta de la emergencia asociada a un id. Si no está en la lista (p. ej. no activa)
+ * devuelve un código corto; si no hay id devuelve null.
+ */
+export function etiquetaEmergenciaPorId(
+  emergenciaId: string | null | undefined,
+  lista: Emergencia[] | undefined
+): string | null {
+  const emergencia = resolverEmergencia(emergenciaId, lista);
+  if (emergencia) return etiquetaEmergencia(emergencia);
+  if (emergenciaId) return `Emergencia #${idCorto(emergenciaId)}`;
+  return null;
+}
+
 function severidadApiAUi(s: SeveridadEmergenciaApi): NivelSeveridad {
   if (s === 'CATASTROFICA') return 'CRITICA';
   return s as NivelSeveridad;
@@ -415,15 +463,14 @@ export const deleteEmergencia = async (id: string): Promise<void> => {
 };
 
 // ─── Centros de acopio ────────────────────────────────────────────────────────
-// El MS de recursos no está integrado en el gateway aún; no llamar a /centros-acopio por defecto.
-// Para reactivar el cliente cuando exista el servicio: NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true
+// Gateway: GET /centros-acopio → ms-resources /centros (ruta pública en el gateway).
+// Desactivar solo si el MS no está levantado: NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false
 
 export function isCentrosAcopioApiEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO === 'true';
+  return process.env.NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO !== 'false';
 }
 
 export const getCentrosAcopio = async (): Promise<CentroAcopio[]> => {
-  if (!isCentrosAcopioApiEnabled()) return [];
   return fetchCentrosPaginados('/centros-acopio');
 };
 
@@ -432,7 +479,6 @@ export const getCentrosCercanos = async (
   lng: number,
   radioKm = 20
 ): Promise<CentroAcopio[]> => {
-  if (!isCentrosAcopioApiEnabled()) return [];
   return fetchCentrosPaginados('/centros-acopio/cercanos', {
     lat,
     lng,
@@ -442,7 +488,7 @@ export const getCentrosCercanos = async (
 
 function rejectCentrosDeshabilitados(): never {
   throw new Error(
-    'El módulo de centros de acopio no está disponible. Cuando el microservicio esté listo, define NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=true.'
+    'El módulo de centros de acopio está desactivado en el frontend (NEXT_PUBLIC_ENABLE_CENTROS_ACOPIO=false).'
   );
 }
 

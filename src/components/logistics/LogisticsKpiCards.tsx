@@ -12,7 +12,7 @@ export default function LogisticsKpiCards({ kpis }: LogisticsKpiCardsProps) {
     {
       label: 'Transferencias en curso',
       value: kpis.transferenciasEnCurso,
-      trend: `↑ ${kpis.transferenciasDelta} desde ayer`,
+      trend: kpis.transferenciasDelta ? `↑ ${kpis.transferenciasDelta} desde ayer` : 'Datos en vivo',
       trendClass: 'logistics-kpi-card__trend--up',
       icon: <ArrowLeftRight size={20} />,
       iconClass: 'logistics-kpi-card__icon--orange',
@@ -20,7 +20,7 @@ export default function LogisticsKpiCards({ kpis }: LogisticsKpiCardsProps) {
     {
       label: 'Misiones activas',
       value: kpis.misionesActivas,
-      trend: `↑ ${kpis.misionesDelta} desde ayer`,
+      trend: kpis.misionesDelta ? `↑ ${kpis.misionesDelta} desde ayer` : 'Datos en vivo',
       trendClass: 'logistics-kpi-card__trend--up',
       icon: <Target size={20} />,
       iconClass: 'logistics-kpi-card__icon--blue',
@@ -36,7 +36,7 @@ export default function LogisticsKpiCards({ kpis }: LogisticsKpiCardsProps) {
     {
       label: 'Centros de acopio operativos',
       value: kpis.centrosOperativos,
-      trend: `↑ ${kpis.centrosDelta} desde ayer`,
+      trend: kpis.centrosDelta ? `↑ ${kpis.centrosDelta} desde ayer` : 'Desde transferencias/misiones',
       trendClass: 'logistics-kpi-card__trend--up',
       icon: <Warehouse size={20} />,
       iconClass: 'logistics-kpi-card__icon--orange',

@@ -78,3 +78,39 @@ NEXT_PUBLIC_FIREBASE_APP_ID=tu_app_id
 npm run build
 npm start
 ```
+
+## AWS / DevOps (rama `aws`)
+
+| Recurso | Nombre |
+|---------|--------|
+| Repositorio GitHub | [gabihuenchu/frontend-info](https://github.com/gabihuenchu/frontend-info) |
+| Rama de despliegue | `aws` |
+| Imagen ECR | `catastrofescl/frontend-info:latest` |
+| Puerto contenedor | `3000` |
+| Workflow | `.github/workflows/docker-aws.yml` |
+
+### Secrets en GitHub Actions
+
+**AWS (laboratorio Vocareum):**
+
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_SESSION_TOKEN`
+- `AWS_REGION` (ej. `us-east-1`)
+
+**Build del frontend** (se incrustan en el bundle en tiempo de build):
+
+- `NEXT_PUBLIC_API_URL` — URL del API Gateway en AWS (ej. `http://IP_ALB:8080`)
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (opcional)
+
+Crear repositorio ECR:
+
+```bash
+aws ecr create-repository --repository-name catastrofescl/frontend-info
+```

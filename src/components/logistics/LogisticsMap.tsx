@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import MapThemeToggle from '@/components/maps/MapThemeToggle';
 import { useDashboardTheme } from '@/providers/DashboardThemeProvider';
-import { useCatastrofesGoogleMaps, getGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
+import { useCatastrofesGoogleMaps, useGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
 import { googleMapDarkStyles } from '@/lib/mapStyles';
 import { puntosMapaDesdeRutas } from '@/services/logistics.service';
 import type { RutaVoluntarioResponse } from '@/types/logistics';
@@ -25,7 +25,7 @@ interface LogisticsMapProps {
 export default function LogisticsMap({ rutas = [] }: LogisticsMapProps) {
   const { dark: appDark } = useDashboardTheme();
   const [mapDark, setMapDark] = useState(appDark);
-  const apiKey = getGoogleMapsApiKey();
+  const apiKey = useGoogleMapsApiKey();
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
 
   const puntos = useMemo(() => puntosMapaDesdeRutas(rutas), [rutas]);

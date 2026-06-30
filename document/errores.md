@@ -33,6 +33,15 @@
 
 ## Errores Resueltos
 
+### [ERR-FRONT-002] Google Maps no carga en Fargate — "Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" / `NoApiKeys`
+- **Fecha:** 2026-06-30
+- **Microservicio/Módulo:** frontend-info (mapas: emergencias, centros, logística)
+- **Severidad:** 🟡 Medio
+- **Estado:** Resuelto
+- **Descripción:** En el despliegue de AWS Fargate, todos los mapas mostraban el aviso "Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY en el entorno para habilitar el mapa y el dibujo de zonas" y la consola registraba `Google Maps JavaScript API warning: NoApiKeys`.
+- **Causa raíz:** `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` es una variable `NEXT_PUBLIC_*` que Next.js inlinea en **tiempo de build**. La imagen del frontend se construyó sin pasar ese `--build-arg`, por lo que la clave quedó vacía en el bundle; definirla como variable de la task (runtime) no tenía efecto porque los componentes la leían solo de `process.env.NEXT_PUBLIC_*`.
+- **Solución aplicada:** Se expone la clave en runtime vía `/api/config-publica` y un nuevo hook `useGoogleMapsApiKey()` que la carga cuando no está horneada en build. La task solo necesita la variable de runtime `GOOGLE_MAPS_API_KEY`. Ver `arreglos-y-cambios.md` #ARR-018 y `devOps/solucion_frontend.md` §8.
+
 ### [ERR-006] Error 500 en `/auth/firebase/sync` por dependencia de Redis en entorno local
 - **Fecha:** 2026-05-04
 - **Microservicio/Módulo:** ms-identity

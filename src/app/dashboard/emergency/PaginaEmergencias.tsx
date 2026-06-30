@@ -26,6 +26,7 @@ import {
   useUpdateAnuncio,
 } from "@/hooks/useEmergencies";
 import { useCentrosDetalle, useCrearCentro } from "@/hooks/useResources";
+import { useGoogleMapsApiKey } from "@/hooks/useGoogleMaps";
 import type { CentroDetalle, EstadoCentro } from "@/types/resources";
 import type {
   Emergencia,
@@ -1020,6 +1021,7 @@ type BorradorLatLng = { lat: number; lng: number };
 
 export default function PaginaEmergencias() {
   const { dark, theme } = useDashboardTheme();
+  const googleMapsApiKey = useGoogleMapsApiKey();
   const [emergenciaSeleccionada, setEmergenciaSeleccionada] = useState<Emergencia | null>(null);
   const [panelVista, setPanelVista] = useState<VistaPanel>("detalles");
   const [editData, setEditData] = useState<{ tipo: string; nivel: string; nombre: string } | undefined>();
@@ -1555,7 +1557,7 @@ export default function PaginaEmergencias() {
           {/* MAPA */}
           <div className="mapa-container">
             <EmergencyMapGoogle
-              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""}
+              apiKey={googleMapsApiKey}
               defaultMapDark={dark}
               emergencias={emergenciasFiltradas}
               geoJson={geoJson}

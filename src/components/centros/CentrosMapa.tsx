@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import MapThemeToggle from '@/components/maps/MapThemeToggle';
 import { useDashboardTheme } from '@/providers/DashboardThemeProvider';
-import { useCatastrofesGoogleMaps, getGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
+import { useCatastrofesGoogleMaps, useGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
 import { googleMapDarkStyles } from '@/lib/mapStyles';
 import type { CentroDetalle, EstadoCentro } from '@/types/resources';
 
@@ -26,7 +26,7 @@ interface CentrosMapaProps {
 export default function CentrosMapa({ centros, selectedId, onSelect }: CentrosMapaProps) {
   const { dark } = useDashboardTheme();
   const [mapDark, setMapDark] = useState(dark);
-  const apiKey = getGoogleMapsApiKey();
+  const apiKey = useGoogleMapsApiKey();
   const { isLoaded, loadError } = useCatastrofesGoogleMaps(apiKey);
 
   const conCoords = useMemo(

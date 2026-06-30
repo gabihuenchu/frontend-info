@@ -20,6 +20,15 @@
 
 ## Cambios Aplicados
 
+### [ARR-018] Carga en runtime de la clave de Google Maps (sin reconstruir la imagen)
+- **Fecha:** 2026-06-30
+- **Autor:** Alfonso González / Cursor
+- **Tipo:** Bugfix | Config
+- **Error relacionado:** ERR-FRONT-002
+- **Descripción del cambio:** Los mapas mostraban "Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY..." y el warning `NoApiKeys` en el despliegue de Fargate, porque la clave es una variable `NEXT_PUBLIC_*` que Next.js hornea en build y la imagen se construyó sin ese build-arg. Se replicó el patrón de Firebase: el endpoint `/api/config-publica` (evaluado en runtime) ahora también devuelve `googleMapsApiKey` leído de `GOOGLE_MAPS_API_KEY`; se creó el hook `useGoogleMapsApiKey()` que prioriza la clave de build y, si está vacía, la obtiene en runtime (con caché compartida). Los componentes de mapa pasaron a usar ese hook. Así la clave se inyecta como variable de entorno del contenedor sin reconstruir la imagen.
+- **Archivos afectados:** `src/app/api/config-publica/route.ts`, `src/hooks/useGoogleMaps.ts`, `src/components/centros/CentrosMapa.tsx`, `src/components/logistics/LogisticsMap.tsx`, `src/components/centros/CrearCentroDialog.tsx`, `src/app/dashboard/emergency/PaginaEmergencias.tsx`; doc: `devOps/solucion_frontend.md` (§8), `devOps/ECS TASK.md`, `devOps/plan-accion-aws-laboratorio (1).md`.
+- **Tests actualizados:** N/A
+
 ### [DEC-018] Adopción de Vitest + React Testing Library para tests unitarios de frontend-info
 - **Fecha:** 2026-06-22
 - **Autor:** Alfonso González / Cursor

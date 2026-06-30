@@ -5,7 +5,7 @@ import { GoogleMap, Marker } from '@react-google-maps/api';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { useCrearCentro } from '@/hooks/useResources';
-import { useCatastrofesGoogleMaps, getGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
+import { useCatastrofesGoogleMaps, useGoogleMapsApiKey } from '@/hooks/useGoogleMaps';
 import { googleMapDarkStyles } from '@/lib/mapStyles';
 import { useDashboardTheme } from '@/providers/DashboardThemeProvider';
 import { formatApiError } from '@/lib/api-errors';
@@ -21,7 +21,7 @@ interface CrearCentroDialogProps {
 
 export default function CrearCentroDialog({ onClose, onCreado }: CrearCentroDialogProps) {
   const { dark } = useDashboardTheme();
-  const apiKey = getGoogleMapsApiKey();
+  const apiKey = useGoogleMapsApiKey();
   const { isLoaded } = useCatastrofesGoogleMaps(apiKey);
   const crear = useCrearCentro();
 

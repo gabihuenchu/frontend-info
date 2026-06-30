@@ -4,6 +4,29 @@
 
 ---
 
+### [2026-06-30] Clave de Google Maps configurable en runtime (despliegue Fargate)
+**Integrante(s):** Alfonso González / Cursor  
+**Fase trabajada:** Fase 9 — QA + hardening + despliegue
+
+#### Completado
+- Se resolvió el aviso "Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" / warning `NoApiKeys` en todos los mapas del despliegue de AWS Fargate (ver `errores.md` [ERR-FRONT-002]).
+- El endpoint `/api/config-publica` ahora expone también `googleMapsApiKey`, leído en runtime de `GOOGLE_MAPS_API_KEY` (con respaldo a las `NEXT_PUBLIC_*`).
+- Nuevo hook `useGoogleMapsApiKey()` en `src/hooks/useGoogleMaps.ts`: prioriza la clave horneada en build y, si está vacía, la obtiene en runtime con caché compartida.
+- Migrados los componentes de mapa a `useGoogleMapsApiKey()`: `CentrosMapa`, `LogisticsMap`, `CrearCentroDialog` y `PaginaEmergencias` (prop `apiKey` de `EmergencyMapGoogle`).
+- Documentación actualizada: `devOps/solucion_frontend.md` (§8), `devOps/ECS TASK.md` (contenedor `frontend` con `GOOGLE_MAPS_API_KEY`) y `devOps/plan-accion-aws-laboratorio (1).md`. Registro en `arreglos-y-cambios.md` [ARR-018].
+
+#### En progreso
+- Ninguno.
+
+#### Bloqueadores
+- Ninguno.
+
+#### Próximos pasos
+- Reconstruir y subir la imagen del frontend **una vez** (incluye endpoint y hook nuevos) y añadir `GOOGLE_MAPS_API_KEY` al `environment` del contenedor `frontend`, luego relanzar la task.
+- Verificar en `GET /api/config-publica` que `googleMapsApiKey` no venga vacío y que los mapas carguen.
+
+---
+
 ### [2026-06-22] Suite de tests unitarios para frontend-info (Vitest + RTL)
 **Integrante(s):** Alfonso González / Cursor  
 **Fase trabajada:** Fase 8 — Frontend Completo (testing)

@@ -21,7 +21,7 @@ export async function listarTransferencias(): Promise<TransferenciaResponse[]> {
   const res = await apiClient.get<TransferenciaResponse[]>('/transferencias');
   return res.data;
 }
-//EXPORTA
+//EXPORt
 export async function crearTransferencia(
   data: CrearTransferenciaRequest
 ): Promise<TransferenciaResponse> {

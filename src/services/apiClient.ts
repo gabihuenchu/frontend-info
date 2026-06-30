@@ -2,8 +2,10 @@ import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import { getFirebaseAuthClient } from './firebaseClient';
 
-// El frontend debe consumir siempre el API Gateway; este enruta al MS Identity.
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// El frontend usa el proxy de Next.js (/api/*) para que el navegador
+// nunca necesite saber la IP del servidor. El proxy (next.config.js) redirige
+// /api/* → http://localhost:8080/* (API Gateway) server-side.
+const BASE_URL = '/api';
 
 /** Evita spam en consola cuando un MS opcional no está levantado en local. */
 const loggedUnavailableEndpoints = new Set<string>();

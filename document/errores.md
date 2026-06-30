@@ -80,6 +80,16 @@
 - **Causa raíz:** Incompatibilidad entre el tipo de columna en PostgreSQL y el mapeo esperado por Hibernate en `usuarios.pais` (`bpchar/CHAR(2)` en BD vs `VARCHAR(2)` esperado en validación).
 - **Solución aplicada:** Ajuste del tipo de columna en BD para alinear esquema y entidad (`ALTER TABLE usuarios ALTER COLUMN pais TYPE VARCHAR(2) USING TRIM(pais);` + default `CL`).
 
+
+### [ERR-007] Formateo de RUT aplicado incorrectamente a Pasaporte y DNI en Registro
+- **Fecha:** 2026-06-23
+- **Microservicio/Módulo:** frontend-info
+- **Severidad:** 🟡 Medio
+- **Estado:** Resuelto
+- **Descripción:** Cuando un usuario seleccionaba "PASAPORTE" o "DNI" en el formulario de registro, el campo de número de documento seguía forzando la máscara y validación de RUT (`xx.xxx.xxx-x`), eliminando letras y caracteres válidos e impidiendo el registro.
+- **Causa raíz:** La función `onChange` del input llamaba incondicionalmente a `formatRut` independientemente del `docType` seleccionado, y no se limpiaba el campo al cambiar de tipo.
+- **Solución aplicada:** Se condicionó el formateo al tipo "RUT" y se limpió el input al cambiar de tipo de documento. Ver `arreglos-y-cambios.md` #ARR-018.
+
 ---
 
 ## Plantilla Rápida

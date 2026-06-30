@@ -14,7 +14,7 @@ import { getFirebaseAuthClient } from './firebaseClient';
  * que en flujos de registro pueden dejar inconsistencias difíciles de depurar.
  */
 const registerHttp = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

@@ -203,7 +203,10 @@ export default function RegisterPage() {
                 <select
                   className="login-select"
                   value={docType}
-                  onChange={(e) => setDocType(e.target.value)}
+                  onChange={(e) => {
+                    setDocType(e.target.value);
+                    setDocNumber('');
+                  }}
                 >
                   <option value="RUT">RUT</option>
                   <option value="PASAPORTE">PAS</option>
@@ -216,7 +219,10 @@ export default function RegisterPage() {
                   className="login-document-input"
                   type="text"
                   value={docNumber}
-                  onChange={(e) => setDocNumber(formatRut(e.target.value))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDocNumber(docType === 'RUT' ? formatRut(val) : val);
+                  }}
                   placeholder="Número de documento"
                   autoComplete="off"
                   style={{ background: '#00000059', color: '#ffffff' }}

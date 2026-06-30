@@ -20,6 +20,15 @@
 
 ## Cambios Aplicados
 
+### [ARR-018] Corrección de máscara en formulario de registro para Pasaportes/DNI
+- **Fecha:** 2026-06-23
+- **Autor:** Camilo / Claude
+- **Tipo:** Bugfix
+- **Error relacionado:** ERR-007
+- **Descripción del cambio:** El input de número de documento aplicaba incondicionalmente la máscara de RUT chileno (`xx.xxx.xxx-x`) mediante `formatRut`. Se condicionó la aplicación de la máscara solo cuando `tipoDocumento === 'RUT'`, permitiendo ingresar libremente caracteres alfanuméricos para Pasaportes y DNIs. Adicionalmente, el campo se vacía al cambiar el tipo de documento para evitar que persistan residuos de formateos previos.
+- **Archivos afectados:** `frontend-info/src/app/register/page.tsx`
+- **Tests actualizados:** N/A
+
 ### [ARR-017] Menú lateral definitivo del dashboard (estructura por módulos)
 - **Fecha:** 2026-06-04
 - **Autor:** Camilo / Claude

@@ -19,7 +19,7 @@ RUN npm install
 COPY . .
 
 # Variables públicas (build-time) — valores por defecto seguros para local
-ARG NEXT_PUBLIC_API_URL=http://localhost:8080
+ARG NEXT_PUBLIC_API_URL=
 ARG NEXT_PUBLIC_FIREBASE_API_KEY=
 ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID=

@@ -15,7 +15,7 @@ export function formatApiError(error: unknown): string {
           : '';
       return (
         'No se pudo conectar con el servidor. Verifica que el API Gateway esté activo ' +
-        `(NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}).` +
+        `(destino: ${process.env.NEXT_PUBLIC_API_URL || '/api → API_GATEWAY_INTERNAL_URL'}).` +
         originHint
       );
     }

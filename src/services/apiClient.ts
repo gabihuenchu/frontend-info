@@ -3,7 +3,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirebaseAuthClient } from './firebaseClient';
 
 // El frontend debe consumir siempre el API Gateway; este enruta al MS Identity.
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Por defecto usamos la ruta relativa '/api': el navegador llama al MISMO origen
+// (sin CORS ni problema de loopback) y el proxy de Next (next.config.js → rewrites)
+// reenvía a ${API_GATEWAY_INTERNAL_URL} en runtime. Así la imagen funciona en
+// cualquier IP/host sin reconstruir. NEXT_PUBLIC_API_URL sigue teniendo prioridad
+// si se desea apuntar directamente a un gateway.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 /** Evita spam en consola cuando un MS opcional no está levantado en local. */
 const loggedUnavailableEndpoints = new Set<string>();

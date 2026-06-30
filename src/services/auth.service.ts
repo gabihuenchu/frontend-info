@@ -6,7 +6,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { getFirebaseAuthClient } from './firebaseClient';
+import { getFirebaseAuthClient, inicializarFirebaseRuntime } from './firebaseClient';
 
 /**
  * Cliente HTTP sin interceptors para POST /auth/register.
@@ -14,7 +14,9 @@ import { getFirebaseAuthClient } from './firebaseClient';
  * que en flujos de registro pueden dejar inconsistencias difíciles de depurar.
  */
 const registerHttp = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+  // Ruta relativa '/api' por defecto: mismo origen (sin CORS) y el proxy de Next
+  // reenvía al gateway por API_GATEWAY_INTERNAL_URL en runtime.
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -115,6 +117,7 @@ export const AuthService = {
 
   /** @deprecated Usar register() que llama POST /auth/register; se mantiene por compatibilidad */
   registerLegacyClientFirebase: async (data: RegisterRequest): Promise<RegisterResponse> => {
+    await inicializarFirebaseRuntime();
     const auth = getFirebaseAuthClient();
     if (!auth) {
       throw new Error('Firebase Auth no está configurado. Revisa las variables NEXT_PUBLIC_FIREBASE_* en .env.local.');
@@ -207,6 +210,7 @@ export const AuthService = {
 
   // 6. Login real con Firebase Auth + validación del perfil contra el Gateway.
   login: async (email: string, password: string): Promise<LoginResponse> => {
+    await inicializarFirebaseRuntime();
     const auth = getFirebaseAuthClient();
     if (!auth) {
       throw new Error('Firebase Auth no está configurado. Revisa las variables NEXT_PUBLIC_FIREBASE_* en .env.local.');

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { getFirebaseAuthClient } from '@/services/firebaseClient';
+import { getFirebaseAuthClient, inicializarFirebaseRuntime } from '@/services/firebaseClient';
 
 interface AuthContextType {
   user: User | null;
@@ -30,23 +30,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [authEnabled, setAuthEnabled] = useState(false);
 
   useEffect(() => {
-    const auth = getFirebaseAuthClient();
-    
-    if (!auth) {
-      console.warn('Firebase Auth no disponible. Continuando sin autenticación.');
-      setAuthEnabled(false);
-      setLoading(false);
-      return;
-    }
+    let unsubscribe: (() => void) | undefined;
+    let cancelado = false;
 
-    setAuthEnabled(true);
-    
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
+    (async () => {
+      // Carga la config de Firebase en runtime si no se horneó en build.
+      await inicializarFirebaseRuntime();
+      if (cancelado) return;
 
-    return () => unsubscribe();
+      const auth = getFirebaseAuthClient();
+
+      if (!auth) {
+        console.warn('Firebase Auth no disponible. Continuando sin autenticación.');
+        setAuthEnabled(false);
+        setLoading(false);
+        return;
+      }
+
+      setAuthEnabled(true);
+
+      unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
+    })();
+
+    return () => {
+      cancelado = true;
+      unsubscribe?.();
+    };
   }, []);
 
   const value: AuthContextType = {
